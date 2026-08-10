@@ -3,6 +3,7 @@ import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { tradeTerms, getTermByCode } from "@/data/trade-terms";
+import { settlementConcepts } from "@/data/settlement-concepts";
 
 export async function generateStaticParams() {
   return tradeTerms.map((t) => ({ code: t.code.toLowerCase() }));
@@ -19,6 +20,11 @@ export default async function TermDetailPage({
 
   const relatedTerms = tradeTerms.filter(
     (t) => t.category === term.category && t.code !== term.code
+  );
+
+  // Cross-module: find settlement concepts linked to this Incoterm
+  const relatedSettlement = settlementConcepts.filter((sc) =>
+    sc.relatedIncotermCodes.includes(term.code)
   );
 
   return (
@@ -275,6 +281,40 @@ export default async function TermDetailPage({
             </div>
           )}
         </div>
+
+        {/* Settlement cross-module links */}
+        {relatedSettlement.length > 0 && (
+          <div>
+            <h2
+              className="text-sm font-semibold pb-3 border-b"
+              style={{ borderColor: "var(--color-border)" }}
+            >
+              国际结算关联
+            </h2>
+            <p
+              className="mt-3 text-xs"
+              style={{ color: "var(--color-text-muted)" }}
+            >
+              实务中与本术语常搭配使用的结算方式：
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {relatedSettlement.map((sc) => (
+                <Link
+                  key={sc.id}
+                  href={`/settlement/${sc.id}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-md hover:bg-gray-50 transition-colors"
+                  style={{ borderColor: "var(--color-border)" }}
+                >
+                  <span>{sc.icon}</span>
+                  <span className="font-medium">{sc.title}</span>
+                  <span style={{ color: "var(--color-text-muted)" }}>
+                    {sc.englishTitle}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ═══ 操作区 ═══ */}
         <div

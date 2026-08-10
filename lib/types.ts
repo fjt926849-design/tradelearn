@@ -117,9 +117,165 @@ export interface TermProgress {
   interval: number;       // 当前间隔 (ms, 0 = 未设置)
 }
 
-/** 闪卡学习总进度 */
+/** 闪卡学习总进度（Incoterms 专用，向后兼容） */
 export interface FlashcardProgress {
   terms: Record<string, TermProgress>;
+}
+
+/** 通用概念进度存储（可复用至任何知识模块） */
+export interface ConceptProgressMap {
+  terms: Record<string, TermProgress>;
+}
+
+export const defaultConceptProgress: ConceptProgressMap = { terms: {} };
+
+/* ═══════════════════════════ 统一知识模块 ═══════════════════════════ */
+
+export type ModuleId =
+  | "incoterms"
+  | "settlement"
+  | "transport"
+  | "insurance"
+  | "documents"
+  | "customs"
+  | "contract";
+
+export const MODULE_LABELS: Record<ModuleId, string> = {
+  incoterms: "贸易术语",
+  settlement: "国际结算",
+  transport: "国际运输",
+  insurance: "货运保险",
+  documents: "进出口单据",
+  customs: "报关与检验",
+  contract: "合同条款",
+};
+
+export const MODULE_ICONS: Record<ModuleId, string> = {
+  incoterms: "📋",
+  settlement: "💳",
+  transport: "🚢",
+  insurance: "🛡️",
+  documents: "📄",
+  customs: "🏛️",
+  contract: "📝",
+};
+
+export const MODULE_ROUTES: Record<ModuleId, string> = {
+  incoterms: "/terms",
+  settlement: "/settlement",
+  transport: "/transport",
+  insurance: "/insurance",
+  documents: "/documents",
+  customs: "/customs",
+  contract: "/contract",
+};
+
+/** 统一概念对比 */
+export interface ConceptComparison {
+  conceptId: string;
+  title: string;
+  differences: string[];
+}
+
+/* ═══════════════════════════ 国际结算 ═══════════════════════════ */
+
+export type SettlementCategory = "payment-method" | "document" | "basics" | "trade-finance" | "lc-detail";
+
+export interface SettlementProcessStep {
+  order: number;
+  actor: "exporter" | "importer" | "exporter-bank" | "importer-bank" | "carrier";
+  actorLabel: string;
+  action: string;
+  documents?: string[];
+}
+
+export interface SettlementParty {
+  role: string;
+  englishRole: string;
+  who: "exporter-side" | "importer-side" | "bank";
+  description: string;
+}
+
+export interface SettlementConcept {
+  id: string;
+  module: ModuleId;
+  title: string;
+  englishTitle: string;
+  category: string;
+  icon: string;
+  summary: string;
+  description: string;
+  keyFeatures: string[];
+  processSteps?: SettlementProcessStep[];
+  parties?: SettlementParty[];
+  commonMisunderstandings: string[];
+  comparisons: ConceptComparison[];
+  relatedIncotermCodes: string[];
+  relatedConceptIds: string[];
+}
+
+/* ═══════════════════════════ 通用知识概念 ═══════════════════════════ */
+
+/** 非 Incoterms / Settlement 的其他模块使用此通用类型 */
+export interface KnowledgeConcept {
+  id: string;
+  module: ModuleId;
+  title: string;
+  englishTitle: string;
+  category: string;
+  icon: string;
+  summary: string;
+  description: string;
+  keyFeatures: string[];
+  commonMisunderstandings: string[];
+  comparisons: ConceptComparison[];
+  relatedConceptIds: string[];
+  relatedIncotermCodes: string[];
+}
+
+/* ═══════════════════════════ 通用场景题 ═══════════════════════════ */
+
+export interface GenericScenarioOption {
+  id: string;
+  label: string;
+}
+
+export interface GenericScenarioQuestion {
+  id: string;
+  module: ModuleId;
+  scenario: string;
+  question: string;
+  options: GenericScenarioOption[];
+  correctIndex: number;
+  explanation: string;
+  knowledgePoints: string[];
+  commonMistake: string;
+  relatedConceptIds: string[];
+}
+
+/* ═══════════════════════════ 综合实战 ═══════════════════════════ */
+
+export interface ComprehensiveStep {
+  id: string;
+  step: number;
+  title: string;
+  description: string;
+  module: ModuleId;
+  options: GenericScenarioOption[];
+  correctIndex: number;
+  explanation: string;
+}
+
+export interface ComprehensiveResult {
+  steps: {
+    stepId: string;
+    selectedIndex: number;
+    isCorrect: boolean;
+  }[];
+  score: number;
+  total: number;
+  weakModules: ModuleId[];
+  recommendations: string[];
 }
 
 /* ═══════════════════════════ 场景实战 ═══════════════════════════ */

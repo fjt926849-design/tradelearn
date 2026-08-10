@@ -1,0 +1,322 @@
+"use client";
+
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { scenarioQuestions } from "@/data/scenario-questions";
+import { usePracticeProgress } from "@/hooks/usePracticeProgress";
+import PracticeResults from "@/components/practice/PracticeResults";
+
+type Phase = "intro" | "question" | "results";
+
+interface AnswerRecord {
+  questionId: string;
+  selectedIndex: number;
+  isCorrect: boolean;
+}
+
+export default function PracticeDeck() {
+  const router = useRouter();
+  const { submitAttempt, completeSession } = usePracticeProgress();
+
+  const [phase, setPhase] = useState<Phase>("intro");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [answers, setAnswers] = useState<AnswerRecord[]>([]);
+
+  const total = scenarioQuestions.length;
+  const question = scenarioQuestions[currentIndex];
+  const isCorrect = selectedOption === question.correctIndex;
+
+  const handleSelect = useCallback((idx: number) => {
+    if (!submitted) setSelectedOption(idx);
+  }, [submitted]);
+
+  const handleSubmit = useCallback(() => {
+    if (selectedOption === null) return;
+    const correct = selectedOption === question.correctIndex;
+    submitAttempt(question.id, selectedOption, correct);
+    setAnswers((prev) => [
+      ...prev,
+      { questionId: question.id, selectedIndex: selectedOption, isCorrect: correct },
+    ]);
+    setSubmitted(true);
+  }, [selectedOption, question, submitAttempt]);
+
+  const handleNext = useCallback(() => {
+    if (currentIndex + 1 >= total) {
+      // Complete session — answers already includes all responses (added by handleSubmit)
+      const finalScore = answers.filter((a) => a.isCorrect).length;
+      const mistakeCodes = answers
+        .filter((a) => !a.isCorrect)
+        .map((a) => {
+          const q = scenarioQuestions.find((x) => x.id === a.questionId)!;
+          return q.relatedTermCodes;
+        })
+        .flat();
+      completeSession(finalScore, total, mistakeCodes);
+      setPhase("results");
+    } else {
+      setSelectedOption(null);
+      setSubmitted(false);
+      setCurrentIndex((p) => p + 1);
+    }
+  }, [currentIndex, total, answers, completeSession]);
+
+  const score = answers.filter((a) => a.isCorrect).length;
+
+  // ─── Intro ───
+  if (phase === "intro") {
+    return (
+      <>
+        <h1 className="text-xl font-semibold mb-8">场景实战</h1>
+        <div className="text-center py-12 space-y-6">
+          <p className="text-3xl">📋</p>
+          <div className="space-y-2">
+            <h2 className="text-lg font-semibold">Incoterms 2020 场景判断</h2>
+            <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+              共 {total} 道题 · 预计 10-15 分钟
+            </p>
+          </div>
+          <div
+            className="max-w-sm mx-auto text-left border rounded-lg p-5 space-y-3"
+            style={{ borderColor: "var(--color-border)" }}
+          >
+            <p className="text-sm font-medium">你将练习：</p>
+            <ul className="text-sm space-y-1.5" style={{ color: "var(--color-text-secondary)" }}>
+              <li>· 根据外贸场景选择正确的贸易术语</li>
+              <li>· 判断风险转移、费用承担、报关责任</li>
+              <li>· 区分容易混淆的术语组合</li>
+            </ul>
+            <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+              每题做出选择后会立即显示解释，帮助你理解为什么对或错。
+            </p>
+          </div>
+          <button
+            onClick={() => setPhase("question")}
+            className="inline-flex items-center px-6 py-3 text-sm font-medium rounded-md border transition-colors hover:bg-gray-50"
+            style={{
+              color: "var(--color-text)",
+              borderColor: "var(--color-text)",
+            }}
+          >
+            开始练习 →
+          </button>
+        </div>
+      </>
+    );
+  }
+
+  // ─── Results ───
+  if (phase === "results") {
+    return (
+      <>
+        <h1 className="text-xl font-semibold mb-8">场景实战</h1>
+        <PracticeResults
+          score={score}
+          total={total}
+          answers={answers}
+          onRedo={() => {
+            setAnswers([]);
+            setSelectedOption(null);
+            setSubmitted(false);
+            setCurrentIndex(0);
+            setPhase("intro");
+          }}
+          onGoHome={() => router.push("/")}
+        />
+      </>
+    );
+  }
+
+  // ─── Question ───
+  return (
+    <>
+      <h1 className="text-xl font-semibold mb-8">场景实战</h1>
+
+      <div className="space-y-6">
+        {/* Progress */}
+        <div className="flex items-center justify-between text-sm">
+          <span style={{ color: "var(--color-text-muted)" }}>
+            第 {currentIndex + 1} / {total} 题
+          </span>
+          <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+            已答对 {score} 题
+          </span>
+        </div>
+
+        {/* Progress bar */}
+        <div
+          className="h-1 rounded-full w-full"
+          style={{ background: "var(--color-border-light)" }}
+        >
+          <div
+            className="h-full rounded-full transition-all"
+            style={{
+              width: `${((currentIndex + 1) / total) * 100}%`,
+              background: "var(--color-text)",
+            }}
+          />
+        </div>
+
+        {/* Scenario */}
+        <div
+          className="border rounded-lg p-4"
+          style={{
+            borderColor: "var(--color-border)",
+            background: "var(--color-bg)",
+          }}
+        >
+          <span className="text-xs font-medium" style={{ color: "var(--color-text-muted)" }}>
+            场景
+          </span>
+          <p className="mt-2 text-sm leading-relaxed">{question.scenario}</p>
+        </div>
+
+        {/* Question */}
+        <p className="text-sm font-medium leading-relaxed">{question.question}</p>
+
+        {/* Options */}
+        <div className="space-y-2">
+          {question.options.map((opt, idx) => {
+            const isSelected = selectedOption === idx;
+            let borderColor = "var(--color-border)";
+            let bg = "transparent";
+
+            if (submitted) {
+              if (idx === question.correctIndex) {
+                borderColor = "var(--color-status-mastered)";
+                bg = "#f0faf0";
+              } else if (isSelected && !isCorrect) {
+                borderColor = "var(--color-status-learning)";
+                bg = "#fef5f5";
+              }
+            } else if (isSelected) {
+              borderColor = "var(--color-text)";
+            }
+
+            return (
+              <button
+                key={opt.code}
+                onClick={() => handleSelect(idx)}
+                disabled={submitted}
+                className="w-full text-left px-4 py-3 rounded-lg border transition-colors"
+                style={{
+                  borderColor,
+                  background: bg,
+                  cursor: submitted ? "default" : "pointer",
+                  opacity: submitted && idx !== question.correctIndex && !isSelected ? 0.6 : 1,
+                }}
+              >
+                <span className="text-sm font-medium">{opt.label}</span>
+                {submitted && idx === question.correctIndex && (
+                  <span
+                    className="ml-2 text-xs"
+                    style={{ color: "var(--color-status-mastered)" }}
+                  >
+                    ✓ 正确
+                  </span>
+                )}
+                {submitted && isSelected && !isCorrect && (
+                  <span
+                    className="ml-2 text-xs"
+                    style={{ color: "var(--color-status-learning)" }}
+                  >
+                    ✗ 你的选择
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Submit button */}
+        {!submitted && (
+          <button
+            onClick={handleSubmit}
+            disabled={selectedOption === null}
+            className="w-full py-2.5 text-sm font-medium rounded-md border transition-colors disabled:opacity-30"
+            style={{
+              color: selectedOption !== null ? "var(--color-text)" : "var(--color-text-muted)",
+              borderColor: selectedOption !== null ? "var(--color-text)" : "var(--color-border)",
+            }}
+          >
+            提交答案
+          </button>
+        )}
+
+        {/* Feedback after submit */}
+        {submitted && (
+          <div className="space-y-4">
+            {/* Result banner */}
+            <div
+              className="border rounded-lg p-4"
+              style={{
+                borderColor: isCorrect ? "var(--color-status-mastered)" : "var(--color-status-learning)",
+              }}
+            >
+              <p
+                className="text-sm font-semibold"
+                style={{
+                  color: isCorrect ? "var(--color-status-mastered)" : "var(--color-status-learning)",
+                }}
+              >
+                {isCorrect ? "✅ 回答正确！" : "❌ 回答错误"}
+              </p>
+              <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+                {question.explanation}
+              </p>
+            </div>
+
+            {/* Knowledge points */}
+            <div
+              className="border rounded-lg p-4"
+              style={{ borderColor: "var(--color-border)" }}
+            >
+              <span className="text-xs font-medium" style={{ color: "var(--color-text-muted)" }}>
+                知识点
+              </span>
+              <ul className="mt-2 space-y-1">
+                {question.knowledgePoints.map((kp, i) => (
+                  <li
+                    key={i}
+                    className="flex gap-2 text-sm"
+                    style={{ color: "var(--color-text-secondary)" }}
+                  >
+                    <span className="shrink-0">·</span>
+                    <span>{kp}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Common mistake */}
+            <div
+              className="border-l-2 pl-4 py-1"
+              style={{ borderColor: "var(--color-status-learning)" }}
+            >
+              <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
+                <span className="font-medium" style={{ color: "var(--color-status-learning)" }}>
+                  易错提醒：
+                </span>
+                {question.commonMistake}
+              </p>
+            </div>
+
+            {/* Next button */}
+            <button
+              onClick={handleNext}
+              className="w-full py-2.5 text-sm font-medium rounded-md border transition-colors hover:bg-gray-50"
+              style={{
+                color: "var(--color-text)",
+                borderColor: "var(--color-text)",
+              }}
+            >
+              {currentIndex + 1 >= total ? "查看结果 →" : "下一题 →"}
+            </button>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}

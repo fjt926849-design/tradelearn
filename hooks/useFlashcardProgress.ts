@@ -11,7 +11,7 @@ const STORAGE_KEY = "tradelearn-flashcard-progress";
  * 保持旧 API 名称不变以向后兼容。
  */
 export function useFlashcardProgress() {
-  const engine = useConceptProgress(STORAGE_KEY);
+  const engine = useConceptProgress(STORAGE_KEY, "incoterms");
 
   const getTermProgress = useCallback(
     (termCode: string): TermProgress => engine.getProgress(termCode),

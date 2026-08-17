@@ -5,5 +5,5 @@ import { useConceptProgress } from "@/hooks/useConceptProgress";
 const STORAGE_KEY = "tradelearn-contract-progress";
 
 export function useContractProgress() {
-  return useConceptProgress(STORAGE_KEY);
+  return useConceptProgress(STORAGE_KEY, "contract");
 }

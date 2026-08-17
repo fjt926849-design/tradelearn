@@ -13,6 +13,20 @@ type CardProgressRow = {
   interval_ms: number;
 };
 
+function describeSyncError(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "object" && error !== null) {
+    const value = error as Record<string, unknown>;
+    return JSON.stringify({
+      message: value.message,
+      details: value.details,
+      hint: value.hint,
+      code: value.code,
+    });
+  }
+  return String(error);
+}
+
 function toCardProgressRow(
   userId: string,
   moduleId: string,
@@ -60,7 +74,7 @@ export async function syncCardProgress(
       });
     if (error) throw error;
   } catch (e) {
-    console.warn("[supabase] card_progress sync failed", e);
+    console.warn("[supabase] card_progress sync failed", describeSyncError(e));
   }
 }
 
@@ -84,7 +98,10 @@ export async function syncStoredCardProgress(
     );
     if (error) throw error;
   } catch (e) {
-    console.warn("[supabase] stored card progress migration failed", e);
+    console.warn(
+      "[supabase] stored card progress migration failed",
+      describeSyncError(e)
+    );
   }
 }
 

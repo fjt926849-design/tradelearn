@@ -230,7 +230,6 @@ export default function ComprehensivePracticePage() {
         <main className="flex-1 max-w-2xl mx-auto px-5 py-10">
           <h1 className="text-xl font-semibold mb-8">综合实战</h1>
           <div className="text-center py-12 space-y-6">
-            <p className="text-4xl">🌍</p>
             <div className="space-y-2">
               <h2 className="text-lg font-semibold">模拟完整外贸业务全流程</h2>
               <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
@@ -291,9 +290,9 @@ export default function ComprehensivePracticePage() {
               <p className="text-4xl font-bold">{score} / {STEPS.length}</p>
               <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
                 正确率 {pct}%
-                {pct >= 80 ? " 🎉 优秀！你对国际贸易全流程有扎实的理解。" :
-                 pct >= 50 ? " 👍 不错！但在一些环节还需要加强。" :
-                 " 📚 需要系统性地补充各模块知识。"}
+                {pct >= 80 ? " · 优秀！你对国际贸易全流程有扎实的理解。" :
+                 pct >= 50 ? " · 不错！但在一些环节还需要加强。" :
+                 " · 需要系统性地补充各模块知识。"}
               </p>
             </div>
 
@@ -310,7 +309,7 @@ export default function ComprehensivePracticePage() {
                       className="flex items-center gap-3 px-4 py-3 border rounded-lg"
                       style={{ borderColor: correct ? "var(--color-status-mastered)" : "var(--color-status-learning)" }}
                     >
-                      <span className="text-lg shrink-0">{correct ? "✅" : "❌"}</span>
+                      <span className="text-lg shrink-0">{correct ? "✓" : "✗"}</span>
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium">步骤{s.step}：{s.title}</p>
                         <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{s.moduleLabel}</p>
@@ -358,7 +357,7 @@ export default function ComprehensivePracticePage() {
                     className="block text-sm py-2 px-4 border rounded-md hover:bg-gray-50 transition-colors"
                     style={{ borderColor: "var(--color-border)" }}
                   >
-                    🃏 去闪卡复习薄弱知识
+                    去闪卡复习薄弱知识
                   </Link>
                 )}
                 <Link
@@ -366,14 +365,14 @@ export default function ComprehensivePracticePage() {
                   className="block text-sm py-2 px-4 border rounded-md hover:bg-gray-50 transition-colors"
                   style={{ borderColor: "var(--color-border)" }}
                 >
-                  📋 回到场景实战选择其他模块
+                  回到场景实战选择其他模块
                 </Link>
                 <button
                   onClick={handleRestart}
                   className="w-full text-left text-sm py-2 px-4 border rounded-md hover:bg-gray-50 transition-colors"
                   style={{ borderColor: "var(--color-border)" }}
                 >
-                  🔄 重新开始综合实战
+                  重新开始综合实战
                 </button>
               </div>
             </div>
@@ -493,7 +492,7 @@ export default function ComprehensivePracticePage() {
                 style={{ borderColor: isCorrect ? "var(--color-status-mastered)" : "var(--color-status-learning)" }}
               >
                 <p className="text-sm font-semibold" style={{ color: isCorrect ? "var(--color-status-mastered)" : "var(--color-status-learning)" }}>
-                  {isCorrect ? "✅ 判断正确！" : "❌ 判断有偏差"}
+                  {isCorrect ? "✓ 判断正确！" : "✗ 判断有偏差"}
                 </p>
                 <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
                   {step.explanation}

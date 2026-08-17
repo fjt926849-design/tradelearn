@@ -15,12 +15,14 @@ import { insuranceConcepts } from "@/data/insurance-concepts";
 import { documentsConcepts } from "@/data/documents-concepts";
 import { customsConcepts } from "@/data/customs-concepts";
 import { contractConcepts } from "@/data/contract-concepts";
+import { MODULE_CHAPTERS } from "@/lib/types";
 import type { ModuleId, LearnStatus } from "@/lib/types";
 
 export interface ModuleStats {
   moduleId: ModuleId;
   label: string;
-  icon: string;
+  no: string; // 章节编号 "01"
+  en: string; // 英文标识 "TERMS"
   route: string;
   total: number;
   mastered: number;
@@ -46,56 +48,48 @@ export interface AggregatedStats {
 const MODULE_CONFIG: {
   id: ModuleId;
   label: string;
-  icon: string;
   route: string;
   allIds: string[];
 }[] = [
   {
     id: "incoterms",
     label: "贸易术语",
-    icon: "📋",
     route: "/terms",
     allIds: tradeTerms.map((t) => t.code),
   },
   {
     id: "settlement",
     label: "国际结算",
-    icon: "💳",
     route: "/settlement",
     allIds: settlementConcepts.map((c) => c.id),
   },
   {
     id: "transport",
     label: "国际运输",
-    icon: "🚢",
     route: "/transport",
     allIds: transportConcepts.map((c) => c.id),
   },
   {
     id: "insurance",
     label: "货运保险",
-    icon: "🛡️",
     route: "/insurance",
     allIds: insuranceConcepts.map((c) => c.id),
   },
   {
     id: "documents",
     label: "进出口单据",
-    icon: "📄",
     route: "/documents",
     allIds: documentsConcepts.map((c) => c.id),
   },
   {
     id: "customs",
     label: "报关与检验",
-    icon: "🏛️",
     route: "/customs",
     allIds: customsConcepts.map((c) => c.id),
   },
   {
     id: "contract",
     label: "合同条款",
-    icon: "📝",
     route: "/contract",
     allIds: contractConcepts.map((c) => c.id),
   },
@@ -203,7 +197,8 @@ export function useProgressAggregator() {
       return {
         moduleId: cfg.id,
         label: cfg.label,
-        icon: cfg.icon,
+        no: MODULE_CHAPTERS[cfg.id].no,
+        en: MODULE_CHAPTERS[cfg.id].en,
         route: cfg.route,
         total,
         mastered,

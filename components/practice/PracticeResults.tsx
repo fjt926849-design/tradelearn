@@ -64,7 +64,6 @@ export default function PracticeResults({
     <div className="text-center space-y-8">
       {/* Header */}
       <div className="space-y-2">
-        <p className="text-3xl">{accuracy >= 80 ? "🎉" : accuracy >= 60 ? "👍" : "💪"}</p>
         <h2 className="text-xl font-semibold">实战完成</h2>
         <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
           共 {total} 题 · 正确 {score} 题 · 正确率 {accuracy}%
@@ -153,7 +152,6 @@ export default function PracticeResults({
                 className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center gap-2">
-                  {term && <span>{term.icon}</span>}
                   <span className="text-sm font-medium">{termCode}</span>
                   {term && (
                     <span className="text-sm" style={{ color: "var(--color-text-muted)" }}>
@@ -177,7 +175,7 @@ export default function PracticeResults({
           style={{ borderColor: "var(--color-border)" }}
         >
           <p className="text-sm font-medium" style={{ color: "var(--color-status-mastered)" }}>
-            🎉 全部正确！
+            全部正确！
           </p>
           <p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>
             你对Incoterms 2020的理解非常扎实，继续保持。

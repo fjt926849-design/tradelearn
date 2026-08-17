@@ -8,7 +8,6 @@ export const contractConcepts: KnowledgeConcept[] = [
     title: "合同概述",
     englishTitle: "Contract Overview",
     category: "basics",
-    icon: "📝",
     summary:
       "国际货物买卖合同是整笔交易的法律基石——从品名、数量到价格条款，从交货条件到违约救济，合同把买卖双方的口头约定变成具有约束力的书面规则。",
     description:
@@ -37,7 +36,6 @@ export const contractConcepts: KnowledgeConcept[] = [
     title: "贸易术语与交付条款",
     englishTitle: "Delivery & Incoterms Clause",
     category: "core-clause",
-    icon: "📋",
     summary:
       "合同中的交付条款通过引用Incoterms来定义价格构成、风险转移和费用分配——正确引用（如「FOB Shanghai, Incoterms 2020」）可以有效避免95%以上的交付争议。",
     description:
@@ -66,7 +64,6 @@ export const contractConcepts: KnowledgeConcept[] = [
     title: "品名与品质条款",
     englishTitle: "Description & Quality Clause",
     category: "core-clause",
-    icon: "🏷️",
     summary:
       "合同中的品名和品质条款决定了「买卖的到底是什么东西」——描述模糊或标准不明是国际贸易中频率最高的争议来源之一。",
     description:
@@ -95,7 +92,6 @@ export const contractConcepts: KnowledgeConcept[] = [
     title: "数量条款",
     englishTitle: "Quantity Clause",
     category: "core-clause",
-    icon: "🔢",
     summary:
       "合同中数量的约定不仅是一个数字——它涉及计量单位（件、套、吨、立方米）、机动幅度（溢短装条款）和数量与价格的联动，精确才能防止到港后为「少了/多了」扯皮。",
     description:
@@ -133,7 +129,6 @@ export const contractConcepts: KnowledgeConcept[] = [
     title: "价格条款",
     englishTitle: "Price Clause",
     category: "core-clause",
-    icon: "💰",
     summary:
       "价格条款规定了币种、单价、总价和价格基础的完整信息——「USD 12.50 / pc FOB Shanghai」这样的完整格式让一个短字符串承载了三个维度的商业信息。",
     description:
@@ -162,7 +157,6 @@ export const contractConcepts: KnowledgeConcept[] = [
     title: "支付条款",
     englishTitle: "Payment Clause",
     category: "core-clause",
-    icon: "💳",
     summary:
       "支付条款是合同中最直接影响双方现金流和信用风险的条款——T/T预付、L/C、D/P还是O/A？各有利弊，关键在于根据双方信任水平和市场惯例选择合适的支付方式和时间安排。",
     description:
@@ -191,7 +185,6 @@ export const contractConcepts: KnowledgeConcept[] = [
     title: "包装条款",
     englishTitle: "Packing Clause",
     category: "core-clause",
-    icon: "📦",
     summary:
       "包装条款不只管纸箱长什么样子——它决定货物能否完好无损地抵达万里之外的买方手中。包装要求不写清楚 = 货损风险全由卖方承担。",
     description:
@@ -220,7 +213,6 @@ export const contractConcepts: KnowledgeConcept[] = [
     title: "检验条款",
     englishTitle: "Inspection Clause",
     category: "core-clause",
-    icon: "🔍",
     summary:
       "检验条款规定了谁有权检验货物、在什么时间和地点检验、以什么标准判断合格——它是买方确认货物符合合同约定的制度保障，也是卖方防止买方无理拒收的防护盾。",
     description:
@@ -249,7 +241,6 @@ export const contractConcepts: KnowledgeConcept[] = [
     title: "装运条款",
     englishTitle: "Shipment Clause",
     category: "core-clause",
-    icon: "🚢",
     summary:
       "装运条款规定了货物的装运时间、装运港/目的港、分批装运和转运安排——装运延迟是外贸中最常见的违约行为之一，明确约定可以防止「磨洋工」和「甩柜」带来的损失。",
     description:
@@ -278,7 +269,6 @@ export const contractConcepts: KnowledgeConcept[] = [
     title: "不可抗力条款",
     englishTitle: "Force Majeure Clause",
     category: "risk-clause",
-    icon: "🌪️",
     summary:
       "疫情封控、港口罢工、运河堵塞、极端气候……当合同无法履行是「老天爷」或「第三方行为」造成的时，不可抗力条款决定了谁承担由此产生的损失——不对等约定可能让你吞下完全不受自己控制的灾难性代价。",
     description:
@@ -307,7 +297,6 @@ export const contractConcepts: KnowledgeConcept[] = [
     title: "违约与救济",
     englishTitle: "Breach & Remedies",
     category: "risk-clause",
-    icon: "⚖️",
     summary:
       "任何合同都可能出问题——当卖方延迟交货、货物品质不符或买方不付款时，违约救济条款决定了受损害方可以要求什么补偿。提前约定违约金和救济方式，胜于出事后无休止的谈判和诉讼。",
     description:
@@ -345,7 +334,6 @@ export const contractConcepts: KnowledgeConcept[] = [
     title: "争议解决条款",
     englishTitle: "Dispute Resolution Clause",
     category: "risk-clause",
-    icon: "🏛️",
     summary:
       "当所有其他条款都「失效」时——争议解决条款决定了在哪个国家、用哪种语言、按哪套规则来解决纠纷。一个好的争议解决条款能把潜在的「全球追诉噩梦」变成可预期的有序裁判程序。",
     description:
@@ -383,7 +371,6 @@ export const contractConcepts: KnowledgeConcept[] = [
     title: "所有权转移",
     englishTitle: "Title Transfer",
     category: "risk-clause",
-    icon: "🔑",
     summary:
       "Incoterms规定的是风险转移（Risk Transfer），不是所有权转移（Title Transfer）——货物的风险可能已在装船时转给了买方，但所有权（Title）可能仍在卖方手中，直到买方付清全款。这两个概念的分离对保护卖方至关重要。",
     description:
@@ -412,7 +399,6 @@ export const contractConcepts: KnowledgeConcept[] = [
     title: "知识产权条款",
     englishTitle: "IP & Confidentiality Clause",
     category: "risk-clause",
-    icon: "🔒",
     summary:
       "OEM代工中，买方提供的设计图纸和品牌商标属于买方的知识产权——卖方未经许可不得使用、复制或转售。同时，卖方也需要保护自己的生产技术和定价信息不被泄露。",
     description:
@@ -441,7 +427,6 @@ export const contractConcepts: KnowledgeConcept[] = [
     title: "合同的成立与修改",
     englishTitle: "Contract Formation & Amendment",
     category: "basics",
-    icon: "✍️",
     summary:
       "合同什么时候「成立」了——是双方签了章？还是邮件中回复了「OK confirmed」？清楚知道合同成立的标志和后续修改的正确方式，可以避免「我以为合同还没签」而对方认为「你已经同意了」。",
     description:

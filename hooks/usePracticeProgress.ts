@@ -7,6 +7,10 @@ import type {
   PracticeAttempt,
   PracticeSession,
 } from "@/lib/types";
+import {
+  syncPracticeAttempt,
+  syncPracticeSession,
+} from "@/lib/supabase/progressSync";
 
 const STORAGE_KEY = "tradelearn-practice-progress";
 
@@ -40,14 +44,14 @@ export function usePracticeProgress() {
       selectedIndex: number,
       isCorrect: boolean
     ) => {
+      const attempt: PracticeAttempt = {
+        questionId,
+        selectedIndex,
+        isCorrect,
+        timestamp: Date.now(),
+      };
       setProgress((prev) => {
         const safe = normalize(prev);
-        const attempt: PracticeAttempt = {
-          questionId,
-          selectedIndex,
-          isCorrect,
-          timestamp: Date.now(),
-        };
         const existing = safe.attempts[questionId] ?? [];
         return {
           ...safe,
@@ -57,6 +61,7 @@ export function usePracticeProgress() {
           },
         };
       });
+      void syncPracticeAttempt(attempt);
     },
     [setProgress]
   );
@@ -64,19 +69,20 @@ export function usePracticeProgress() {
   /** 完成一次实战会话 */
   const completeSession = useCallback(
     (score: number, total: number, mistakeTermCodes: string[]) => {
+      const session: PracticeSession = {
+        date: Date.now(),
+        score,
+        total,
+        mistakeTermCodes: [...new Set(mistakeTermCodes)],
+      };
       setProgress((prev) => {
         const safe = normalize(prev);
-        const session: PracticeSession = {
-          date: Date.now(),
-          score,
-          total,
-          mistakeTermCodes: [...new Set(mistakeTermCodes)],
-        };
         return {
           ...safe,
           sessions: [...safe.sessions, session],
         };
       });
+      void syncPracticeSession(session);
     },
     [setProgress]
   );

@@ -8,7 +8,6 @@ export const transportConcepts: KnowledgeConcept[] = [
     title: "海运基础",
     englishTitle: "Sea Freight Basics",
     category: "mode",
-    icon: "🚢",
     summary:
       "海运承载着全球约80%的国际贸易货物——从大宗散货到集装箱，从滚装船到油轮，海运是国际贸易的运输主力。理解海运的运作方式是外贸从业者的基本功。",
     description:
@@ -47,7 +46,6 @@ export const transportConcepts: KnowledgeConcept[] = [
     title: "空运基础",
     englishTitle: "Air Freight Basics",
     category: "mode",
-    icon: "✈️",
     summary:
       "空运是时效最高的国际贸易运输方式——适合高价值、轻小、紧急的货物，以速度换取成本。理解空运的计价方式和运单特性是使用空运的前提。",
     description:
@@ -86,7 +84,6 @@ export const transportConcepts: KnowledgeConcept[] = [
     title: "铁路运输",
     englishTitle: "Rail Freight",
     category: "mode",
-    icon: "🚂",
     summary:
       "中欧班列使铁路运输成为连接中国与欧洲的「第三条通道」——时效介于海运和空运之间，成本也恰好居中，是「一带一路」背景下快速成长的运输方式。",
     description:
@@ -132,7 +129,6 @@ export const transportConcepts: KnowledgeConcept[] = [
     title: "多式联运",
     englishTitle: "Multimodal Transport",
     category: "mode",
-    icon: "🔗",
     summary:
       "多式联运将两种或以上的运输方式无缝衔接为一个整体运输合同——一个承运人、一张单据、一份运价，把门到门的复杂性交给物流方，简化了贸易商的操作。",
     description:
@@ -171,7 +167,6 @@ export const transportConcepts: KnowledgeConcept[] = [
     title: "整箱与拼箱",
     englishTitle: "FCL & LCL",
     category: "container",
-    icon: "📦",
     summary:
       "FCL（整箱）和 LCL（拼箱）是集装箱运输中最基本的两种装运方式——选择FCL还是LCL直接影响成本、时效和货物安全，是每个外贸人必须做的第一道运输选择题。",
     description:
@@ -200,7 +195,6 @@ export const transportConcepts: KnowledgeConcept[] = [
     title: "集装箱基础",
     englishTitle: "Container Basics",
     category: "container",
-    icon: "🫙",
     summary:
       "集装箱是国际贸易的「标准化革命」——它让货物在不同运输工具之间无缝切换，把装卸效率提升了数十倍，是全球化供应链的物理基础设施。",
     description:
@@ -229,7 +223,6 @@ export const transportConcepts: KnowledgeConcept[] = [
     title: "海运提单",
     englishTitle: "Bill of Lading (B/L)",
     category: "document",
-    icon: "📋",
     summary:
       "海运提单（B/L）是国际贸易中最重要的单据之一——它同时是货物收据、运输合同和货权凭证，是卖方收款和买方提货的关键工具。",
     description:
@@ -268,7 +261,6 @@ export const transportConcepts: KnowledgeConcept[] = [
     title: "承运人与实际承运人",
     englishTitle: "Carrier vs Actual Carrier",
     category: "party",
-    icon: "🏢",
     summary:
       "承运人（Carrier）是与货主签订运输合同的一方，而实际承运人（Actual Carrier）才是真正执行运输的船公司/航空公司——区分二者对确定索赔对象至关重要。",
     description:
@@ -306,7 +298,6 @@ export const transportConcepts: KnowledgeConcept[] = [
     title: "货运代理",
     englishTitle: "Freight Forwarder",
     category: "party",
-    icon: "🏭",
     summary:
       "货运代理（货代）是国际贸易物流的「总协调员」——帮发货人订舱、报关、安排内陆运输、准备单据，让不熟悉物流的贸易商能专注于卖货。",
     description:
@@ -344,7 +335,6 @@ export const transportConcepts: KnowledgeConcept[] = [
     title: "国际运费构成",
     englishTitle: "Freight Cost Structure",
     category: "cost",
-    icon: "💰",
     summary:
       "国际运费不等于海运费——它由海运费、附加费、港杂费、内陆运费等多层费用构成，不搞清楚运费构成就报CFR或CIF价格，利润可能被附加费吃光。",
     description:

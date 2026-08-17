@@ -25,7 +25,6 @@ export default function SettlementFlashcardDeck() {
       homeRoute="/settlement"
       renderFront={(concept) => (
         <div className="text-center space-y-3">
-          <span className="text-5xl">{concept.icon}</span>
           <h2 className="text-2xl font-bold">{concept.title}</h2>
           <p style={{ color: "var(--color-text-secondary)" }}>
             {concept.englishTitle}
@@ -68,7 +67,6 @@ export default function SettlementFlashcardDeck() {
         getId: (c) => c.id,
         getTitle: (c) => c.title,
         getSubtitle: (c) => c.englishTitle,
-        getIcon: (c) => c.icon,
         getRoute: (id) => `/settlement/${id}`,
       }}
     />

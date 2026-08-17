@@ -76,7 +76,6 @@ export interface TradeTerm {
   chineseName: string;
   category: "E" | "F" | "C" | "D";
   categoryLabel: string;
-  icon: string;
   summary: string;
   description: string;
   sellerObligations: string[];
@@ -101,7 +100,6 @@ export interface KnowledgeMapNode {
   id: string;
   title: string;
   description: string;
-  icon: string;
   route?: string;
   isPlaceholder: boolean;
   children?: KnowledgeMapNode[];
@@ -150,14 +148,15 @@ export const MODULE_LABELS: Record<ModuleId, string> = {
   contract: "合同条款",
 };
 
-export const MODULE_ICONS: Record<ModuleId, string> = {
-  incoterms: "📋",
-  settlement: "💳",
-  transport: "🚢",
-  insurance: "🛡️",
-  documents: "📄",
-  customs: "🏛️",
-  contract: "📝",
+/** 模块章节编号 + 英文标识（Trade Manual 编号系统，替代 emoji 图标） */
+export const MODULE_CHAPTERS: Record<ModuleId, { no: string; en: string }> = {
+  incoterms:  { no: "01", en: "TERMS" },
+  settlement: { no: "02", en: "PAYMENT" },
+  transport:  { no: "03", en: "SHIPPING" },
+  insurance:  { no: "04", en: "INSURANCE" },
+  documents:  { no: "05", en: "DOCUMENTS" },
+  customs:    { no: "06", en: "CUSTOMS" },
+  contract:   { no: "07", en: "CONTRACT" },
 };
 
 export const MODULE_ROUTES: Record<ModuleId, string> = {
@@ -202,7 +201,6 @@ export interface SettlementConcept {
   title: string;
   englishTitle: string;
   category: string;
-  icon: string;
   summary: string;
   description: string;
   keyFeatures: string[];
@@ -223,7 +221,6 @@ export interface KnowledgeConcept {
   title: string;
   englishTitle: string;
   category: string;
-  icon: string;
   summary: string;
   description: string;
   keyFeatures: string[];

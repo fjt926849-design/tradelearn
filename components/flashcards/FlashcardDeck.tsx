@@ -30,7 +30,6 @@ export default function FlashcardDeck() {
       homeRoute="/"
       renderFront={(term) => (
         <div className="text-center space-y-3">
-          <span className="text-5xl">{term.icon}</span>
           <h2 className="text-3xl font-bold">{term.code}</h2>
           <p style={{ color: "var(--color-text-secondary)" }}>{term.chineseName}</p>
           <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
@@ -70,7 +69,6 @@ export default function FlashcardDeck() {
         getId: (t) => t.code,
         getTitle: (t) => t.code,
         getSubtitle: (t) => t.chineseName,
-        getIcon: (t) => t.icon,
         getRoute: (id) => `/terms/${id.toLowerCase()}`,
       }}
     />

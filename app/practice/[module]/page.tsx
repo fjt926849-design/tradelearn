@@ -3,7 +3,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import GenericPracticeDeck from "@/components/practice/GenericPracticeDeck";
 import { moduleScenarioQuestions } from "@/data/module-scenario-questions";
-import { MODULE_LABELS, MODULE_ICONS } from "@/lib/types";
+import { MODULE_LABELS, MODULE_CHAPTERS } from "@/lib/types";
 import type { ModuleId } from "@/lib/types";
 
 const MODULE_INTRO_ITEMS: Record<string, string[]> = {
@@ -30,7 +30,7 @@ export default async function ModulePracticePage({
   if (questions.length === 0) notFound();
 
   const label = MODULE_LABELS[module as ModuleId] || module;
-  const icon = MODULE_ICONS[module as ModuleId] || "📋";
+  const chapter = MODULE_CHAPTERS[module as ModuleId];
   const introItems = MODULE_INTRO_ITEMS[module] || ["根据业务场景做出正确的专业判断"];
 
   return (
@@ -39,7 +39,7 @@ export default async function ModulePracticePage({
       <main className="flex-1 max-w-2xl mx-auto px-5 py-10">
         <GenericPracticeDeck
           questions={questions}
-          title={`${icon} ${label}实战`}
+          title={`${chapter.no} ${label}实战`}
           subtitle={`${label}场景判断练习`}
           introItems={introItems}
           homeRoute="/practice"

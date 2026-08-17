@@ -71,7 +71,6 @@ export default function PracticeDeck() {
       <>
         <h1 className="text-xl font-semibold mb-8">场景实战</h1>
         <div className="text-center py-12 space-y-6">
-          <p className="text-3xl">📋</p>
           <div className="space-y-2">
             <h2 className="text-lg font-semibold">Incoterms 2020 场景判断</h2>
             <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
@@ -261,7 +260,7 @@ export default function PracticeDeck() {
                   color: isCorrect ? "var(--color-status-mastered)" : "var(--color-status-learning)",
                 }}
               >
-                {isCorrect ? "✅ 回答正确！" : "❌ 回答错误"}
+                {isCorrect ? "✓ 回答正确！" : "✗ 回答错误"}
               </p>
               <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
                 {question.explanation}

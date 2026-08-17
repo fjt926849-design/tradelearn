@@ -8,7 +8,6 @@ export const settlementConcepts: SettlementConcept[] = [
     title: "国际结算基础",
     englishTitle: "International Settlement Basics",
     category: "basics",
-    icon: "🌐",
     summary:
       "国际结算是指跨国贸易中货款支付与资金清算的全部过程，是贸易术语之外国际贸易实务的第二大核心板块。",
     description:
@@ -35,7 +34,6 @@ export const settlementConcepts: SettlementConcept[] = [
     title: "电汇 T/T",
     englishTitle: "Telegraphic Transfer",
     category: "payment-method",
-    icon: "💸",
     summary:
       "T/T 是国际贸易实务中最常用的支付方式——买方通过银行将款项电汇给卖方，速度快、费用低，但完全依赖商业信用。",
     description:
@@ -81,7 +79,6 @@ export const settlementConcepts: SettlementConcept[] = [
     title: "信用证 L/C",
     englishTitle: "Letter of Credit",
     category: "payment-method",
-    icon: "🏦",
     summary:
       "信用证是银行（开证行）应买方申请开立的、承诺在卖方提交符合信用证条款的单据后付款的书面保证。银行信用替代了商业信用。",
     description:
@@ -142,7 +139,6 @@ export const settlementConcepts: SettlementConcept[] = [
     title: "付款交单 D/P",
     englishTitle: "Documents against Payment",
     category: "payment-method",
-    icon: "📋",
     summary:
       "D/P 是托收的一种方式——卖方通过银行向买方转交单据，买方必须在付款后才能拿到单据并提货。银行代收但不担保。",
     description:
@@ -191,7 +187,6 @@ export const settlementConcepts: SettlementConcept[] = [
     title: "承兑交单 D/A",
     englishTitle: "Documents against Acceptance",
     category: "payment-method",
-    icon: "⚠️",
     summary:
       "D/A 是托收方式中最具风险的一种——买方只需「承兑」远期汇票即可取得单据提货，卖方在买方付款前就失去了货权。",
     description:
@@ -240,7 +235,6 @@ export const settlementConcepts: SettlementConcept[] = [
     title: "赊账 O/A",
     englishTitle: "Open Account",
     category: "payment-method",
-    icon: "📝",
     summary:
       "O/A 是卖方将货物和单据直接发给买方，买方在约定的信用期后付款。对买方最有利、对卖方最大风险。",
     description:
@@ -284,7 +278,6 @@ export const settlementConcepts: SettlementConcept[] = [
     title: "UCP 600 基础",
     englishTitle: "UCP 600 Basics",
     category: "lc-detail",
-    icon: "📖",
     summary: "UCP 600 是国际商会制定的信用证统一惯例，是全球 L/C 业务的「游戏规则」——银行和企业在处理信用证时必须遵守的通行准则。",
     description: "UCP 600（Uniform Customs and Practice for Documentary Credits，跟单信用证统一惯例）由国际商会（ICC）于 2007 年修订生效，是目前全球信用证业务的最核心规则，被 175 个以上国家的银行采用。UCP 600 共 39 条，规定了信用证业务中各方当事人的权利、义务与操作标准。信用证本身只需写明「受 UCP 600 约束」即可自动适用。核心条款包括：第 14 条审单标准（银行有最多 5 个银行工作日审核单据）、第 16 条不符点的处理（银行必须一次性列出全部不符点）、第 28 条保险单据要求（保险金额不低于 CIF/CIP 价值的 110%）、第 30 条容差（金额/数量/单价的 ±10% 或 ±5% 容差）。学习者不需要逐条背诵 UCP 600，但需要理解这几条核心条款在实务中如何影响单据准备和银行审单。",
     keyFeatures: [
@@ -317,7 +310,6 @@ export const settlementConcepts: SettlementConcept[] = [
     title: "L/C 常见风险",
     englishTitle: "L/C Risks",
     category: "lc-detail",
-    icon: "⚠️",
     summary: "信用证虽然由银行信用支撑，但并非无风险——软条款、伪造单据、开证行信用风险、汇率波动等都可能让受益人或申请人遭受损失。",
     description: "许多出口商认为「有了信用证就万无一失」——这是非常危险的想法。信用证的风险主要来自三个方面：第一，开证行信用风险——如果开证行本身实力不足或在政局不稳的国家，即使单据完全相符，银行也可能无力付款。第二，软条款风险——L/C 中可能包含非受益人能够单方面控制的条件，例如「需申请人出具检验证后付款」或「需开证行另行通知后装运」。这些条款将付款的决定权交还给了申请人，实质上削弱了银行信用的独立性。第三，伪造单据风险——银行只审单据表面是否相符，如果受益人恶意伪造单据（即使货物不存在或质量极差），银行在表面相符时照样付款，申请人可能钱货两空。风险防范需要受益人在收到 L/C 后仔细审核每一条款，对无法单方面满足的软条款坚决要求修改或删除。",
     keyFeatures: [
@@ -349,7 +341,6 @@ export const settlementConcepts: SettlementConcept[] = [
     title: "福费廷",
     englishTitle: "Forfaiting",
     category: "trade-finance",
-    icon: "🏦",
     summary: "福费廷是出口商将远期应收账款（通常由银行承兑的汇票或本票）无追索权地卖给包买商，提前获得现款的一种中长期贸易融资方式。",
     description: "福费廷（Forfaiting）源自法语「à forfait」，意为「放弃权利」。出口商在发运大型设备或大宗商品后，持有由进口方银行承兑或担保的远期票据（通常 6 个月至 5 年）。出口商可以将这些票据无追索权地卖给福费廷包买商（通常是国际大银行），立即获得现金，同时将进口商的信用风险、国家风险、汇率风险全部转移给包买商。对出口商最大的好处是「无追索权」——包买商买入票据后，即使到期进口商或担保银行不付款，也不能向出口商追索。福费廷常用于大型设备出口和项目融资，费用通常高于保理但结构更灵活。在中国，中国出口信用保险公司（Sinosure）的保单常与福费廷搭配使用。",
     keyFeatures: [
@@ -381,7 +372,6 @@ export const settlementConcepts: SettlementConcept[] = [
     title: "国际保理",
     englishTitle: "International Factoring",
     category: "trade-finance",
-    icon: "🤝",
     summary: "保理是出口商将应收账款卖给保理商，由保理商提供账款管理、催收、坏账担保和融资的综合金融服务——特别适合 O/A 赊销方式下的信用风险管理。",
     description: "国际保理（International Factoring）是为以赊销（O/A）方式结算的出口商提供的一站式金融服务。出口商发货后将应收账款转让给出口保理商，出口保理商再通过进口国的进口保理商进行账款催收和信用评估。保理的核心价值在于：第一，坏账担保——保理商对核准额度内的应收账款承担 100% 的坏账担保（无追索权保理）；第二，账款催收——保理商在进口国当地进行催收，效率远高于出口商跨国追讨；第三，融资——出口商可在发货后立即获得发票金额 80%-90% 的预付款。保理特别适合：O/A 赊销方式的出口商、面向发达市场的中小企业、希望释放被应收账款占用的流动资金的成长型企业。",
     keyFeatures: [
@@ -418,7 +408,6 @@ export const settlementConcepts: SettlementConcept[] = [
     title: "打包贷款",
     englishTitle: "Packing Loan / Pre-shipment Finance",
     category: "trade-finance",
-    icon: "📦",
     summary: "打包贷款是出口商收到信用证后，在发货前以 L/C 正本为抵押向银行申请的一种装船前融资——用于采购、生产、包装等环节的资金周转。",
     description: "打包贷款（Packing Loan，也称装船前融资 / Pre-shipment Finance）专为持有信用证的出口商设计。出口商在收到买方开来的信用证后，发货前需要资金用于采购原料、组织生产、包装货物等——此时可以 L/C 正本为抵押，向银行申请打包贷款。贷款金额通常为 L/C 金额的 70%-80%，期限覆盖从贷款发放到交单议付的时间（通常 3-6 个月）。出口商用后续的 L/C 议付/付款来还款——即银行「贷前」→出口商「生产发货」→「交单议付」→银行「扣款还贷」。打包贷款的风险在于：如果出口商拿到贷款后不能按 L/C 要求发货并提交相符单据，银行无法通过 L/C 渠道收回贷款，只能向出口商追讨。因此银行通常会严格审核出口商的履约能力和信用状况。",
     keyFeatures: [
@@ -450,7 +439,6 @@ export const settlementConcepts: SettlementConcept[] = [
     title: "银行保函",
     englishTitle: "Bank Guarantee",
     category: "trade-finance",
-    icon: "📜",
     summary: "银行保函是银行应申请人请求开立的、承诺在受益人提出相符索赔时付款的书面保证——广泛用于投标、履约、预付款、质量保证等国际贸易各环节。",
     description: "银行保函（Bank Guarantee）与信用证类似，都是银行信用的体现，但用途更广泛。信用证主要用于「正常履约」下的付款（卖方交单→银行付款），保函主要用于「违约救济」下的付款（申请人违约→受益人索赔→银行付款）。常见类型：投标保函（保证投标人中标后不撤标）、履约保函（保证卖方按合同履约）、预付款保函（保证卖方收到预付款后按约发货）、质量保函（保证质保期内出现问题卖方负责）、以及付款保函（保证买方按约付款）。保函的核心特征是「见索即付」——受益人只需提交书面索赔声明，银行即应付款，无需证明申请人确实违约。这一特征使保函对受益人非常有利，同时也要求申请人对受益人有充分信任。保函与备用信用证功能相似但法律基础不同：保函受国际商会 URDG 758 约束，备用 L/C 受 UCP 600 或 ISP98 约束。",
     keyFeatures: [

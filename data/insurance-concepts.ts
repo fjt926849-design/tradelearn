@@ -8,7 +8,6 @@ export const insuranceConcepts: KnowledgeConcept[] = [
     title: "货运保险基础",
     englishTitle: "Cargo Insurance Basics",
     category: "basics",
-    icon: "🛡️",
     summary:
       "国际货运中的货物面临海上灾难、偷盗、破损、水渍等数十种风险——货运保险以相对极低的保费将这些风险转移给保险公司，是每票国际货物都应考虑的基础保障。",
     description:
@@ -37,7 +36,6 @@ export const insuranceConcepts: KnowledgeConcept[] = [
     title: "保险险别",
     englishTitle: "Insurance Coverage Types",
     category: "basics",
-    icon: "📋",
     summary:
       "货运保险不是「全保」——它分为基本险和附加险，每个险别覆盖不同的风险。选择正确的险别组合，是花最少的钱买到最合适的保护。",
     description:
@@ -75,7 +73,6 @@ export const insuranceConcepts: KnowledgeConcept[] = [
     title: "保险金额",
     englishTitle: "Insured Amount",
     category: "calculation",
-    icon: "💵",
     summary:
       "保险金额决定了出险时最多能赔多少——CIF/CIP术语下保险金额通常为CIF/CIP价值的110%，多出来的10%覆盖买方的预期利润和经营管理费用。",
     description:
@@ -104,7 +101,6 @@ export const insuranceConcepts: KnowledgeConcept[] = [
     title: "保险费计算",
     englishTitle: "Insurance Premium",
     category: "calculation",
-    icon: "🧮",
     summary:
       "保险费 = 保险金额 × 保险费率——看起来简单，但费率的确定涉及货物种类、运输方式、航线风险、险别选择等多个变量，了解费率逻辑才能与保险公司或货代进行有效的保费议价。",
     description:
@@ -133,7 +129,6 @@ export const insuranceConcepts: KnowledgeConcept[] = [
     title: "保险单据",
     englishTitle: "Insurance Policy & Certificate",
     category: "document",
-    icon: "📜",
     summary:
       "保险单和保险凭证是证明保险关系的法律文件——国际结算中（尤其是信用证下）对保险单据的形式和内容都有严格要求，一个格式上的小失误就可能导致银行拒付。",
     description:
@@ -171,7 +166,6 @@ export const insuranceConcepts: KnowledgeConcept[] = [
     title: "风险转移 vs 保险安排",
     englishTitle: "Risk Transfer vs Insurance",
     category: "basics",
-    icon: "⚖️",
     summary:
       "Incoterms规定的是风险从卖方转移到买方的「时间点」，而保险是由谁安排的「操作问题」——理解二者独立但配合的关系，是正确管理国际货物运输风险的关键。",
     description:
@@ -200,7 +194,6 @@ export const insuranceConcepts: KnowledgeConcept[] = [
     title: "保险索赔流程",
     englishTitle: "Insurance Claim Process",
     category: "process",
-    icon: "📝",
     summary:
       "货物到了发现少了、破了、湿了——保险索赔涉及取证、报损、理赔三个关键步骤。第一时间保留证据和正确通知相关方是索赔成功的前提。",
     description:
@@ -229,7 +222,6 @@ export const insuranceConcepts: KnowledgeConcept[] = [
     title: "常用保险类型",
     englishTitle: "Common Insurance Types",
     category: "basics",
-    icon: "🗂️",
     summary:
       "除了逐票投保，国际贸易中还有预约保险（Open Policy）和卖方利益险等更高效的保险安排方式——选择合适的保险模式可以既省事又省钱。",
     description:

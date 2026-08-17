@@ -22,8 +22,8 @@ export default function Header() {
 
   return (
     <header
-      className="sticky top-0 z-50 bg-white border-b"
-      style={{ borderColor: "var(--color-border)" }}
+      className="sticky top-0 z-50 border-b"
+      style={{ background: "var(--color-bg)", borderColor: "var(--color-border)" }}
     >
       <div className="max-w-4xl mx-auto px-5 h-12 flex items-center justify-between">
         <Link
@@ -47,10 +47,10 @@ export default function Header() {
                 className="px-3 py-1.5 text-sm rounded transition-colors"
                 style={{
                   color: active
-                    ? "var(--color-text)"
+                    ? "var(--color-accent)"
                     : "var(--color-text-muted)",
-                  background: active ? "var(--color-border-light)" : "transparent",
-                  fontWeight: active ? 500 : 400,
+                  background: active ? "var(--color-accent-soft)" : "transparent",
+                  fontWeight: active ? 600 : 400,
                 }}
               >
                 {l.label}

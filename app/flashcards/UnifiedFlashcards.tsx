@@ -14,14 +14,14 @@ import ContractFlashcardDeck from "@/components/flashcards/ContractFlashcardDeck
 
 type ModuleKey = "incoterms" | "settlement" | "transport" | "insurance" | "documents" | "customs" | "contract";
 
-const MODULES: { key: ModuleKey; label: string; icon: string }[] = [
-  { key: "incoterms", label: "贸易术语", icon: "📋" },
-  { key: "settlement", label: "国际结算", icon: "💳" },
-  { key: "transport", label: "国际运输", icon: "🚢" },
-  { key: "insurance", label: "货运保险", icon: "🛡️" },
-  { key: "documents", label: "进出口单据", icon: "📄" },
-  { key: "customs", label: "报关与检验", icon: "🏛️" },
-  { key: "contract", label: "合同条款", icon: "📝" },
+const MODULES: { key: ModuleKey; label: string }[] = [
+  { key: "incoterms", label: "贸易术语" },
+  { key: "settlement", label: "国际结算" },
+  { key: "transport", label: "国际运输" },
+  { key: "insurance", label: "货运保险" },
+  { key: "documents", label: "进出口单据" },
+  { key: "customs", label: "报关与检验" },
+  { key: "contract", label: "合同条款" },
 ];
 
 function ModulePicker({
@@ -50,7 +50,7 @@ function ModulePicker({
               fontWeight: active === m.key ? 500 : 400,
             }}
           >
-            {m.icon} {m.label}
+            {m.label}
           </button>
         ))}
       </div>

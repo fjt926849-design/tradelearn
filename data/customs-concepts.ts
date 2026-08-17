@@ -8,7 +8,6 @@ export const customsConcepts: KnowledgeConcept[] = [
     title: "报关基础",
     englishTitle: "Customs Basics",
     category: "basics",
-    icon: "🏛️",
     summary:
       "报关是进出境货物、物品、运输工具的所有人或其代理人向海关办理手续的全过程。它是国际贸易中货物跨越国境的必经环节——没有通关，货物就无法合法进出。",
     description:
@@ -37,7 +36,6 @@ export const customsConcepts: KnowledgeConcept[] = [
     title: "出口报关",
     englishTitle: "Export Customs Clearance",
     category: "process",
-    icon: "📤",
     summary:
       "出口报关是货物从中国出境的核心环节——出口商需在货物运抵海关监管区后、装船/装机前，向海关申报并完成通关手续。准确的出口报关是后续退税的基础。",
     description:
@@ -76,7 +74,6 @@ export const customsConcepts: KnowledgeConcept[] = [
     title: "进口报关",
     englishTitle: "Import Customs Clearance",
     category: "process",
-    icon: "📥",
     summary:
       "进口报关是货物进入目的国的法定程序——进口商在货物抵达目的港后，向海关申报、缴纳关税和进口增值税、接受检验检疫，取得放行后才能提货。",
     description:
@@ -115,7 +112,6 @@ export const customsConcepts: KnowledgeConcept[] = [
     title: "报关主体",
     englishTitle: "Customs Declarant",
     category: "party",
-    icon: "👤",
     summary:
       "谁有资格向海关申报？进出口收发货人可以自行报关，也可以委托专业报关行代理报关。理解报关主体的角色和责任，是避免通关风险和合规问题的前提。",
     description:
@@ -143,7 +139,6 @@ export const customsConcepts: KnowledgeConcept[] = [
     title: "HS 编码基础",
     englishTitle: "HS Code Basics",
     category: "classification",
-    icon: "🔢",
     summary:
       "HS编码是全球通用的商品分类体系——前6位世界统一，之后各国自行扩展。正确的HS编码决定了关税税率、监管条件和原产地规则的适用。错了要付出代价。",
     description:
@@ -182,7 +177,6 @@ export const customsConcepts: KnowledgeConcept[] = [
     title: "完税价格",
     englishTitle: "Customs Valuation",
     category: "classification",
-    icon: "💲",
     summary:
       "完税价格是海关据以计算关税的基准价值——不是简单的发票金额换算。大多数国家以CIF价值作为进口完税价格的基础。正确理解完税价格的构成，直接影响税费成本。",
     description:
@@ -221,7 +215,6 @@ export const customsConcepts: KnowledgeConcept[] = [
     title: "报关单据",
     englishTitle: "Customs Documents",
     category: "document",
-    icon: "📄",
     summary:
       "报关单据是提交给海关的整套文件——商业发票、装箱单、提单/空运单、产地证、报关单是核心五件套。出口和进口的单据要求不同，不同国家更有差异。",
     description:
@@ -250,7 +243,6 @@ export const customsConcepts: KnowledgeConcept[] = [
     title: "商检基础",
     englishTitle: "Commodity Inspection Basics",
     category: "inspection",
-    icon: "🔍",
     summary:
       "商检是商品检验的简称——对进出口商品的品质、规格、数量、包装、安全、卫生等进行检验鉴定。不是所有商品都需要商检，但被列入《法检目录》的商品必须通过。",
     description:

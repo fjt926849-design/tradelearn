@@ -7,6 +7,12 @@ import { tradeTerms } from "@/data/trade-terms";
 import { useFlashcardProgress } from "@/hooks/useFlashcardProgress";
 import StatusDot from "@/components/ui/StatusDot";
 import type { TradeTerm } from "@/lib/types";
+import { getModuleNav } from "@/lib/navigation";
+
+const INDEX_BY_SLUG = new Map(
+  getModuleNav("incoterms").map((n, i) => [n.slug, i + 1] as const)
+);
+
 
 const categoryOrder = [
   { key: "E", label: "E 组 · 启运", desc: "卖方在自己场所将货物交给买方" },
@@ -68,7 +74,7 @@ export default function TermsPage() {
                         style={{ borderColor: "var(--color-border)" }}
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <span className="text-xl shrink-0">{term.icon}</span>
+                          <span className="shrink-0 w-7 text-xs font-semibold tabular-nums" style={{ color: "var(--color-text-muted)" }}>{String(INDEX_BY_SLUG.get(term.code.toLowerCase()) ?? 0).padStart(2, "0")}</span>
                           <div className="min-w-0">
                             <span className="text-sm font-medium">
                               {term.code}

@@ -8,7 +8,6 @@ export const documentsConcepts: KnowledgeConcept[] = [
     title: "单据体系总览",
     englishTitle: "Trade Documents Overview",
     category: "basics",
-    icon: "📑",
     summary:
       "进出口贸易单据是一个有机整体——商业发票是核心，提单是货权凭证，保险单是风险保障，三者构成国际贸易的「单据铁三角」。",
     description:
@@ -45,7 +44,6 @@ export const documentsConcepts: KnowledgeConcept[] = [
     title: "商业发票",
     englishTitle: "Commercial Invoice",
     category: "core",
-    icon: "🧾",
     summary:
       "商业发票是整个出口单据体系的核心——由卖方出具，列明货物描述、价值、买卖双方信息和贸易术语，是所有其他单据的参照基础。",
     description:
@@ -101,7 +99,6 @@ export const documentsConcepts: KnowledgeConcept[] = [
     title: "装箱单",
     englishTitle: "Packing List",
     category: "core",
-    icon: "📦",
     summary:
       "装箱单详细记录货物的包装方式——列出每件包装的毛重、净重、尺寸和内容物，是海关查验、买方收货、承运人配载的关键依据。",
     description:
@@ -144,7 +141,6 @@ export const documentsConcepts: KnowledgeConcept[] = [
     title: "提单",
     englishTitle: "Bill of Lading (B/L)",
     category: "transport",
-    icon: "🚢",
     summary:
       "提单是海运中最核心的单据——集货物收据、运输合同证明和物权凭证三大功能于一身，谁持有正本提单谁就拥有货权。",
     description:
@@ -192,7 +188,6 @@ export const documentsConcepts: KnowledgeConcept[] = [
     title: "空运单",
     englishTitle: "Air Waybill (AWB)",
     category: "transport",
-    icon: "✈️",
     summary:
       "空运单是空运的核心单据——但它与提单有本质区别：空运单不是物权凭证，不可转让，收货人凭身份即可提货，无需出示正本。",
     description:
@@ -237,7 +232,6 @@ export const documentsConcepts: KnowledgeConcept[] = [
     title: "原产地证",
     englishTitle: "Certificate of Origin",
     category: "official",
-    icon: "🏷️",
     summary:
       "原产地证是证明货物「国籍」的官方文件——决定货物能否享受关税优惠、是否需要缴纳反倾销税，是进口报关的必备单据之一。",
     description:
@@ -289,7 +283,6 @@ export const documentsConcepts: KnowledgeConcept[] = [
     title: "保险单",
     englishTitle: "Insurance Policy",
     category: "official",
-    icon: "🛡️",
     summary:
       "保险单是货物运输风险的保障凭证——在 CIF/CIP 术语下卖方必须投保并提供保险单，是信用证结算中不可或缺的单据之一。",
     description:
@@ -333,7 +326,6 @@ export const documentsConcepts: KnowledgeConcept[] = [
     title: "汇票",
     englishTitle: "Draft / Bill of Exchange",
     category: "payment",
-    icon: "💱",
     summary:
       "汇票是国际贸易结算中的支付指令——卖方（出票人）命令买方或银行（受票人）支付指定金额给持票人，是跟单托收和信用证业务中的核心金融票据。",
     description:
@@ -377,7 +369,6 @@ export const documentsConcepts: KnowledgeConcept[] = [
     title: "检验证书",
     englishTitle: "Inspection Certificate",
     category: "official",
-    icon: "🔍",
     summary:
       "检验证书是由第三方检验机构签发的品质证明文件——证明货物在装运前符合合同约定的质量、数量、重量或包装标准，是买方放心付款的重要保障。",
     description:

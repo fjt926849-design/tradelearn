@@ -15,7 +15,6 @@ export interface ConceptFlashcardResultsProps<T> {
   getId: (c: T) => string;
   getTitle: (c: T) => string;
   getSubtitle: (c: T) => string;
-  getIcon: (c: T) => string;
   getRoute: (id: string) => string;
   storageKey: string;
   moduleId: ModuleId;
@@ -42,7 +41,6 @@ export default function ConceptFlashcardResults<T>({
   getId,
   getTitle,
   getSubtitle,
-  getIcon,
   getRoute,
   storageKey,
   moduleId,
@@ -79,7 +77,6 @@ export default function ConceptFlashcardResults<T>({
     <div className="text-center space-y-8">
       {/* Header */}
       <div className="space-y-2">
-        <p className="text-3xl">🎉</p>
         <h2 className="text-xl font-semibold">本轮学习完成</h2>
         <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
           共 {total} 张卡片 · 掌握 {masteredCount} 张
@@ -131,7 +128,6 @@ export default function ConceptFlashcardResults<T>({
                 className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center gap-2">
-                  <span>{getIcon(concept)}</span>
                   <span className="text-sm font-medium">{getTitle(concept)}</span>
                   <span className="text-sm" style={{ color: "var(--color-text-muted)" }}>
                     {getSubtitle(concept)}

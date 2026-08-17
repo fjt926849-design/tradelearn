@@ -2,6 +2,7 @@ import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { knowledgeMapData } from "@/data/knowledge-map";
+import { MODULE_CHAPTERS } from "@/lib/types";
 
 const domains = knowledgeMapData.children ?? [];
 
@@ -31,7 +32,7 @@ export default function KnowledgeMapPage() {
             style={{ borderColor: "var(--color-border)" }}
           >
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-2xl">📋</span>
+              <span className="text-xs font-semibold tabular-nums" style={{ color: "var(--color-text-muted)" }}>{MODULE_CHAPTERS.incoterms.no}</span>
               <div>
                 <h2 className="font-semibold">贸易术语</h2>
                 <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
@@ -91,7 +92,6 @@ export default function KnowledgeMapPage() {
                   className="p-4 text-center"
                   style={{ background: "var(--color-bg)" }}
                 >
-                  <span className="text-xl opacity-25">{d.icon}</span>
                   <p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>
                     {d.title}
                   </p>

@@ -7,6 +7,12 @@ import { transportConcepts } from "@/data/transport-concepts";
 import { useTransportProgress } from "@/hooks/useTransportProgress";
 import StatusDot from "@/components/ui/StatusDot";
 import type { KnowledgeConcept } from "@/lib/types";
+import { getModuleNav } from "@/lib/navigation";
+
+const INDEX_BY_ID = new Map(
+  getModuleNav("transport").map((n, i) => [n.slug, i + 1] as const)
+);
+
 
 const categoryLabels: Record<string, string> = {
   mode: "运输方式",
@@ -56,7 +62,7 @@ export default function TransportPage() {
                       className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <span className="text-xl shrink-0">{concept.icon}</span>
+                        <span className="shrink-0 w-7 text-xs font-semibold tabular-nums" style={{ color: "var(--color-text-muted)" }}>{String(INDEX_BY_ID.get(concept.id) ?? 0).padStart(2, "0")}</span>
                         <div className="min-w-0">
                           <span className="text-sm font-medium">{concept.title}</span>
                           <span className="ml-2 text-xs hidden sm:inline" style={{ color: "var(--color-text-muted)" }}>

@@ -105,7 +105,6 @@ export default function ConceptFlashcardDeck<T>(config: ConceptDeckConfig<T>) {
       <>
         <h1 className="text-xl font-semibold mb-8">{title}</h1>
         <div className="text-center py-16 space-y-4">
-          <p className="text-3xl">✅</p>
           <h2 className="text-lg font-semibold">{emptyTitle}</h2>
           <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
             {emptyMessage(stats)}
@@ -193,7 +192,6 @@ export default function ConceptFlashcardDeck<T>(config: ConceptDeckConfig<T>) {
       <>
         <h1 className="text-xl font-semibold mb-8">{title}</h1>
         <div className="text-center py-16 space-y-4">
-          <p className="text-3xl">✅</p>
           <h2 className="text-lg font-semibold">{emptyTitle}</h2>
           <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
             {emptyMessage(stats)}

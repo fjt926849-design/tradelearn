@@ -12,6 +12,7 @@ export default function TransportFlashcardDeck() {
       concepts={transportConcepts}
       getId={(c) => c.id}
       storageKey={STORAGE_KEY}
+      moduleId="transport"
       title="运输闪卡"
       emptyTitle="暂无待复习卡片"
       emptyMessage={(s) =>

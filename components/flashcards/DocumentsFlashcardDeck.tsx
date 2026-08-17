@@ -12,6 +12,7 @@ export default function DocumentsFlashcardDeck() {
       concepts={documentsConcepts}
       getId={(c) => c.id}
       storageKey={STORAGE_KEY}
+      moduleId="documents"
       title="单据闪卡"
       emptyTitle="暂无待复习卡片"
       emptyMessage={(s) =>

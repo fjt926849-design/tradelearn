@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import FlashCard from "@/components/flashcards/FlashCard";
 import ConceptFlashcardResults from "@/components/flashcards/ConceptFlashcardResults";
 import { useConceptProgress } from "@/hooks/useConceptProgress";
-import type { SelfRating } from "@/lib/types";
+import type { SelfRating, ModuleId } from "@/lib/types";
 import { RATING_LABELS } from "@/lib/types";
 import type { RoundStats, ConceptFlashcardResultsProps } from "./ConceptFlashcardResults";
 
@@ -25,6 +25,8 @@ export interface ConceptDeckConfig<T> {
   getId: (c: T) => string;
   /** 持久化 key */
   storageKey: string;
+  /** 模块 ID（对应 Supabase card_progress.module_id） */
+  moduleId: ModuleId;
   /** 页面标题 */
   title: string;
   /** 空队列标题 */
@@ -42,7 +44,7 @@ export interface ConceptDeckConfig<T> {
   /** Results 组件所需的额外 props（除了通用的那些） */
   resultsProps: Omit<
     ConceptFlashcardResultsProps<T>,
-    "storageKey" | "stats" | "total" | "weakIds" | "onReviewWeak" | "onGoHome"
+    "moduleId" | "storageKey" | "stats" | "total" | "weakIds" | "onReviewWeak" | "onGoHome"
   >;
 }
 
@@ -51,6 +53,7 @@ export default function ConceptFlashcardDeck<T>(config: ConceptDeckConfig<T>) {
     concepts,
     getId,
     storageKey,
+    moduleId,
     title,
     emptyTitle,
     emptyMessage,
@@ -64,7 +67,7 @@ export default function ConceptFlashcardDeck<T>(config: ConceptDeckConfig<T>) {
   const allIds = useMemo(() => concepts.map(getId), [concepts, getId]);
 
   const { rateConcept, buildReviewQueue, todayStats, getNextReviewInfo, stats } =
-    useConceptProgress(storageKey);
+    useConceptProgress(storageKey, moduleId);
 
   const roundRatings = useRef<Record<string, SelfRating>>({});
 
@@ -220,6 +223,7 @@ export default function ConceptFlashcardDeck<T>(config: ConceptDeckConfig<T>) {
         <ConceptFlashcardResults<T>
           {...resultsProps}
           storageKey={storageKey}
+          moduleId={moduleId}
           stats={roundStats}
           total={total}
           weakIds={weakIds}

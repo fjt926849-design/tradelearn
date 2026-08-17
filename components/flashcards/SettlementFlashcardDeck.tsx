@@ -16,6 +16,7 @@ export default function SettlementFlashcardDeck() {
       concepts={settlementConcepts}
       getId={(c) => c.id}
       storageKey={STORAGE_KEY}
+      moduleId="settlement"
       title="结算闪卡"
       emptyTitle="暂无待复习卡片"
       emptyMessage={(s) =>

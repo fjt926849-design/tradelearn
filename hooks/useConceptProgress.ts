@@ -1,9 +1,18 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useLocalStorage } from "./useLocalStorage";
-import type { SelfRating, ConceptProgressMap } from "@/lib/types";
+import type {
+  SelfRating,
+  ConceptProgressMap,
+  TermProgress,
+  ModuleId,
+} from "@/lib/types";
 import { calcNextReview, defaultConceptProgress } from "@/lib/types";
+import {
+  syncCardProgress,
+  syncStoredCardProgress,
+} from "@/lib/supabase/progressSync";
 
 /** 格式化下次复习时间 */
 function formatNextLabel(nextReviewAt: number): string {
@@ -22,11 +31,15 @@ function formatNextLabel(nextReviewAt: number): string {
  * 任何知识模块（Incoterms / Settlement / Transport / …）共享同一套
  * 间隔复习逻辑，仅通过 storageKey 区分持久化命名空间。
  */
-export function useConceptProgress(storageKey: string) {
+export function useConceptProgress(storageKey: string, moduleId: ModuleId) {
   const [progress, setProgress] = useLocalStorage<ConceptProgressMap>(
     storageKey,
     defaultConceptProgress
   );
+
+  // 保持 localStorage 为当前主源；首次挂载时只把已有数据镜像到云端。
+  // ref 防止每次评分触发重复迁移。
+  const migratedRef = useRef(false);
 
   /** 获取单个概念进度 */
   const getProgress = useCallback(
@@ -54,32 +67,37 @@ export function useConceptProgress(storageKey: string) {
     [progress]
   );
 
+  useEffect(() => {
+    if (migratedRef.current) return;
+    migratedRef.current = true;
+    const stored = Object.keys(progress.terms).map((conceptId) =>
+      getProgress(conceptId)
+    );
+    void syncStoredCardProgress(moduleId, stored);
+  }, [getProgress, moduleId, progress.terms]);
+
   /** 自评后更新进度 */
   const rateConcept = useCallback(
     (conceptId: string, rating: SelfRating) => {
-      setProgress((prev) => {
-        const existing = prev.terms[conceptId];
-        const currentInterval = existing?.interval ?? 0;
-        const { nextReviewAt, interval, status } = calcNextReview(
-          rating,
-          currentInterval
-        );
-        return {
-          terms: {
-            ...prev.terms,
-            [conceptId]: {
-              termCode: conceptId,
-              status,
-              lastReviewed: Date.now(),
-              reviewCount: (existing?.reviewCount ?? 0) + 1,
-              nextReviewAt,
-              interval,
-            },
-          },
-        };
-      });
+      const existing = progress.terms[conceptId];
+      const currentInterval = existing?.interval ?? 0;
+      const { nextReviewAt, interval, status } = calcNextReview(
+        rating,
+        currentInterval
+      );
+      const next: TermProgress = {
+        termCode: conceptId,
+        status,
+        lastReviewed: Date.now(),
+        reviewCount: (existing?.reviewCount ?? 0) + 1,
+        nextReviewAt,
+        interval,
+      };
+      setProgress({ terms: { ...progress.terms, [conceptId]: next } });
+      // 旁路同步到 Supabase（fire-and-forget，不阻塞本地学习逻辑）
+      void syncCardProgress(moduleId, conceptId, next);
     },
-    [setProgress]
+    [setProgress, progress, moduleId]
   );
 
   /** 获取到期需要复习的概念 ID 集合 */

@@ -1,6 +1,7 @@
 "use client";
 
 import { useConceptProgress } from "@/hooks/useConceptProgress";
+import type { ModuleId } from "@/lib/types";
 
 export interface RoundStats {
   mastered: number;
@@ -17,6 +18,7 @@ export interface ConceptFlashcardResultsProps<T> {
   getIcon: (c: T) => string;
   getRoute: (id: string) => string;
   storageKey: string;
+  moduleId: ModuleId;
   stats: RoundStats;
   total: number;
   weakIds: string[];
@@ -43,13 +45,14 @@ export default function ConceptFlashcardResults<T>({
   getIcon,
   getRoute,
   storageKey,
+  moduleId,
   stats,
   total,
   weakIds,
   onReviewWeak,
   onGoHome,
 }: ConceptFlashcardResultsProps<T>) {
-  const { getProgress, getNextReviewInfo } = useConceptProgress(storageKey);
+  const { getProgress, getNextReviewInfo } = useConceptProgress(storageKey, moduleId);
   const allIds = concepts.map(getId);
   const weakCount = weakIds.length;
   const masteredCount = stats.mastered + stats.gotIt;

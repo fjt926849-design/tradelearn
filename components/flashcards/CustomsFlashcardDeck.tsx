@@ -12,6 +12,7 @@ export default function CustomsFlashcardDeck() {
       concepts={customsConcepts}
       getId={(c) => c.id}
       storageKey={STORAGE_KEY}
+      moduleId="customs"
       title="报关闪卡"
       emptyTitle="暂无待复习卡片"
       emptyMessage={(s) =>

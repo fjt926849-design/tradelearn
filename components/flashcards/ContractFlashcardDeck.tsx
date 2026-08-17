@@ -12,6 +12,7 @@ export default function ContractFlashcardDeck() {
       concepts={contractConcepts}
       getId={(c) => c.id}
       storageKey={STORAGE_KEY}
+      moduleId="contract"
       title="合同条款闪卡"
       emptyTitle="暂无待复习卡片"
       emptyMessage={(s) =>

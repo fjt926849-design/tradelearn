@@ -20,6 +20,7 @@ export default function FlashcardDeck() {
       concepts={tradeTerms}
       getId={(t) => t.code}
       storageKey={STORAGE_KEY}
+      moduleId="incoterms"
       frontLoadId={targetTerm ? targetTerm.toUpperCase() : undefined}
       title="闪卡学习"
       emptyTitle="今日学习已完成"

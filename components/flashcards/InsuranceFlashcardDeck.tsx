@@ -12,6 +12,7 @@ export default function InsuranceFlashcardDeck() {
       concepts={insuranceConcepts}
       getId={(c) => c.id}
       storageKey={STORAGE_KEY}
+      moduleId="insurance"
       title="保险闪卡"
       emptyTitle="暂无待复习卡片"
       emptyMessage={(s) =>

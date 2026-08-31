@@ -7,6 +7,7 @@ export type LearningEventName =
   | "practice_started"
   | "practice_answered"
   | "practice_completed"
+  | "chapter_checkpoint_completed"
   | "curriculum_filtered"
   | "curriculum_opened"
   | "progress_migration";

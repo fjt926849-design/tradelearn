@@ -147,6 +147,7 @@ export default async function CurriculumChapterPage({ params }: { params: Promis
 
           <div className="flex flex-wrap gap-3 border-t pt-6" style={{ borderColor: "var(--color-border)" }}>
             <Link href="/knowledge-map" className="rounded-md border px-4 py-2 text-sm font-medium" style={{ borderColor: "var(--color-border)" }}>返回课程地图</Link>
+            {lesson && <Link href={`/knowledge-map/chapter/${chapter.id}/practice`} className="rounded-md border px-4 py-2 text-sm font-medium" style={{ borderColor: "var(--color-accent)", color: "var(--color-accent)" }}>章节检测</Link>}
             {!isPlanned && chapter.route && <Link href={chapter.route} className="rounded-md px-4 py-2 text-sm font-medium text-white" style={{ background: "var(--color-accent)" }}>进入本章学习</Link>}
           </div>
         </div>

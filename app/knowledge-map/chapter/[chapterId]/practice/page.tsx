@@ -6,6 +6,7 @@ import BackButton from "@/components/learn/BackButton";
 import ChapterCheckpoint from "@/components/curriculum/ChapterCheckpoint";
 import { curriculumChapters } from "@/data/curriculum";
 import { getCurriculumLesson } from "@/data/curriculum-lessons";
+import { getAdditionalCurriculumChecks } from "@/data/curriculum-checks";
 
 export function generateStaticParams() {
   return curriculumChapters
@@ -40,7 +41,7 @@ export default async function ChapterPracticePage({ params }: { params: Promise<
               先独立作答，再查看解释。检测结果只用于即时反馈，不会重置或覆盖你的学习记录。
             </p>
           </section>
-          <ChapterCheckpoint chapterId={chapter.id} chapterNumber={chapter.number} chapterTitle={chapter.title} check={lesson.check} />
+          <ChapterCheckpoint chapterId={chapter.id} chapterNumber={chapter.number} chapterTitle={chapter.title} checks={[lesson.check, ...getAdditionalCurriculumChecks(chapter.id)]} />
         </div>
       </main>
       <Footer />

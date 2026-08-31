@@ -87,7 +87,8 @@ export function useCurriculumProgress() {
     if (!record.lessonStartedAt && legacyTotal > 0 && legacyKnown > 0) {
       progress = Math.max(30, Math.round((legacyKnown / legacyTotal) * 100));
     }
-    return { ...record, progress, legacyKnown, legacyTotal };
+    const status = record.status === "new" && legacyKnown > 0 ? "learning" : record.status;
+    return { ...record, status, progress, legacyKnown, legacyTotal };
   }, [getLegacyStatus, records]);
 
   const chapterProgress = useMemo(() => Object.fromEntries(curriculumChapters.map((chapter) => [chapter.id, getChapterProgress(chapter.id)])), [getChapterProgress]);
@@ -124,6 +125,15 @@ export function useCurriculumProgress() {
     });
   }, []);
 
+  const addStudySeconds = useCallback((chapterId: string, seconds: number) => {
+    if (!Number.isFinite(seconds) || seconds <= 0) return;
+    const rounded = Math.round(seconds);
+    setRecords((previous) => {
+      const current = previous[chapterId] ?? { chapterId, status: "new" as const };
+      return { ...previous, [chapterId]: { ...current, chapterId, studySeconds: (current.studySeconds ?? 0) + rounded, lastOpenedAt: Date.now() } };
+    });
+  }, []);
+
   const currentChapter = useMemo(() => {
     const active = curriculumChapters.find((chapter) => chapterProgress[chapter.id]?.status === "learning");
     if (active) return active;
@@ -131,6 +141,7 @@ export function useCurriculumProgress() {
   }, [chapterProgress]);
 
   const completedCount = useMemo(() => curriculumChapters.filter((chapter) => chapterProgress[chapter.id]?.status === "completed").length, [chapterProgress]);
+  const totalStudySeconds = useMemo(() => Object.values(chapterProgress).reduce((total, record) => total + (record.studySeconds ?? 0), 0), [chapterProgress]);
 
-  return { chapterProgress, currentChapter, completedCount, hydrated, markLessonStarted, markLessonCompleted, recordCheckpoint };
+  return { chapterProgress, currentChapter, completedCount, totalStudySeconds, hydrated, markLessonStarted, markLessonCompleted, recordCheckpoint, addStudySeconds };
 }

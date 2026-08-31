@@ -5,10 +5,8 @@ import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/", label: "首页" },
-  { href: "/knowledge-map", label: "课程" },
-  { href: "/practice", label: "实战" },
-  { href: "/flashcards", label: "闪卡" },
-  { href: "/progress", label: "进度" },
+  { href: "/knowledge-map", label: "学习" },
+  { href: "/progress", label: "我的" },
 ];
 
 export default function Header() {
@@ -19,7 +17,7 @@ export default function Header() {
       className="sticky top-0 z-50 border-b"
       style={{ background: "var(--color-bg)", borderColor: "var(--color-border)" }}
     >
-      <div className="max-w-4xl mx-auto px-5 h-12 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
         <Link
           href="/"
           className="font-semibold text-base tracking-tight"

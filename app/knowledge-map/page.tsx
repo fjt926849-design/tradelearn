@@ -14,12 +14,9 @@ export default function KnowledgeMapPage() {
   return (
     <>
       <Header />
-      <main className="flex-1 max-w-2xl mx-auto px-5 py-10 space-y-10">
+      <main className="flex-1 max-w-6xl mx-auto w-full px-5 py-10 space-y-8">
         <div>
-          <h1 className="text-xl font-semibold">知识地图</h1>
-          <p className="mt-1 text-sm" style={{ color: "var(--color-text-muted)" }}>
-            第七版教材的五篇二十二章学习地图。已开放内容会直接进入学习，建设中的章节也可先开始微课并查看实训规划。
-          </p>
+          <h1 className="sr-only">课程学习中心</h1>
         </div>
 
         <CurriculumBrowser parts={curriculumParts} />

@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { curriculumStats } from "@/data/curriculum";
+import { getCurriculumLesson } from "@/data/curriculum-lessons";
 import { tradeTerms } from "@/data/trade-terms";
 import { settlementConcepts } from "@/data/settlement-concepts";
 import { transportConcepts } from "@/data/transport-concepts";
@@ -10,39 +11,22 @@ import { insuranceConcepts } from "@/data/insurance-concepts";
 import { documentsConcepts } from "@/data/documents-concepts";
 import { customsConcepts } from "@/data/customs-concepts";
 import { contractConcepts } from "@/data/contract-concepts";
-import { MODULE_ROUTES } from "@/lib/types";
 import type { CurriculumChapter, CurriculumPart, CurriculumPartId } from "@/lib/types";
+import { useCurriculumProgress } from "@/hooks/useCurriculumProgress";
 import { trackLearningEvent } from "@/lib/analytics";
 
 type PartFilter = "all" | CurriculumPartId;
-const DEFAULT_PART_FILTER: PartFilter = "all";
-const DEFAULT_WORKFLOW_FILTER = "全部";
+type StatusFilter = "all" | "new" | "learning" | "completed";
+type SortFilter = "default" | "recent" | "progress";
+type ViewMode = "textbook" | "workflow";
 
 const STATUS_META = {
-  available: { label: "已开放", tone: "var(--color-status-mastered)" },
-  partial: { label: "部分开放", tone: "var(--color-status-learning)" },
-  planned: { label: "建设中", tone: "var(--color-text-muted)" },
+  new: { label: "未开始", tone: "var(--color-text-muted)" },
+  learning: { label: "进行中", tone: "var(--color-accent)" },
+  completed: { label: "已完成", tone: "var(--color-status-mastered)" },
 } as const;
 
-function chapterRoute(chapter: CurriculumChapter) {
-  return chapter.route ?? (chapter.moduleId ? MODULE_ROUTES[chapter.moduleId] : `/knowledge-map/chapter/${chapter.id}`);
-}
-
-function matchesChapter(chapter: CurriculumChapter, query: string, workflow: string) {
-  const normalized = query.trim().toLowerCase();
-  const matchesWorkflow = workflow === "全部" || chapter.workflowStages.includes(workflow);
-  if (!matchesWorkflow) return false;
-  if (!normalized) return true;
-
-  return [
-    chapter.number,
-    chapter.title,
-    chapter.description,
-    chapter.learningObjectives.join(" "),
-    chapter.workflowStages.join(" "),
-    chapter.sourceRefs.map((source) => source.label).join(" "),
-  ].join(" ").toLowerCase().includes(normalized);
-}
+const WORKFLOW_ORDER = ["询盘", "报价", "谈判", "合同", "装运", "履约", "风险", "结算", "合规", "争议", "基础概念"];
 
 interface ConceptSearchItem {
   id: string;
@@ -79,362 +63,112 @@ const conceptSearchItems: ConceptSearchItem[] = [
   }))),
 ];
 
-function ChapterCard({ chapter }: { chapter: CurriculumChapter }) {
-  const status = STATUS_META[chapter.status];
-  const href = chapterRoute(chapter);
-  const previewLabel = chapter.workflowStages[0] ?? "基础概念";
-  const isPlanned = chapter.status === "planned";
-  const body = (
-    <article
-      className="group border rounded-xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm"
-      style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2 min-w-0">
-          <span
-            className="text-[11px] font-semibold tabular-nums rounded-md px-2 py-1"
-            style={{ background: "var(--color-accent-soft)", color: "var(--color-accent)" }}
-          >
-            {chapter.number}
-          </span>
-          <span className="text-[11px]" style={{ color: status.tone }}>{status.label}</span>
-        </div>
-        {href && <span className="text-sm transition-transform duration-200 group-hover:translate-x-0.5" style={{ color: "var(--color-text-muted)" }}>→</span>}
-      </div>
+function chapterHref(chapter: CurriculumChapter) {
+  return `/knowledge-map/chapter/${chapter.id}`;
+}
 
-      <h3 className="mt-3 text-base font-semibold tracking-tight">{chapter.title}</h3>
-      <p className="mt-1.5 text-xs leading-5" style={{ color: "var(--color-text-secondary)" }}>{chapter.description}</p>
-
-      <div
-        className="mt-4 rounded-lg border p-3"
-        style={{ borderColor: "var(--color-border-light)", background: "var(--color-bg-soft)" }}
-      >
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[10px] font-semibold tracking-[0.14em] uppercase" style={{ color: "var(--color-text-muted)" }}>
-            业务场景
-          </span>
-          <span className="text-xs font-medium" style={{ color: "var(--color-accent)" }}>{previewLabel}</span>
-        </div>
-        <p className="mt-2 text-xs leading-5" style={{ color: "var(--color-text-secondary)" }}>
-          {chapter.learningObjectives[0] ?? "建立本章核心判断能力"}
-        </p>
-      </div>
-
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {chapter.workflowStages.slice(0, 3).map((stage) => (
-          <span
-            key={stage}
-            className="text-[10px] rounded-full border px-2 py-1"
-            style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
-          >
-            {stage}
-          </span>
-        ))}
-      </div>
-
-      <div className="mt-4 flex items-center justify-between text-xs">
-        <span style={{ color: "var(--color-text-muted)" }}>
-          {chapter.sourceRefs.length > 0 ? `来源 ${chapter.sourceRefs.length} 项` : "待补充来源"}
-        </span>
-        <span className="font-medium" style={{ color: "var(--color-text)" }}>
-          {isPlanned ? "开始微课" : "进入学习"}
-        </span>
-      </div>
-    </article>
-  );
-
-  if (!href) return <div aria-disabled="true">{body}</div>;
-  return (
-    <Link
-      href={href}
-      onClick={() => trackLearningEvent("curriculum_opened", { chapterId: chapter.id, chapterNumber: chapter.number })}
-      className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-xl"
-    >
-      {body}
-    </Link>
-  );
+function selectStyle() {
+  return { borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text)" };
 }
 
 export default function CurriculumBrowser({ parts }: { parts: CurriculumPart[] }) {
-  // Keep the server render and the browser's first render identical. Filters
-  // intentionally reset on entry so users never return to a confusing result.
-  const [partFilter, setPartFilter] = useState<PartFilter>(DEFAULT_PART_FILTER);
-  const [workflowFilter, setWorkflowFilter] = useState(DEFAULT_WORKFLOW_FILTER);
+  const { chapterProgress, currentChapter, completedCount, totalStudySeconds } = useCurriculumProgress();
+  const [partFilter, setPartFilter] = useState<PartFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [sortFilter, setSortFilter] = useState<SortFilter>("default");
+  const [viewMode, setViewMode] = useState<ViewMode>("textbook");
   const [query, setQuery] = useState("");
-  const [filterPanel, setFilterPanel] = useState(false);
-  const [filterMode, setFilterMode] = useState<"part" | "workflow">("part");
+  const [expandedPart, setExpandedPart] = useState<CurriculumPartId | undefined>();
+  const [expandedChapter, setExpandedChapter] = useState<string | undefined>();
+  const expandedPartId = expandedPart ?? currentChapter?.partId ?? "intro";
+  const expandedChapterId = expandedChapter ?? currentChapter?.id;
 
-  const workflows = useMemo(() => {
-    const values = parts.flatMap((part) => part.chapters.flatMap((chapter) => chapter.workflowStages));
-    return ["全部", ...Array.from(new Set(values))];
-  }, [parts]);
+  const filteredChapters = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    const result = parts.flatMap((part) => part.chapters.map((chapter) => ({ chapter, part })));
+    return result
+      .filter(({ part }) => partFilter === "all" || part.id === partFilter)
+      .filter(({ chapter }) => statusFilter === "all" || chapterProgress[chapter.id]?.status === statusFilter)
+      .filter(({ chapter }) => {
+        if (!normalized) return true;
+        return [chapter.number, chapter.title, chapter.description, chapter.learningObjectives.join(" "), chapter.workflowStages.join(" "), chapter.sourceRefs.map((source) => source.label).join(" ")].join(" ").toLowerCase().includes(normalized);
+      })
+      .sort((a, b) => {
+        if (sortFilter === "progress") return (chapterProgress[b.chapter.id]?.progress ?? 0) - (chapterProgress[a.chapter.id]?.progress ?? 0);
+        if (sortFilter === "recent") return (chapterProgress[b.chapter.id]?.lastOpenedAt ?? 0) - (chapterProgress[a.chapter.id]?.lastOpenedAt ?? 0);
+        return parts.indexOf(a.part) - parts.indexOf(b.part) || a.part.chapters.indexOf(a.chapter) - b.part.chapters.indexOf(b.chapter);
+      });
+  }, [parts, partFilter, statusFilter, sortFilter, query, chapterProgress]);
 
-  const workflowCounts = useMemo(() => {
-    const counts = new Map<string, number>();
-    parts.forEach((part) => part.chapters.forEach((chapter) => chapter.workflowStages.forEach((stage) => {
-      counts.set(stage, (counts.get(stage) ?? 0) + 1);
-    })));
-    return counts;
-  }, [parts]);
-
-  useEffect(() => {
-    if (!filterPanel) return;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setFilterPanel(false);
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [filterPanel]);
-
-  const activePartFilter = partFilter === "all" || parts.some((part) => part.id === partFilter) ? partFilter : "all";
-  const activeWorkflowFilter = workflows.includes(workflowFilter) ? workflowFilter : "全部";
-
-  const visibleParts = useMemo(() => {
-    return parts
-      .filter((part) => activePartFilter === "all" || part.id === activePartFilter)
-      .map((part) => ({
-        ...part,
-        chapters: part.chapters.filter((chapter) => matchesChapter(chapter, query, activeWorkflowFilter)),
-      }))
-      .filter((part) => part.chapters.length > 0);
-  }, [parts, activePartFilter, query, activeWorkflowFilter]);
-
-  const visibleChapterCount = visibleParts.reduce((total, part) => total + part.chapters.length, 0);
   const conceptMatches = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    if (!normalized) return [];
-    return conceptSearchItems.filter((item) => item.text.toLowerCase().includes(normalized)).slice(0, 8);
+    return normalized ? conceptSearchItems.filter((item) => item.text.toLowerCase().includes(normalized)).slice(0, 8) : [];
   }, [query]);
 
-  const activeFilterSummary = activePartFilter !== "all"
-    ? parts.find((part) => part.id === activePartFilter)?.number ?? "教材篇章"
-    : activeWorkflowFilter !== "全部"
-      ? activeWorkflowFilter
-      : "全部课程";
+  const totalChapters = curriculumStats.chapters + 1;
+  const overallProgress = Math.round((completedCount / totalChapters) * 100);
+  const currentPart = currentChapter ? parts.find((part) => part.id === currentChapter.partId) : parts[0];
+  const currentPartCompleted = currentPart?.chapters.filter((chapter) => chapterProgress[chapter.id]?.status === "completed").length ?? 0;
+  const currentPartTotal = currentPart?.chapters.length ?? 0;
+  const totalStudyMinutes = Math.round(totalStudySeconds / 60);
 
-  const selectPart = (value: PartFilter) => {
-    setPartFilter(value);
-    setWorkflowFilter("全部");
-    trackLearningEvent("curriculum_filtered", { filterType: "part", filterValue: value });
-  };
+  const visiblePart = (part: CurriculumPart) => filteredChapters.filter((item) => item.part.id === part.id).map((item) => item.chapter);
+  const workflowGroups = WORKFLOW_ORDER.map((stage) => ({ stage, chapters: filteredChapters.filter(({ chapter }) => (chapter.workflowStages[0] ?? "基础概念") === stage).map(({ chapter }) => chapter) })).filter((group) => group.chapters.length > 0);
 
-  const selectWorkflow = (value: string) => {
-    setWorkflowFilter(value);
-    setPartFilter("all");
-    trackLearningEvent("curriculum_filtered", { filterType: "workflow", filterValue: value });
-  };
-
-  const clearFilters = () => {
-    setQuery("");
-    setWorkflowFilter(DEFAULT_WORKFLOW_FILTER);
-    setPartFilter(DEFAULT_PART_FILTER);
-    setFilterMode("part");
+  const renderChapter = (chapter: CurriculumChapter) => {
+    const progress = chapterProgress[chapter.id];
+    const status = STATUS_META[progress?.status ?? "new"];
+    const isExpanded = expandedChapterId === chapter.id;
+    const lesson = getCurriculumLesson(chapter.id);
+    return (
+      <div key={chapter.id} className="border-b last:border-b-0" style={{ borderColor: "var(--color-border-light)" }}>
+        <button type="button" onClick={() => { setExpandedChapter(isExpanded ? undefined : chapter.id); setExpandedPart(chapter.partId); }} className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-[var(--color-bg-soft)]">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold" style={{ background: "var(--color-accent-soft)", color: "var(--color-accent)" }}>{chapter.number === "导论" ? "导" : chapter.number}</span>
+          <span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium">{chapter.title}</span><span className="mt-0.5 block text-xs" style={{ color: status.tone }}>{status.label}</span></span>
+          <span className="shrink-0 text-xs tabular-nums" style={{ color: progress?.progress === 100 ? "var(--color-status-mastered)" : "var(--color-text-muted)" }}>{progress?.progress ?? 0}%</span>
+          <span aria-hidden="true" className="shrink-0 text-sm" style={{ color: "var(--color-text-muted)" }}>{isExpanded ? "⌃" : "⌄"}</span>
+        </button>
+        {isExpanded && (
+          <div className="border-t px-4 pb-4 pt-4" style={{ borderColor: "var(--color-border-light)", background: "var(--color-bg-soft)" }}>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div><p className="text-xs font-semibold" style={{ color: "var(--color-text-muted)" }}>章节简介</p><p className="mt-2 text-sm leading-6" style={{ color: "var(--color-text-secondary)" }}>{chapter.description}</p></div>
+              <div><p className="text-xs font-semibold" style={{ color: "var(--color-text-muted)" }}>学习收获</p><ul className="mt-2 space-y-1.5 text-sm leading-5" style={{ color: "var(--color-text-secondary)" }}>{chapter.learningObjectives.slice(0, 3).map((objective) => <li key={objective}>✓ {objective}</li>)}</ul></div>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-1.5">{chapter.workflowStages.map((stage) => <span key={stage} className="rounded-full border px-2 py-1 text-[10px]" style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}>{stage}</span>)}</div>
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{progress?.legacyTotal ? `已掌握知识点 ${progress.legacyKnown}/${progress.legacyTotal}` : lesson ? "微课 + 章节检测" : "章节内容"}</span>
+              <div className="flex flex-wrap gap-2"><Link href={chapterHref(chapter)} onClick={() => trackLearningEvent("curriculum_opened", { chapterId: chapter.id, chapterNumber: chapter.number })} className="rounded-md px-3 py-2 text-xs font-medium text-white" style={{ background: "var(--color-accent)" }}>{progress?.progress ? "继续学习" : "开始学习"} →</Link>{lesson && <Link href={`${chapterHref(chapter)}/practice`} className="rounded-md border px-3 py-2 text-xs font-medium" style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)" }}>章节检测</Link>}</div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-3 gap-2 text-center">
-        {[
-          [curriculumStats.parts, "篇"],
-          [curriculumStats.chapters, "章"],
-          [curriculumStats.available + curriculumStats.partial, "已建/部分"],
-        ].map(([value, label]) => (
-          <div key={label} className="border rounded-lg p-3" style={{ borderColor: "var(--color-border)" }}>
-            <div className="text-lg font-semibold tabular-nums">{value}</div>
-            <div className="text-xs" style={{ color: "var(--color-text-muted)" }}>{label}</div>
-          </div>
-        ))}
-      </div>
-
-      <section
-        className="sticky top-[49px] z-20 -mx-1 rounded-xl border p-3 space-y-3"
-        style={{ borderColor: "var(--color-border)", background: "color-mix(in srgb, var(--color-bg) 94%, transparent)", backdropFilter: "blur(10px)" }}
-        aria-label="筛选课程"
-      >
-        <p className="px-1 text-xs leading-5" style={{ color: "var(--color-text-muted)" }}>
-          用筛选快速缩小课程范围：按教材篇章或当前业务阶段查看，搜索可定位具体章节。筛选不会影响你的学习进度。
-        </p>
-        <button
-          type="button"
-          onClick={() => setFilterPanel(true)}
-          aria-haspopup="dialog"
-          aria-expanded={filterPanel}
-          className="flex w-full items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors hover:bg-[var(--color-bg-soft)]"
-          style={{ borderColor: activePartFilter !== "all" || activeWorkflowFilter !== "全部" ? "var(--color-accent)" : "var(--color-border)" }}
-        >
-          <span>
-            <span className="block text-[10px] tracking-[0.14em] uppercase" style={{ color: "var(--color-text-muted)" }}>课程筛选</span>
-            <span className="mt-1 block text-sm font-medium">
-              {activePartFilter !== "all"
-                ? `${parts.find((part) => part.id === activePartFilter)?.number ?? "教材篇章"} · ${parts.find((part) => part.id === activePartFilter)?.chapters.length ?? 0} 章`
-                : activeWorkflowFilter !== "全部"
-                  ? `${activeWorkflowFilter} · ${workflowCounts.get(activeWorkflowFilter) ?? 0} 章`
-                  : `全部内容 · ${curriculumStats.chapters + 1} 项`}
-            </span>
-          </span>
-          <span aria-hidden="true" className="text-base" style={{ color: "var(--color-text-muted)" }}>⌄</span>
-        </button>
-
-        <label className="flex items-center gap-2 border rounded-lg px-3 py-2" style={{ borderColor: "var(--color-border)" }}>
-          <span aria-hidden="true" style={{ color: "var(--color-text-muted)" }}>⌕</span>
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索章节、业务场景或关键词…"
-            className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--color-text-muted)]"
-            aria-label="搜索课程"
-          />
-          {query && (
-            <button type="button" onClick={() => setQuery("")} className="text-xs" style={{ color: "var(--color-text-muted)" }} aria-label="清除搜索">清除</button>
-          )}
-        </label>
+      <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight">课程</h1>
+          <p className="mt-2 text-sm" style={{ color: "var(--color-text-muted)" }}>按学习顺序逐步掌握外贸实务基础。</p>
+        </div>
+        <aside className="rounded-xl border p-4" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }} aria-label="课程进度">
+          <div className="grid grid-cols-2 divide-x" style={{ borderColor: "var(--color-border-light)" }}><div className="pr-3"><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>课程进度</p><p className="mt-1 text-2xl font-semibold tabular-nums">{completedCount} <span className="text-sm font-normal" style={{ color: "var(--color-text-muted)" }}>/ {totalChapters} 章</span></p></div><div className="pl-3"><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>累计学习</p><p className="mt-1 text-2xl font-semibold tabular-nums">{totalStudyMinutes} <span className="text-sm font-normal" style={{ color: "var(--color-text-muted)" }}>分钟</span></p></div></div>
+          <div className="mt-4 h-1.5 rounded-full" style={{ background: "var(--color-border-light)" }}><div className="h-full rounded-full transition-all" style={{ width: `${overallProgress}%`, background: "var(--color-accent)" }} /></div>
+          <p className="mt-3 text-xs" style={{ color: "var(--color-text-muted)" }}>建议每日学习 15—20 分钟 · 当前篇章 {currentPartCompleted}/{currentPartTotal}</p>
+          {currentChapter && <Link href={chapterHref(currentChapter)} className="mt-3 inline-flex w-full items-center justify-center rounded-md border py-2 text-sm font-medium" style={{ borderColor: "var(--color-accent)", color: "var(--color-accent)" }}>继续：{currentChapter.title} →</Link>}
+        </aside>
       </section>
 
-      {filterPanel && (
-        <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/30 p-3 sm:items-center" role="presentation" onClick={() => setFilterPanel(false)}>
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="curriculum-filter-title"
-            onClick={(event) => event.stopPropagation()}
-            className="w-full max-w-lg rounded-2xl border p-4 shadow-xl"
-            style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}
-          >
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h2 id="curriculum-filter-title" className="text-base font-semibold">筛选课程</h2>
-                <p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>选择一种浏览方式，课程筛选不会影响学习进度。</p>
-              </div>
-              <button type="button" onClick={() => setFilterPanel(false)} className="rounded-full border px-2.5 py-1 text-xs" style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }} aria-label="关闭筛选面板">关闭</button>
-            </div>
+      <section className="space-y-3" aria-label="课程筛选">
+        <label className="flex items-center gap-2 rounded-lg border px-3 py-2.5" style={{ borderColor: "var(--color-border)" }}><span aria-hidden="true" style={{ color: "var(--color-text-muted)" }}>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索章节、知识点或关键词" className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--color-text-muted)]" aria-label="搜索课程" />{query && <button type="button" onClick={() => setQuery("")} className="text-xs" style={{ color: "var(--color-accent)" }}>清除</button>}</label>
+        <div className="flex flex-wrap items-center gap-2"><select value={partFilter} onChange={(event) => setPartFilter(event.target.value as PartFilter)} className="rounded-md border px-3 py-2 text-xs" style={selectStyle()} aria-label="筛选教材篇章"><option value="all">全部篇章</option>{parts.map((part) => <option key={part.id} value={part.id}>{part.number} · {part.chapters.length} 章</option>)}</select><select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as StatusFilter)} className="rounded-md border px-3 py-2 text-xs" style={selectStyle()} aria-label="筛选学习状态"><option value="all">全部状态</option><option value="new">未开始</option><option value="learning">进行中</option><option value="completed">已完成</option></select><select value={sortFilter} onChange={(event) => setSortFilter(event.target.value as SortFilter)} className="rounded-md border px-3 py-2 text-xs" style={selectStyle()} aria-label="课程排序"><option value="default">默认顺序</option><option value="recent">最近学习</option><option value="progress">完成度优先</option></select><div className="ml-auto flex rounded-md border p-0.5" style={{ borderColor: "var(--color-border)" }}><button type="button" onClick={() => setViewMode("textbook")} className="rounded px-2.5 py-1.5 text-xs" style={{ background: viewMode === "textbook" ? "var(--color-accent-soft)" : "transparent", color: viewMode === "textbook" ? "var(--color-accent)" : "var(--color-text-muted)" }}>教材顺序</button><button type="button" onClick={() => setViewMode("workflow")} className="rounded px-2.5 py-1.5 text-xs" style={{ background: viewMode === "workflow" ? "var(--color-accent-soft)" : "transparent", color: viewMode === "workflow" ? "var(--color-accent)" : "var(--color-text-muted)" }}>业务流程</button></div></div>
+      </section>
 
-            <div className="mt-4 grid grid-cols-2 rounded-lg bg-[var(--color-bg-soft)] p-1">
-              <button type="button" onClick={() => setFilterMode("part")} className="rounded-md px-3 py-2 text-sm font-medium transition-colors" style={{ background: filterMode === "part" ? "var(--color-surface)" : "transparent", color: filterMode === "part" ? "var(--color-text)" : "var(--color-text-muted)", boxShadow: filterMode === "part" ? "0 1px 2px rgb(0 0 0 / 8%)" : "none" }}>按教材篇章</button>
-              <button type="button" onClick={() => setFilterMode("workflow")} className="rounded-md px-3 py-2 text-sm font-medium transition-colors" style={{ background: filterMode === "workflow" ? "var(--color-surface)" : "transparent", color: filterMode === "workflow" ? "var(--color-text)" : "var(--color-text-muted)", boxShadow: filterMode === "workflow" ? "0 1px 2px rgb(0 0 0 / 8%)" : "none" }}>按业务流程</button>
-            </div>
+      {conceptMatches.length > 0 && <section className="space-y-2" aria-label="知识点搜索结果"><div className="flex items-center justify-between"><h2 className="text-sm font-semibold">知识点结果</h2><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>最多 8 项</span></div><div className="grid gap-2 sm:grid-cols-2">{conceptMatches.map((item) => <Link key={item.id} href={item.href} className="flex items-center gap-3 rounded-lg border p-3 hover:bg-[var(--color-bg-soft)]" style={{ borderColor: "var(--color-border)" }}><span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium">{item.title}</span><span className="mt-0.5 block truncate text-xs" style={{ color: "var(--color-text-muted)" }}>{item.module} · {item.sub}</span></span><span style={{ color: "var(--color-text-muted)" }}>→</span></Link>)}</div></section>}
 
-            {filterMode === "part" ? (
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  aria-pressed={activePartFilter === "all"}
-                  onClick={() => { selectPart("all"); setFilterPanel(false); }}
-                  className="rounded-lg border px-3 py-3 text-left text-sm"
-                  style={{ borderColor: activePartFilter === "all" ? "var(--color-accent)" : "var(--color-border)", background: activePartFilter === "all" ? "var(--color-accent-soft)" : "transparent", color: activePartFilter === "all" ? "var(--color-accent)" : "var(--color-text)" }}
-                >
-                  <span className="block font-medium">全部内容</span>
-                  <span className="mt-1 block text-xs opacity-70">{curriculumStats.chapters + 1} 项</span>
-                </button>
-                {parts.map((part) => {
-                  const isActive = activePartFilter === part.id;
-                  return (
-                    <button
-                      key={part.id}
-                      type="button"
-                      aria-pressed={isActive}
-                      onClick={() => { selectPart(part.id); setFilterPanel(false); }}
-                      className="rounded-lg border px-3 py-3 text-left text-sm"
-                      style={{ borderColor: isActive ? "var(--color-accent)" : "var(--color-border)", background: isActive ? "var(--color-accent-soft)" : "transparent", color: isActive ? "var(--color-accent)" : "var(--color-text)" }}
-                    >
-                      <span className="block font-medium">{part.number}</span>
-                      <span className="mt-1 block text-xs opacity-70">{part.chapters.length} 章</span>
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {workflows.map((workflow) => {
-                  const isActive = activeWorkflowFilter === workflow;
-                  return (
-                    <button
-                      key={workflow}
-                      type="button"
-                      aria-pressed={isActive}
-                      onClick={() => { selectWorkflow(workflow); setFilterPanel(false); }}
-                      className="rounded-lg border px-3 py-3 text-left text-sm"
-                      style={{ borderColor: isActive ? "var(--color-accent)" : "var(--color-border)", background: isActive ? "var(--color-accent-soft)" : "transparent", color: isActive ? "var(--color-accent)" : "var(--color-text)" }}
-                    >
-                      <span className="block font-medium">{workflow === "全部" ? "全部流程" : workflow}</span>
-                      <span className="mt-1 block text-xs opacity-70">{workflow === "全部" ? `${curriculumStats.chapters + 1} 项` : `${workflowCounts.get(workflow) ?? 0} 章`}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      <div className="flex items-center justify-between">
-        <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-          {query || activeWorkflowFilter !== "全部" || activePartFilter !== "all" ? `当前显示 ${visibleChapterCount} 项 · ${activeFilterSummary}` : "按篇章浏览 · 每章都有业务应用场景"}
-        </p>
-        {(query || activeWorkflowFilter !== "全部" || activePartFilter !== "all") && (
-          <button type="button" onClick={clearFilters} className="text-xs hover:underline" style={{ color: "var(--color-accent)" }}>
-            清除筛选
-          </button>
-        )}
-      </div>
-
-      {query.trim() && conceptMatches.length > 0 && (
-        <section className="space-y-2" aria-label="知识点搜索结果">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold">知识点结果</h2>
-            <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>最多显示 8 项</span>
-          </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {conceptMatches.map((item) => (
-              <Link
-                key={item.id}
-                href={item.href}
-                onClick={() => trackLearningEvent("curriculum_opened", { conceptId: item.id, module: item.module })}
-                className="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-[var(--color-bg-soft)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
-                style={{ borderColor: "var(--color-border)" }}
-              >
-                <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-medium truncate">{item.title}</span>
-                  <span className="block mt-0.5 text-xs truncate" style={{ color: "var(--color-text-muted)" }}>{item.module} · {item.sub}</span>
-                </span>
-                <span className="text-sm" style={{ color: "var(--color-text-muted)" }}>→</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {visibleParts.length === 0 ? (
-        <div className="border rounded-xl p-8 text-center" style={{ borderColor: "var(--color-border)" }}>
-          <p className="text-sm font-medium">没有找到匹配章节</p>
-          <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>试试更短的关键词，或清除筛选后重新浏览。</p>
-          <button type="button" onClick={clearFilters} className="mt-4 text-sm font-medium hover:underline" style={{ color: "var(--color-accent)" }}>
-            显示全部章节
-          </button>
-        </div>
-      ) : (
-        <section className="space-y-8">
-          {visibleParts.map((part) => (
-            <div key={part.id} className="space-y-3">
-              <div className="flex items-end justify-between gap-3 border-b pb-3" style={{ borderColor: "var(--color-border)" }}>
-                <div>
-                  <p className="text-[11px] font-semibold tracking-[0.12em]" style={{ color: "var(--color-text-muted)" }}>{part.number}</p>
-                  <h2 className="mt-1 text-base font-semibold">{part.title}</h2>
-                  <p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>{part.description}</p>
-                </div>
-                <span className="shrink-0 text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>{part.chapters.length} 章</span>
-              </div>
-              <div className="grid gap-3 md:grid-cols-2">
-                {part.chapters.map((chapter) => <ChapterCard key={chapter.id} chapter={chapter} />)}
-              </div>
-            </div>
-          ))}
-        </section>
-      )}
+      <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{filteredChapters.length} 个章节 · {viewMode === "textbook" ? "教材顺序" : "按业务流程"}{query ? ` · 搜索“${query}”` : ""}</p>
+      {viewMode === "textbook" ? <section className="space-y-4">{parts.map((part) => { const chapters = visiblePart(part); if (chapters.length === 0) return null; const completed = part.chapters.filter((chapter) => chapterProgress[chapter.id]?.status === "completed").length; const isOpen = expandedPartId === part.id; return <div key={part.id} className="overflow-hidden rounded-xl border" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}><button type="button" onClick={() => setExpandedPart(isOpen ? undefined : part.id)} className="flex w-full items-center gap-3 px-4 py-4 text-left"><span className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ background: "var(--color-accent-soft)", color: "var(--color-accent)" }}>▣</span><span className="min-w-0 flex-1"><span className="block text-sm font-semibold">{part.number}　{part.title}</span><span className="mt-1 block text-xs" style={{ color: "var(--color-text-muted)" }}>{part.description}</span></span><span className="shrink-0 text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>{completed} / {part.chapters.length} <span aria-hidden="true" className="ml-2">{isOpen ? "⌃" : "⌄"}</span></span></button>{isOpen && <div className="border-t" style={{ borderColor: "var(--color-border-light)" }}>{chapters.map(renderChapter)}</div>}</div>; })}</section> : <section className="space-y-4">{workflowGroups.map((group) => <div key={group.stage} className="overflow-hidden rounded-xl border" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}><div className="border-b px-4 py-3" style={{ borderColor: "var(--color-border-light)" }}><p className="text-sm font-semibold">{group.stage}</p><p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>在业务流程中的相关课程</p></div>{group.chapters.map(renderChapter)}</div>)}</section>}
     </div>
   );
 }

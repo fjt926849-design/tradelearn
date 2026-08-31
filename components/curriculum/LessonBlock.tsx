@@ -8,14 +8,16 @@ import { trackLearningEvent } from "@/lib/analytics";
 export default function LessonBlock({ lesson, chapterId }: { lesson: CurriculumLesson; chapterId: string }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [completed, setCompleted] = useState(false);
-  const { markLessonStarted, markLessonCompleted } = useCurriculumProgress();
+  const { markLessonStarted, markLessonCompleted, addStudySeconds } = useCurriculumProgress();
   const submitted = selected !== null;
   const correct = selected === lesson.check.answerIndex;
 
   useEffect(() => {
+    const startedAt = Date.now();
     markLessonStarted(chapterId);
     trackLearningEvent("lesson_started", { chapterId });
-  }, [chapterId, markLessonStarted]);
+    return () => addStudySeconds(chapterId, (Date.now() - startedAt) / 1000);
+  }, [chapterId, markLessonStarted, addStudySeconds]);
 
   const completeLesson = () => {
     markLessonCompleted(chapterId);

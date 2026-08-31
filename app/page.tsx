@@ -1,363 +1,146 @@
 "use client";
 
-import { useMemo } from "react";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Hero from "@/components/home/Hero";
+import { useCurriculumProgress } from "@/hooks/useCurriculumProgress";
 import { useFlashcardProgress } from "@/hooks/useFlashcardProgress";
 import { usePracticeProgress } from "@/hooks/usePracticeProgress";
 import { useProgressAggregator } from "@/hooks/useProgressAggregator";
+import { curriculumChapters, curriculumParts } from "@/data/curriculum";
+import { getCurriculumLesson } from "@/data/curriculum-lessons";
 import { tradeTerms } from "@/data/trade-terms";
-import { knowledgeMapData } from "@/data/knowledge-map";
 
-const ALL_CODES = tradeTerms.map((t) => t.code);
+const ALL_CODES = tradeTerms.map((term) => term.code);
 
-// knowledge-map 域名 → 章节编号（与 MODULE_CHAPTERS 对齐）
-const DOMAIN_CHAPTER: Record<string, { no: string; en: string }> = {
-  "trade-terms": { no: "01", en: "TERMS" },
-  settlement: { no: "02", en: "PAYMENT" },
-  "transport-logistics": { no: "03", en: "SHIPPING" },
-  insurance: { no: "04", en: "INSURANCE" },
-  documents: { no: "05", en: "DOCUMENTS" },
-  customs: { no: "06", en: "CUSTOMS" },
-  contract: { no: "07", en: "CONTRACT" },
-};
+const PRACTICE_ENTRIES = [
+  { href: "/practice/incoterms", label: "报价实训", description: "根据交付场景选择贸易术语" },
+  { href: "/practice/contract", label: "合同实训", description: "补齐条款并判断履约风险" },
+  { href: "/practice/comprehensive", label: "综合业务模拟", description: "从询盘到结算完成一笔业务" },
+];
 
-const QUICK_ENTRIES = [
-  { href: "/flashcards", tag: "FLASHCARDS", title: "闪卡复习", desc: "按知识点间隔复习" },
-  { href: "/practice", tag: "PRACTICE", title: "场景实战", desc: "按业务场景练习" },
-  { href: "/practice/comprehensive", tag: "SIMULATION", title: "综合实战", desc: "全流程业务模拟" },
-  { href: "/knowledge-map", tag: "MAP", title: "课程地图", desc: "5篇22章学习结构" },
+const DOMAIN_ENTRIES = [
+  { href: "/terms", number: "01", label: "贸易术语", en: "TERMS" },
+  { href: "/settlement", number: "02", label: "国际结算", en: "PAYMENT" },
+  { href: "/transport", number: "03", label: "国际运输", en: "SHIPPING" },
+  { href: "/insurance", number: "04", label: "货运保险", en: "INSURANCE" },
+  { href: "/documents", number: "05", label: "进出口单据", en: "DOCUMENTS" },
+  { href: "/customs", number: "06", label: "报关与检验", en: "CUSTOMS" },
+  { href: "/contract", number: "07", label: "合同条款", en: "CONTRACT" },
 ];
 
 export default function HomePage() {
-  const { getTermProgress, todayStats, getWeakTermCodes, getNextReviewInfo } =
-    useFlashcardProgress();
-  const { getMistakeStats, hasMistakes, lastSession } = usePracticeProgress();
-  const { aggregated, modules } = useProgressAggregator();
+  const { aggregated } = useProgressAggregator();
+  const { getWeakTermCodes, getTermProgress, getNextReviewInfo } = useFlashcardProgress();
+  const { hasMistakes, lastSession, getMistakeStats } = usePracticeProgress();
+  const { chapterProgress, currentChapter, completedCount, totalStudySeconds } = useCurriculumProgress();
 
-  const today = useMemo(() => todayStats(ALL_CODES), [todayStats]);
-  const weakTermCodes = useMemo(() => getWeakTermCodes(ALL_CODES), [getWeakTermCodes]);
-  const nextReviewInfo = useMemo(() => getNextReviewInfo(ALL_CODES), [getNextReviewInfo]);
-  const mistakeStats = useMemo(() => getMistakeStats(), [getMistakeStats]);
-
-  // Recently reviewed
+  const weakTermCodes = getWeakTermCodes(ALL_CODES);
+  const nextReviewInfo = getNextReviewInfo(ALL_CODES);
   const recentTerms = tradeTerms
-    .map((t) => ({ term: t, progress: getTermProgress(t.code) }))
-    .filter((p) => p.progress.lastReviewed > 0)
+    .map((term) => ({ term, progress: getTermProgress(term.code) }))
+    .filter(({ progress }) => progress.lastReviewed > 0)
     .sort((a, b) => b.progress.lastReviewed - a.progress.lastReviewed)
     .slice(0, 3);
 
-  const domains = knowledgeMapData.children ?? [];
+  const currentProgress = currentChapter ? chapterProgress[currentChapter.id] : undefined;
+  const currentOrdinal = currentChapter ? curriculumChapters.findIndex((chapter) => chapter.id === currentChapter.id) + 1 : 1;
+  const currentPart = currentChapter ? curriculumParts.find((part) => part.id === currentChapter.partId) : undefined;
+  const currentChapterHref = currentChapter?.route ?? `/knowledge-map/chapter/${currentChapter?.id ?? "intro"}`;
+  const currentPracticeHref = currentChapter && getCurriculumLesson(currentChapter.id)
+    ? `/knowledge-map/chapter/${currentChapter.id}/practice`
+    : currentChapterHref;
+  const checkpointReady = curriculumChapters.filter((chapter) => {
+    const progress = chapterProgress[chapter.id];
+    return progress && progress.status !== "completed" && progress.progress >= 60;
+  }).length;
+  const totalStudyMinutes = Math.floor(totalStudySeconds / 60);
+  const mistakeStats = getMistakeStats();
 
   return (
     <>
       <Header />
       <main className="flex-1">
-        <Hero
-          totalConcepts={aggregated.totalConcepts}
-          totalMastered={aggregated.totalMastered}
-          overallProgress={aggregated.overallProgress}
-        />
+        <section className="border-b" style={{ borderColor: "var(--color-border)" }}>
+          <div className="mx-auto max-w-6xl px-5 py-8 lg:py-12">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_330px] lg:items-stretch">
+              <div className="rounded-xl border p-6 sm:p-8" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--color-accent)" }}>学习仪表盘 · TRADELEARN</p>
+                <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">继续你的外贸学习</h1>
+                <p className="mt-3 max-w-xl text-sm leading-6" style={{ color: "var(--color-text-secondary)" }}>从一个章节开始，把术语、合同、装运、结算和实战串成一条清晰的业务路径。</p>
 
-        <div className="max-w-2xl mx-auto px-5 py-10 space-y-10">
-          {/* ═══ 今日学习（统一学习中心） ═══ */}
-          <section>
-            <div className="border rounded-lg p-5" style={{ borderColor: "var(--color-border)" }}>
-              <h2 className="text-sm font-semibold mb-1">今日学习</h2>
-              <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                全平台 {aggregated.totalConcepts} 个知识点 · 已掌握 {aggregated.totalMastered} 个
-              </p>
-
-              {/* Aggregated stats */}
-              <div className="mt-4 grid grid-cols-4 gap-2 text-center">
-                <div className="rounded-md border p-3" style={{ borderColor: "var(--color-border)" }}>
-                  <div className="text-lg font-bold tabular-nums">{aggregated.totalDue}</div>
-                  <div className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>待复习</div>
-                </div>
-                <div className="rounded-md border p-3" style={{ borderColor: "var(--color-border)" }}>
-                  <div className="text-lg font-bold tabular-nums">{aggregated.totalNew}</div>
-                  <div className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>新知识</div>
-                </div>
-                <div className="rounded-md border p-3" style={{ borderColor: "var(--color-border)" }}>
-                  <div className="text-lg font-bold tabular-nums" style={{ color: "var(--color-status-learning)" }}>{aggregated.totalWeak}</div>
-                  <div className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>薄弱</div>
-                </div>
-                <div className="rounded-md border p-3" style={{ borderColor: "var(--color-border)" }}>
-                  <div className="text-lg font-bold tabular-nums">{aggregated.totalMastered}</div>
-                  <div className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>已掌握</div>
-                </div>
-              </div>
-
-              {/* Overall progress bar */}
-              <div className="mt-3 flex items-center gap-3">
-                <div className="h-1.5 rounded-full flex-1" style={{ background: "var(--color-border-light)" }}>
-                  <div
-                    className="h-full rounded-full"
-                    style={{ width: `${aggregated.overallProgress}%`, background: "var(--color-accent)" }}
-                  />
-                </div>
-                <span className="text-xs font-medium shrink-0 tabular-nums">{aggregated.overallProgress}%</span>
-              </div>
-
-              {/* CTA */}
-              <div className="mt-4">
-                {aggregated.totalDue > 0 ? (
-                  <Link
-                    href="/flashcards"
-                    className="inline-flex items-center px-5 py-2.5 text-sm font-medium rounded-md border transition-colors hover:bg-gray-50"
-                    style={{ color: "var(--color-text)", borderColor: "var(--color-text)" }}
-                  >
-                    开始今日学习 →
-                  </Link>
-                ) : (
-                  <div className="border rounded-lg p-4 text-center space-y-2" style={{ borderColor: "var(--color-border)" }}>
-                    <p className="text-sm font-medium">今日学习已完成</p>
-                    <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                      已掌握 {aggregated.totalMastered} / {aggregated.totalConcepts} 个知识点
-                      {nextReviewInfo.timestamp && <> · 下次复习：{nextReviewInfo.label}</>}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-
-          {/* ═══ 各模块进度 ═══ */}
-          <section>
-            <h2 className="text-sm font-medium" style={{ color: "var(--color-text-muted)" }}>
-              学习进度
-            </h2>
-            <div className="mt-2 border rounded-lg divide-y" style={{ borderColor: "var(--color-border)" }}>
-              {modules.map((m) => (
-                <Link
-                  key={m.moduleId}
-                  href={m.route}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
-                >
-                  <span className="shrink-0 w-7 text-xs font-semibold tabular-nums" style={{ color: "var(--color-text-muted)" }}>
-                    {m.no}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-baseline justify-between mb-1">
-                      <span className="text-sm font-medium">
-                        {m.label}
-                        <span className="ml-2 text-[10px] tracking-[0.14em]" style={{ color: "var(--color-text-muted)" }}>
-                          {m.en}
-                        </span>
-                      </span>
-                      <span className="text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>
-                        {m.mastered + m.familiar}/{m.total}
-                      </span>
+                <div className="mt-7 rounded-lg border p-4 sm:p-5" style={{ borderColor: "var(--color-border-light)", background: "var(--color-bg-soft)" }}>
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>当前学习章节 · {currentOrdinal} / {curriculumChapters.length}</p>
+                      <h2 className="mt-1 truncate text-lg font-semibold">{currentChapter?.title ?? "国际贸易实务导论"}</h2>
+                      <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>{currentChapter?.description}</p>
                     </div>
-                    <div className="h-1 rounded-full" style={{ background: "var(--color-border-light)" }}>
-                      <div
-                        className="h-full rounded-full"
-                        style={{ width: `${m.progress}%`, background: "var(--color-accent)" }}
-                      />
-                    </div>
+                    <span className="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium" style={{ background: "var(--color-accent-soft)", color: "var(--color-accent)" }}>{currentProgress?.progress ?? 0}%</span>
                   </div>
-                  {m.dueCount > 0 && (
-                    <span
-                      className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-full"
-                      style={{ background: "var(--color-accent-soft)", color: "var(--color-accent)" }}
-                    >
-                      {m.dueCount} 待复习
-                    </span>
-                  )}
-                </Link>
-              ))}
-            </div>
-          </section>
-
-          {/* ═══ 薄弱知识 ═══ */}
-          {today.weakCount > 0 && (
-            <section>
-              <h2 className="text-sm font-medium" style={{ color: "var(--color-text-muted)" }}>
-                薄弱知识
-              </h2>
-              <div className="mt-2 border rounded-lg p-4" style={{ borderColor: "var(--color-border)" }}>
-                <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-lg font-semibold" style={{ color: "var(--color-status-learning)" }}>{today.weakCount} 个</span>
-                  <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>术语需要加强</span>
-                </div>
-                <div className="space-y-1.5">
-                  {weakTermCodes.slice(0, 3).map((code) => {
-                    const t = tradeTerms.find((x) => x.code === code)!;
-                    return (
-                      <Link
-                        key={code}
-                        href={`/terms/${code.toLowerCase()}`}
-                        className="flex items-center gap-2 text-sm hover:underline"
-                        style={{ color: "var(--color-text-secondary)" }}
-                      >
-                        <span className="font-semibold tabular-nums">{t.code}</span>
-                        <span style={{ color: "var(--color-text-muted)" }}>{t.chineseName}</span>
-                      </Link>
-                    );
-                  })}
-                  {weakTermCodes.length > 3 && (
-                    <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                      还有 {weakTermCodes.length - 3} 个薄弱术语
-                    </p>
-                  )}
-                </div>
-                <div className="mt-3">
-                  <Link
-                    href="/flashcards"
-                    className="inline-flex items-center px-4 py-2 text-sm rounded-md border transition-colors hover:bg-gray-50"
-                    style={{ color: "var(--color-text)", borderColor: "var(--color-text)" }}
-                  >
-                    复习薄弱知识 →
-                  </Link>
-                </div>
-              </div>
-            </section>
-          )}
-
-          {/* ═══ 实战提示 ═══ */}
-          {hasMistakes && mistakeStats.length > 0 && (
-            <section>
-              <div className="border rounded-lg p-4" style={{ borderColor: "var(--color-border)" }}>
-                <div className="flex items-start gap-3">
-                  <span
-                    className="shrink-0 mt-0.5 w-9 h-9 rounded-md flex items-center justify-center text-[10px] font-bold tracking-wider"
-                    style={{ background: "var(--color-accent-soft)", color: "var(--color-accent)" }}
-                  >
-                    实战
-                  </span>
-                  <div className="space-y-2 min-w-0">
-                    <p className="text-sm font-medium">场景实战有薄弱点</p>
-                    <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                      {mistakeStats.slice(0, 2).map((s) => s.termCode).join(" / ")} 容易混淆，建议多加练习。
-                      {lastSession && <> 上次实战正确率：{Math.round((lastSession.score / lastSession.total) * 100)}%。</>}
-                    </p>
-                    <Link href="/practice" className="inline-flex items-center text-sm hover:underline" style={{ color: "var(--color-text)" }}>
-                      去实战练习 →
-                    </Link>
+                  <div className="mt-4 h-1.5 overflow-hidden rounded-full" style={{ background: "var(--color-border-light)" }}><div className="h-full rounded-full" style={{ width: `${currentProgress?.progress ?? 0}%`, background: "var(--color-accent)" }} /></div>
+                  <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                    <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{currentProgress?.lastOpenedAt ? `上次学习：${formatRelativeTime(currentProgress.lastOpenedAt)}` : "还没有开始学习，从第一课开始即可"}</p>
+                    <Link href={currentChapterHref} className="inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--color-accent)" }}>{currentProgress?.progress ? "继续学习" : "开始第一课"} <span aria-hidden="true" className="ml-1">→</span></Link>
                   </div>
                 </div>
               </div>
-            </section>
-          )}
 
-          {/* ═══ 快速入口 ═══ */}
+              <aside className="rounded-xl border p-6" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }} aria-label="学习概览">
+                <div className="flex items-start justify-between gap-4"><div><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>课程完成度</p><p className="mt-2 text-3xl font-semibold tabular-nums">{Math.round((completedCount / curriculumChapters.length) * 100)}%</p></div><span className="rounded-lg px-2 py-1 text-xs" style={{ color: "var(--color-accent)", background: "var(--color-accent-soft)" }}>学习中</span></div>
+                <div className="mt-4 h-2 overflow-hidden rounded-full" style={{ background: "var(--color-border-light)" }}><div className="h-full rounded-full" style={{ width: `${(completedCount / curriculumChapters.length) * 100}%`, background: "var(--color-accent)" }} /></div>
+                <div className="mt-5 grid grid-cols-2 gap-4 border-t pt-4" style={{ borderColor: "var(--color-border-light)" }}><div><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>已完成章节</p><p className="mt-1 text-xl font-semibold tabular-nums">{completedCount}<span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>/{curriculumChapters.length}</span></p></div><div><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>累计学习</p><p className="mt-1 text-xl font-semibold tabular-nums">{totalStudyMinutes}<span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>分钟</span></p></div></div>
+                <p className="mt-5 text-xs leading-5" style={{ color: "var(--color-text-muted)" }}>建议每日学习 15—20 分钟，完成一节微课再做章节检测。</p>
+              </aside>
+            </div>
+          </div>
+        </section>
+
+        <div className="mx-auto max-w-6xl space-y-10 px-5 py-10">
           <section>
-            <h2 className="text-sm font-medium" style={{ color: "var(--color-text-muted)" }}>
-              快速入口
-            </h2>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              {QUICK_ENTRIES.map((q) => (
-                <Link
-                  key={q.href}
-                  href={q.href}
-                  className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
-                  style={{ borderColor: "var(--color-border)" }}
-                >
-                  <span className="text-[10px] font-semibold tracking-[0.16em]" style={{ color: "var(--color-text-muted)" }}>
-                    {q.tag}
-                  </span>
-                  <p className="mt-2 text-sm font-medium">{q.title}</p>
-                  <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-muted)" }}>{q.desc}</p>
-                </Link>
-              ))}
+            <div className="flex items-end justify-between gap-4"><div><h2 className="text-xl font-semibold">今日任务</h2><p className="mt-1 text-sm" style={{ color: "var(--color-text-muted)" }}>用 15—20 分钟完成一次小闭环。</p></div><Link href="/progress" className="text-sm hover:underline" style={{ color: "var(--color-accent)" }}>查看我的进度 →</Link></div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <Link href="/flashcards" className="rounded-xl border p-4 transition-colors hover:bg-[var(--color-bg-soft)]" style={{ borderColor: "var(--color-border)" }}><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>待复习知识点</p><p className="mt-2 text-2xl font-semibold tabular-nums">{aggregated.totalDue}</p><p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>{aggregated.totalNew} 个新知识点等待学习</p></Link>
+              <Link href={checkpointReady > 0 ? currentPracticeHref : currentChapterHref} className="rounded-xl border p-4 transition-colors hover:bg-[var(--color-bg-soft)]" style={{ borderColor: "var(--color-border)" }}><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>待完成章节检测</p><p className="mt-2 text-2xl font-semibold tabular-nums">{checkpointReady}</p><p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>{checkpointReady > 0 ? "完成检测即可推进章节" : "先完成微课，再进行检测"}</p></Link>
+              <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border)" }}><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>今日建议</p><p className="mt-2 text-2xl font-semibold">15—20<span className="ml-1 text-sm font-normal">分钟</span></p><p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>{nextReviewInfo.timestamp ? `下一次复习：${nextReviewInfo.label}` : "完成一节微课，建立学习节奏"}</p></div>
             </div>
           </section>
 
-          {/* ═══ 最近学习 ═══ */}
-          {recentTerms.length > 0 && (
-            <section>
-              <h2 className="text-sm font-medium" style={{ color: "var(--color-text-muted)" }}>
-                最近学习
-              </h2>
-              <div className="mt-2 space-y-px">
-                {recentTerms.map(({ term, progress }) => {
-                  const timeAgo = getTimeAgo(progress.lastReviewed);
-                  const nextLabel = getNextLabel(progress.nextReviewAt);
-                  return (
-                    <Link
-                      key={term.code}
-                      href={`/terms/${term.code.toLowerCase()}`}
-                      className="flex items-center justify-between py-2.5 px-3 rounded hover:bg-gray-50 transition-colors"
-                    >
-                      <span className="text-sm">
-                        <span className="font-semibold tabular-nums">{term.code}</span>
-                        <span className="ml-2" style={{ color: "var(--color-text-muted)" }}>{term.chineseName}</span>
-                      </span>
-                      <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                        {timeAgo} · {nextLabel}
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </section>
-          )}
-
-          {/* ═══ 知识地图 ═══ */}
           <section>
-            <h2 className="text-sm font-medium" style={{ color: "var(--color-text-muted)" }}>
-              知识地图
-            </h2>
-            <div
-              className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-px border rounded-lg overflow-hidden"
-              style={{ borderColor: "var(--color-border)" }}
-            >
-              {domains.map((d) => {
-                const ch = DOMAIN_CHAPTER[d.id] ?? { no: "—", en: "" };
-                return (
-                  <Link
-                    key={d.id}
-                    href={d.route ?? "/"}
-                    className="p-4 text-center hover:bg-gray-50 transition-colors"
-                    style={{ background: "var(--color-bg)" }}
-                  >
-                    <span className="text-xs font-semibold tabular-nums" style={{ color: "var(--color-text-muted)" }}>
-                      {ch.no}
-                    </span>
-                    <p className="mt-1 text-xs font-medium">{d.title}</p>
-                    <p className="mt-0.5 text-[10px] tracking-[0.12em]" style={{ color: "var(--color-text-muted)" }}>
-                      {ch.en}
-                    </p>
-                  </Link>
-                );
-              })}
-            </div>
+            <div className="flex items-end justify-between gap-4"><div><h2 className="text-xl font-semibold">课程总览</h2><p className="mt-1 text-sm" style={{ color: "var(--color-text-muted)" }}>五篇课程，按教材顺序逐步掌握。</p></div><Link href="/knowledge-map" className="text-sm hover:underline" style={{ color: "var(--color-accent)" }}>进入完整课程 →</Link></div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{curriculumParts.filter((part) => part.id !== "intro").map((part) => { const views = part.chapters.map((chapter) => chapterProgress[chapter.id]); const completed = views.filter((view) => view?.status === "completed").length; const percent = views.length ? Math.round(views.reduce((sum, view) => sum + (view?.progress ?? 0), 0) / views.length) : 0; const isCurrent = currentPart?.id === part.id; return <Link key={part.id} href="/knowledge-map" className="rounded-xl border p-4 transition-colors hover:bg-[var(--color-bg-soft)]" style={{ borderColor: isCurrent ? "var(--color-accent)" : "var(--color-border)", background: isCurrent ? "var(--color-accent-soft)" : "var(--color-surface)" }}><div className="flex items-center justify-between gap-2"><span className="text-xs font-semibold" style={{ color: isCurrent ? "var(--color-accent)" : "var(--color-text-muted)" }}>{part.number}</span><span className="text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>{completed}/{views.length}</span></div><p className="mt-3 text-sm font-medium">{part.title}</p><div className="mt-4 h-1.5 overflow-hidden rounded-full" style={{ background: "var(--color-border-light)" }}><div className="h-full rounded-full" style={{ width: `${percent}%`, background: "var(--color-accent)" }} /></div><p className="mt-2 text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>{percent}% 完成</p></Link>; })}</div>
           </section>
 
-          {/* ═══ About ═══ */}
-          <section className="pt-6 border-t text-center" style={{ borderColor: "var(--color-border)" }}>
-            <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
-              国际贸易实务一站式学习平台——贸易术语 · 国际结算 · 运输 · 保险 · 单据 · 报关 · 合同。
-              <br />
-              间隔复习系统帮助你科学安排学习节奏。
-            </p>
+          <section>
+            <div className="flex items-end justify-between gap-4"><div><h2 className="text-xl font-semibold">业务实战</h2><p className="mt-1 text-sm" style={{ color: "var(--color-text-muted)" }}>把刚学的知识放进真实业务场景。</p></div><Link href="/practice" className="text-sm hover:underline" style={{ color: "var(--color-accent)" }}>查看全部实战 →</Link></div>
+            <div className="mt-4 grid gap-3 md:grid-cols-3">{PRACTICE_ENTRIES.map((entry, index) => <Link key={entry.href} href={entry.href} className="group rounded-xl border p-5 transition-colors hover:bg-[var(--color-bg-soft)]" style={{ borderColor: "var(--color-border)" }}><div className="flex items-center justify-between"><span className="text-xs font-semibold tabular-nums" style={{ color: "var(--color-accent)" }}>0{index + 1}</span><span className="transition-transform group-hover:translate-x-1" style={{ color: "var(--color-text-muted)" }}>→</span></div><p className="mt-6 text-base font-semibold">{entry.label}</p><p className="mt-1 text-xs leading-5" style={{ color: "var(--color-text-muted)" }}>{entry.description}</p></Link>)}</div>
+          </section>
+
+          {(weakTermCodes.length > 0 || recentTerms.length > 0 || hasMistakes) ? <section className="grid gap-4 lg:grid-cols-2">
+            {weakTermCodes.length > 0 && <div className="rounded-xl border p-5" style={{ borderColor: "var(--color-border)" }}><div className="flex items-center justify-between"><h2 className="text-base font-semibold">薄弱知识</h2><Link href="/flashcards" className="text-xs hover:underline" style={{ color: "var(--color-accent)" }}>去复习 →</Link></div><p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>{weakTermCodes.length} 个术语需要加强</p><div className="mt-4 space-y-2">{weakTermCodes.slice(0, 4).map((code) => { const term = tradeTerms.find((item) => item.code === code); return <Link key={code} href={`/terms/${code.toLowerCase()}`} className="flex items-center justify-between text-sm hover:underline"><span><b>{code}</b><span className="ml-2" style={{ color: "var(--color-text-muted)" }}>{term?.chineseName}</span></span><span style={{ color: "var(--color-text-muted)" }}>→</span></Link>; })}</div></div>}
+            {recentTerms.length > 0 && <div className="rounded-xl border p-5" style={{ borderColor: "var(--color-border)" }}><h2 className="text-base font-semibold">最近学习</h2><div className="mt-4 space-y-1">{recentTerms.map(({ term, progress }) => <Link key={term.code} href={`/terms/${term.code.toLowerCase()}`} className="flex items-center justify-between rounded-md px-2 py-2 text-sm hover:bg-[var(--color-bg-soft)]"><span><b>{term.code}</b><span className="ml-2" style={{ color: "var(--color-text-muted)" }}>{term.chineseName}</span></span><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{formatRelativeTime(progress.lastReviewed)}</span></Link>)}</div>{hasMistakes && lastSession && <p className="mt-3 border-t pt-3 text-xs" style={{ borderColor: "var(--color-border-light)", color: "var(--color-text-muted)" }}>最近实战正确率 {Math.round((lastSession.score / lastSession.total) * 100)}%，{mistakeStats.length} 个薄弱点待巩固。</p>}</div>}
+          </section> : <section className="rounded-xl border p-6" style={{ borderColor: "var(--color-border)", background: "var(--color-bg-soft)" }}><p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--color-accent)" }}>WELCOME · 新用户引导</p><h2 className="mt-2 text-lg font-semibold">从第一课开始建立你的外贸知识体系</h2><p className="mt-2 max-w-2xl text-sm leading-6" style={{ color: "var(--color-text-secondary)" }}>先完成导论，再学习贸易术语，最后用报价和合同实战检验理解。每次学习都会自动记录进度。</p><div className="mt-5 flex flex-wrap gap-2"><Link href="/start" className="rounded-md px-4 py-2 text-sm font-medium text-white" style={{ background: "var(--color-accent)" }}>开始诊断</Link><Link href="/knowledge-map" className="rounded-md border px-4 py-2 text-sm" style={{ borderColor: "var(--color-border)" }}>查看课程地图</Link></div></section>}
+
+          <section>
+            <div className="flex items-end justify-between gap-4"><div><h2 className="text-xl font-semibold">知识模块</h2><p className="mt-1 text-sm" style={{ color: "var(--color-text-muted)" }}>需要查找具体知识点时，从这里快速进入。</p></div><Link href="/knowledge-map" className="text-sm hover:underline" style={{ color: "var(--color-accent)" }}>课程地图 →</Link></div>
+            <div className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-xl border sm:grid-cols-4 lg:grid-cols-7" style={{ borderColor: "var(--color-border)" }}>{DOMAIN_ENTRIES.map((entry) => <Link key={entry.href} href={entry.href} className="p-4 text-center transition-colors hover:bg-[var(--color-bg-soft)]" style={{ background: "var(--color-surface)" }}><span className="text-xs font-semibold tabular-nums" style={{ color: "var(--color-text-muted)" }}>{entry.number}</span><p className="mt-2 text-xs font-medium">{entry.label}</p><p className="mt-1 text-[10px] tracking-[0.12em]" style={{ color: "var(--color-text-muted)" }}>{entry.en}</p></Link>)}</div>
           </section>
         </div>
+
+        <section aria-label="TradeLearn 品牌介绍" className="border-t" style={{ borderColor: "var(--color-border)" }}><Hero totalConcepts={aggregated.totalConcepts} totalMastered={aggregated.totalMastered} overallProgress={aggregated.overallProgress} /></section>
       </main>
       <Footer />
     </>
   );
 }
 
-function getTimeAgo(ts: number): string {
-  if (ts <= 0) return "";
-  const diff = Date.now() - ts;
-  if (diff < 0) return "";
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return "刚刚";
+function formatRelativeTime(timestamp: number): string {
+  const diff = Date.now() - timestamp;
+  if (diff < 60_000) return "刚刚";
+  const minutes = Math.floor(diff / 60_000);
   if (minutes < 60) return `${minutes} 分钟前`;
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `${hours} 小时前`;
   return `${Math.floor(hours / 24)} 天前`;
-}
-
-function getNextLabel(nextReviewAt: number): string {
-  if (nextReviewAt <= 0) return "待复习";
-  const diff = nextReviewAt - Date.now();
-  if (diff <= 0) return "待复习";
-  const hours = Math.floor(diff / 3600000);
-  if (hours < 24) return `${hours} 小时后复习`;
-  return `${Math.floor(hours / 24)} 天后复习`;
 }

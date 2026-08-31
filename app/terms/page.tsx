@@ -8,6 +8,7 @@ import { useFlashcardProgress } from "@/hooks/useFlashcardProgress";
 import StatusDot from "@/components/ui/StatusDot";
 import type { TradeTerm } from "@/lib/types";
 import { getModuleNav } from "@/lib/navigation";
+import BackButton from "@/components/learn/BackButton";
 
 const INDEX_BY_SLUG = new Map(
   getModuleNav("incoterms").map((n, i) => [n.slug, i + 1] as const)
@@ -35,6 +36,7 @@ export default function TermsPage() {
     <>
       <Header />
       <main className="flex-1 max-w-2xl mx-auto px-5 py-10">
+        <BackButton fallbackRoute="/knowledge-map" label="返回课程地图" />
         <div className="mb-8">
           <h1 className="text-xl font-semibold">贸易术语</h1>
           <p className="mt-1 text-sm" style={{ color: "var(--color-text-muted)" }}>

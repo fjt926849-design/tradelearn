@@ -5,6 +5,7 @@ import { MODULE_CHAPTERS } from "@/lib/types";
 import { getModuleQuestionCount } from "@/data/module-scenario-questions";
 import { scenarioQuestions } from "@/data/scenario-questions";
 import type { ModuleId } from "@/lib/types";
+import BackButton from "@/components/learn/BackButton";
 
 const modules: { id: ModuleId | "incoterms-legacy"; no: string; label: string; desc: string; count: number; route: string }[] = [
   {
@@ -70,6 +71,7 @@ export default function PracticeHubPage() {
     <>
       <Header />
       <main className="flex-1 max-w-2xl mx-auto px-5 py-10">
+        <BackButton fallbackRoute="/" label="返回首页" />
         <div className="mb-8">
           <h1 className="text-xl font-semibold">场景实战</h1>
           <p className="mt-1 text-sm" style={{ color: "var(--color-text-muted)" }}>

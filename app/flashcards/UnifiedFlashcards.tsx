@@ -11,6 +11,7 @@ import InsuranceFlashcardDeck from "@/components/flashcards/InsuranceFlashcardDe
 import DocumentsFlashcardDeck from "@/components/flashcards/DocumentsFlashcardDeck";
 import CustomsFlashcardDeck from "@/components/flashcards/CustomsFlashcardDeck";
 import ContractFlashcardDeck from "@/components/flashcards/ContractFlashcardDeck";
+import BackButton from "@/components/learn/BackButton";
 
 type ModuleKey = "incoterms" | "settlement" | "transport" | "insurance" | "documents" | "customs" | "contract";
 
@@ -67,6 +68,7 @@ export default function UnifiedFlashcards() {
     <>
       <Header />
       <main className="flex-1 max-w-xl mx-auto px-5 py-10">
+        <BackButton fallbackRoute="/" label="返回首页" />
         <ModulePicker active={activeModule} onChange={setActiveModule} />
 
         {activeModule === "incoterms" && <FlashcardDeck />}

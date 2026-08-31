@@ -8,6 +8,7 @@ import { useSettlementProgress } from "@/hooks/useSettlementProgress";
 import StatusDot from "@/components/ui/StatusDot";
 import type { SettlementConcept } from "@/lib/types";
 import { getModuleNav } from "@/lib/navigation";
+import BackButton from "@/components/learn/BackButton";
 
 const INDEX_BY_ID = new Map(
   getModuleNav("settlement").map((n, i) => [n.slug, i + 1] as const)
@@ -59,6 +60,7 @@ export default function SettlementPage() {
     <>
       <Header />
       <main className="flex-1 max-w-2xl mx-auto px-5 py-10">
+        <BackButton fallbackRoute="/knowledge-map" label="返回课程地图" />
         <div className="mb-8">
           <h1 className="text-xl font-semibold">国际结算</h1>
           <p className="mt-1 text-sm" style={{ color: "var(--color-text-muted)" }}>

@@ -4,6 +4,8 @@ interface HeroProps {
   totalConcepts: number;
   totalMastered: number;
   overallProgress: number;
+  primaryHref?: string;
+  primaryLabel?: string;
 }
 
 const delay = (seconds: number) => ({ animationDelay: `${seconds}s` });
@@ -12,6 +14,8 @@ export default function Hero({
   totalConcepts,
   totalMastered,
   overallProgress,
+  primaryHref = "/start",
+  primaryLabel = "从零开始",
 }: HeroProps) {
   return (
     <section className="hero-section">
@@ -36,8 +40,8 @@ export default function Hero({
               通过知识卡、进度追踪与闪卡复习，让学习更系统、更清晰。
             </p>
             <div className="hero-cta hero-anim" style={delay(0.36)}>
-              <Link href="/start" className="hero-cta-primary">
-                从零开始 <span aria-hidden="true">→</span>
+              <Link href={primaryHref} className="hero-cta-primary">
+                {primaryLabel} <span aria-hidden="true">→</span>
               </Link>
               <div className="hero-meta">
                 <span>

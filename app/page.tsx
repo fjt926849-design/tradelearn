@@ -48,6 +48,8 @@ export default function HomePage() {
   const currentOrdinal = currentChapter ? curriculumChapters.findIndex((chapter) => chapter.id === currentChapter.id) + 1 : 1;
   const currentPart = currentChapter ? curriculumParts.find((part) => part.id === currentChapter.partId) : undefined;
   const currentChapterHref = currentChapter?.route ?? `/knowledge-map/chapter/${currentChapter?.id ?? "intro"}`;
+  const heroHref = currentProgress?.progress ? currentChapterHref : "/start";
+  const heroLabel = currentProgress?.progress ? "继续学习" : "从零开始";
   const currentPracticeHref = currentChapter && getCurriculumLesson(currentChapter.id)
     ? `/knowledge-map/chapter/${currentChapter.id}/practice`
     : currentChapterHref;
@@ -62,6 +64,13 @@ export default function HomePage() {
     <>
       <Header />
       <main className="flex-1">
+        <Hero
+          totalConcepts={aggregated.totalConcepts}
+          totalMastered={aggregated.totalMastered}
+          overallProgress={aggregated.overallProgress}
+          primaryHref={heroHref}
+          primaryLabel={heroLabel}
+        />
         <section className="border-b" style={{ borderColor: "var(--color-border)" }}>
           <div className="mx-auto max-w-6xl px-5 py-8 lg:py-12">
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_330px] lg:items-stretch">
@@ -128,7 +137,6 @@ export default function HomePage() {
           </section>
         </div>
 
-        <section aria-label="TradeLearn 品牌介绍" className="border-t" style={{ borderColor: "var(--color-border)" }}><Hero totalConcepts={aggregated.totalConcepts} totalMastered={aggregated.totalMastered} overallProgress={aggregated.overallProgress} /></section>
       </main>
       <Footer />
     </>

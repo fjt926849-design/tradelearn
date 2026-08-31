@@ -34,7 +34,7 @@ export default function HomePage() {
   const { aggregated } = useProgressAggregator();
   const { getWeakTermCodes, getTermProgress, getNextReviewInfo } = useFlashcardProgress();
   const { hasMistakes, lastSession, getMistakeStats } = usePracticeProgress();
-  const { chapterProgress, currentChapter, completedCount, totalStudySeconds, hydrated } = useCurriculumProgress();
+  const { chapterProgress, currentChapter, completedCount, totalStudySeconds } = useCurriculumProgress();
 
   const weakTermCodes = getWeakTermCodes(ALL_CODES);
   const nextReviewInfo = getNextReviewInfo(ALL_CODES);
@@ -51,8 +51,6 @@ export default function HomePage() {
     ? `/knowledge-map/chapter/${currentChapter.id}`
     : currentChapter?.route ?? `/knowledge-map/chapter/${currentChapter?.id ?? "intro"}`;
   const allChaptersCompleted = completedCount === curriculumChapters.length;
-  const heroHref = allChaptersCompleted ? "/knowledge-map" : currentProgress?.progress ? currentChapterHref : "/start";
-  const heroLabel = allChaptersCompleted ? "开始复习" : currentProgress?.progress ? "继续学习" : "从零开始";
   const currentPracticeHref = currentChapter && getCurriculumLesson(currentChapter.id)
     ? `/knowledge-map/chapter/${currentChapter.id}/practice`
     : currentChapterHref;
@@ -76,8 +74,6 @@ export default function HomePage() {
           totalConcepts={aggregated.totalConcepts}
           totalMastered={aggregated.totalMastered}
           overallProgress={aggregated.overallProgress}
-          primaryHref={hydrated ? heroHref : "/start"}
-          primaryLabel={hydrated ? heroLabel : "加载进度…"}
         />
         <section className="border-b" style={{ borderColor: "var(--color-border)" }}>
           <div className="mx-auto max-w-6xl px-5 py-8 lg:py-12">

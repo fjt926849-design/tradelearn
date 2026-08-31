@@ -169,6 +169,18 @@ export interface CurriculumChapter {
   practicePlan?: string[];
 }
 
+/** 课程中心使用的章节级进度；与旧模块知识点进度并行保存。 */
+export interface CurriculumProgressRecord {
+  chapterId: string;
+  status: "new" | "learning" | "completed";
+  lessonStartedAt?: number;
+  lessonCompletedAt?: number;
+  checkpointScore?: number;
+  checkpointTotal?: number;
+  lastOpenedAt?: number;
+  studySeconds?: number;
+}
+
 export interface CurriculumPart {
   id: CurriculumPartId;
   number: string;

@@ -79,7 +79,7 @@ export default async function CurriculumChapterPage({ params }: { params: Promis
                 <h2 className="text-base font-semibold">本章微课</h2>
                 <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>约 8 分钟</span>
               </div>
-              <LessonBlock lesson={lesson} />
+              <LessonBlock lesson={lesson} chapterId={chapter.id} />
             </section>
           )}
 

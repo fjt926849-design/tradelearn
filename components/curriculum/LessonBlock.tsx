@@ -1,12 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { CurriculumLesson } from "@/lib/types";
+import { useCurriculumProgress } from "@/hooks/useCurriculumProgress";
+import { trackLearningEvent } from "@/lib/analytics";
 
-export default function LessonBlock({ lesson }: { lesson: CurriculumLesson }) {
+export default function LessonBlock({ lesson, chapterId }: { lesson: CurriculumLesson; chapterId: string }) {
   const [selected, setSelected] = useState<number | null>(null);
+  const [completed, setCompleted] = useState(false);
+  const { markLessonStarted, markLessonCompleted } = useCurriculumProgress();
   const submitted = selected !== null;
   const correct = selected === lesson.check.answerIndex;
+
+  useEffect(() => {
+    markLessonStarted(chapterId);
+    trackLearningEvent("lesson_started", { chapterId });
+  }, [chapterId, markLessonStarted]);
+
+  const completeLesson = () => {
+    markLessonCompleted(chapterId);
+    setCompleted(true);
+    trackLearningEvent("lesson_completed", { chapterId });
+  };
 
   return (
     <section className="space-y-6" aria-label="章节微课">
@@ -75,6 +90,9 @@ export default function LessonBlock({ lesson }: { lesson: CurriculumLesson }) {
       <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border)" }}>
         <h2 className="text-sm font-semibold">操作任务</h2>
         <p className="mt-2 text-sm leading-6" style={{ color: "var(--color-text-secondary)" }}>{lesson.task}</p>
+        <button type="button" onClick={completeLesson} disabled={completed} className="mt-4 rounded-md border px-3 py-2 text-sm font-medium transition-colors disabled:opacity-60" style={{ borderColor: completed ? "var(--color-status-mastered)" : "var(--color-text)", color: completed ? "var(--color-status-mastered)" : "var(--color-text)" }}>
+          {completed ? "本节已完成" : "完成本节微课"}
+        </button>
       </div>
     </section>
   );

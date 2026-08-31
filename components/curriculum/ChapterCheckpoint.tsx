@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { trackLearningEvent } from "@/lib/analytics";
 import type { CurriculumLesson } from "@/lib/types";
+import { useCurriculumProgress } from "@/hooks/useCurriculumProgress";
 
 type CurriculumCheck = CurriculumLesson["check"];
 
@@ -20,6 +21,7 @@ export default function ChapterCheckpoint({ chapterId, chapterNumber, chapterTit
   const [submitted, setSubmitted] = useState(false);
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [finished, setFinished] = useState(false);
+  const { recordCheckpoint } = useCurriculumProgress();
   const check = checks[currentIndex];
   const isCorrect = selectedIndex === check.answerIndex;
   const score = answers.filter(Boolean).length;
@@ -34,6 +36,7 @@ export default function ChapterCheckpoint({ chapterId, chapterNumber, chapterTit
 
   const next = () => {
     if (currentIndex + 1 >= checks.length) {
+      recordCheckpoint(chapterId, score, checks.length);
       setFinished(true);
       return;
     }

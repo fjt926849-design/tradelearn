@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { ensureProgressMigrationSnapshot } from "@/lib/progressMigration";
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
   const [storedValue, setStoredValue] = useState<T>(() => {
@@ -12,6 +13,10 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       return initialValue;
     }
   });
+
+  useEffect(() => {
+    ensureProgressMigrationSnapshot();
+  }, []);
 
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {

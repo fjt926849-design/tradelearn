@@ -8,6 +8,7 @@ import { getModuleNav, getPrevNext } from "@/lib/navigation";
 import { MODULE_CHAPTERS } from "@/lib/types";
 import ModuleIndex from "@/components/learn/ModuleIndex";
 import PrevNextNav from "@/components/learn/PrevNextNav";
+import BackButton from "@/components/learn/BackButton";
 
 export async function generateStaticParams() {
   return tradeTerms.map((t) => ({ code: t.code.toLowerCase() }));
@@ -39,6 +40,7 @@ export default async function TermDetailPage({
     <>
       <Header />
       <main className="flex-1 max-w-5xl mx-auto px-5 py-10">
+        <BackButton fallbackRoute="/terms" />
         <div className="lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 lg:items-start">
           <ModuleIndex moduleId="incoterms" currentSlug={code} />
           <div className="min-w-0">

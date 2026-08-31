@@ -9,6 +9,8 @@
 create table if not exists public.card_progress (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null,
+  -- V2 keeps the curriculum version explicit so new chapters never overwrite V1 history.
+  curriculum_version text not null default 'v1',
   module_id text not null,
   concept_id text not null,
   status text not null default 'new'
@@ -18,8 +20,14 @@ create table if not exists public.card_progress (
   review_count integer not null default 0,
   interval_ms bigint not null default 0,
   updated_at timestamptz not null default now(),
-  constraint card_progress_user_module_concept_key unique (user_id, module_id, concept_id)
+  constraint card_progress_user_module_concept_key unique (user_id, curriculum_version, module_id, concept_id)
 );
+
+-- Safe to run against an existing database before the V2 migration.
+alter table public.card_progress add column if not exists curriculum_version text not null default 'v1';
+alter table public.card_progress drop constraint if exists card_progress_user_module_concept_key;
+create unique index if not exists card_progress_v2_unique_idx
+  on public.card_progress (user_id, curriculum_version, module_id, concept_id);
 
 create index if not exists card_progress_user_idx on public.card_progress (user_id);
 create index if not exists card_progress_module_idx on public.card_progress (module_id);

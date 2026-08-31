@@ -58,6 +58,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Keep constrained page shells inside the viewport on narrow screens. */
+main {
+  width: 100%;
+}
+
 /* 闪卡翻转动画（Phase 4 使用） */
 .perspective-1000 { perspective: 1000px; }
 .backface-hidden { backface-visibility: hidden; }
@@ -511,6 +516,14 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+}
+
+/* Horizontal mobile navigation stays usable without adding another menu layer. */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 .prevnext-label {
   font-size: 13px;

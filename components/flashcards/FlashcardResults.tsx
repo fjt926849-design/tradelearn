@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { tradeTerms } from "@/data/trade-terms";
 import { useFlashcardProgress } from "@/hooks/useFlashcardProgress";
 
@@ -28,6 +29,7 @@ export default function FlashcardResults({
   onGoHome,
 }: ResultsProps) {
   const { getNextReviewInfo, getTermProgress } = useFlashcardProgress();
+  const [now] = useState(() => Date.now());
   const weakCount = weakTermCodes.length;
   const masteredCount = stats.mastered + stats.gotIt;
   const nextReview = getNextReviewInfo(ALL_CODES);
@@ -37,7 +39,7 @@ export default function FlashcardResults({
     .map((code) => {
       const term = tradeTerms.find((t) => t.code === code);
       const progress = getTermProgress(code);
-      return { code, term, nextReviewLabel: progress.nextReviewAt > Date.now() ? formatShortLabel(progress.nextReviewAt) : null };
+      return { code, term, nextReviewLabel: progress.nextReviewAt > now ? formatShortLabel(progress.nextReviewAt, now) : null };
     })
     .filter((w) => w.term != null);
 
@@ -162,8 +164,8 @@ export default function FlashcardResults({
 }
 
 /** 简短格式化，用于列表中显示 */
-function formatShortLabel(nextReviewAt: number): string {
-  const diff = nextReviewAt - Date.now();
+function formatShortLabel(nextReviewAt: number, now: number): string {
+  const diff = nextReviewAt - now;
   if (diff <= 0) return "现在";
   const minutes = Math.floor(diff / 60000);
   if (minutes < 60) return `${minutes} 分钟`;

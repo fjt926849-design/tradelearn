@@ -11,6 +11,7 @@ import { getModuleNav, getPrevNext } from "@/lib/navigation";
 import { MODULE_CHAPTERS } from "@/lib/types";
 import ModuleIndex from "@/components/learn/ModuleIndex";
 import PrevNextNav from "@/components/learn/PrevNextNav";
+import BackButton from "@/components/learn/BackButton";
 
 export async function generateStaticParams() {
   return settlementConcepts.map((c) => ({ id: c.id }));
@@ -42,6 +43,7 @@ export default async function SettlementDetailPage({
     <>
       <Header />
       <main className="flex-1 max-w-5xl mx-auto px-5 py-10">
+        <BackButton fallbackRoute="/settlement" />
         <div className="lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 lg:items-start">
           <ModuleIndex moduleId="settlement" currentSlug={id} />
           <div className="min-w-0">

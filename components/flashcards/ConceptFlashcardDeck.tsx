@@ -8,6 +8,7 @@ import { useConceptProgress } from "@/hooks/useConceptProgress";
 import type { SelfRating, ModuleId } from "@/lib/types";
 import { RATING_LABELS } from "@/lib/types";
 import type { RoundStats, ConceptFlashcardResultsProps } from "./ConceptFlashcardResults";
+import { trackLearningEvent } from "@/lib/analytics";
 
 type Phase = "card" | "results";
 
@@ -99,38 +100,11 @@ export default function ConceptFlashcardDeck<T>(config: ConceptDeckConfig<T>) {
   const currentId = queue[currentIndex];
   const concept = currentId ? concepts.find((c) => getId(c) === currentId) : undefined;
 
-  // Defensive: invalid concept
-  if (!concept) {
-    return (
-      <>
-        <h1 className="text-xl font-semibold mb-8">{title}</h1>
-        <div className="text-center py-16 space-y-4">
-          <h2 className="text-lg font-semibold">{emptyTitle}</h2>
-          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-            {emptyMessage(stats)}
-          </p>
-          <button
-            onClick={() => router.push(homeRoute)}
-            className="inline-flex items-center px-4 py-2 text-sm rounded-md border transition-colors hover:bg-gray-50"
-            style={{ borderColor: "var(--color-border)" }}
-          >
-            返回
-          </button>
-        </div>
-      </>
-    );
-  }
-
   const todayInfo = useMemo(() => todayStats(allIds), [todayStats, allIds]);
   const nextReviewInfo = getNextReviewInfo(allIds);
 
   // Weak IDs from this round
-  const weakIds: string[] = useMemo(() => {
-    if (phase !== "results") return [];
-    return Object.entries(roundRatings.current)
-      .filter(([, r]) => r === "forgot" || r === "blurry")
-      .map(([id]) => id);
-  }, [phase]);
+  const [weakIds, setWeakIds] = useState<string[]>([]);
 
   const handleFlip = useCallback(() => {
     if (!rated) setFlipped((p) => !p);
@@ -138,7 +112,9 @@ export default function ConceptFlashcardDeck<T>(config: ConceptDeckConfig<T>) {
 
   const handleRate = useCallback(
     (rating: SelfRating) => {
+      if (!currentId) return;
       rateConcept(currentId, rating);
+      trackLearningEvent("flashcard_rated", { moduleId, conceptId: currentId, rating });
       roundRatings.current[currentId] = rating;
       setRated(true);
 
@@ -151,11 +127,14 @@ export default function ConceptFlashcardDeck<T>(config: ConceptDeckConfig<T>) {
         return next;
       });
     },
-    [currentId, rateConcept]
+    [currentId, rateConcept, moduleId]
   );
 
   const handleNext = useCallback(() => {
     if (currentIndex + 1 >= total) {
+      setWeakIds(Object.entries(roundRatings.current)
+        .filter(([, r]) => r === "forgot" || r === "blurry")
+        .map(([id]) => id));
       if (forceQueue) setForceQueue(null);
       setPhase("results");
     } else {
@@ -174,6 +153,7 @@ export default function ConceptFlashcardDeck<T>(config: ConceptDeckConfig<T>) {
 
     roundRatings.current = {};
     setRoundStats({ mastered: 0, gotIt: 0, blurry: 0, forgot: 0 });
+    setWeakIds([]);
     setCurrentIndex(0);
     setFlipped(false);
     setRated(false);
@@ -185,6 +165,20 @@ export default function ConceptFlashcardDeck<T>(config: ConceptDeckConfig<T>) {
     setForceQueue(null);
     router.push(homeRoute);
   }, [router, homeRoute]);
+
+  // Defensive: invalid concept
+  if (!concept) {
+    return (
+      <>
+        <h1 className="text-xl font-semibold mb-8">{title}</h1>
+        <div className="text-center py-16 space-y-4">
+          <h2 className="text-lg font-semibold">{emptyTitle}</h2>
+          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>{emptyMessage(stats)}</p>
+          <button onClick={() => router.push(homeRoute)} className="inline-flex items-center px-4 py-2 text-sm rounded-md border transition-colors hover:bg-gray-50" style={{ borderColor: "var(--color-border)" }}>返回</button>
+        </div>
+      </>
+    );
+  }
 
   // Empty queue
   if (total === 0 && phase === "card") {
@@ -274,6 +268,11 @@ export default function ConceptFlashcardDeck<T>(config: ConceptDeckConfig<T>) {
           </div>
 
           {/* Card */}
+          {!flipped && (
+            <p className="text-center text-xs" style={{ color: "var(--color-text-muted)" }}>
+              先在心里回忆答案，再点击卡片翻面
+            </p>
+          )}
           <FlashCard
             flipped={flipped}
             onFlip={handleFlip}
@@ -285,7 +284,7 @@ export default function ConceptFlashcardDeck<T>(config: ConceptDeckConfig<T>) {
           {flipped && !rated && (
             <div className="text-center space-y-3">
               <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-                你的掌握程度？
+                你的熟悉程度？（课程掌握还会参考练习成绩）
               </p>
               <div className="flex items-center justify-center gap-2">
                 {RATING_OPTIONS.map(([key, color]) => (

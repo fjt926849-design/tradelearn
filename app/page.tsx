@@ -25,10 +25,10 @@ const DOMAIN_CHAPTER: Record<string, { no: string; en: string }> = {
 };
 
 const QUICK_ENTRIES = [
-  { href: "/flashcards", tag: "FLASHCARDS", title: "闪卡复习", desc: "7 个模块独立追踪" },
-  { href: "/practice", tag: "PRACTICE", title: "场景实战", desc: "7 个模块 + 综合模拟" },
+  { href: "/flashcards", tag: "FLASHCARDS", title: "闪卡复习", desc: "按知识点间隔复习" },
+  { href: "/practice", tag: "PRACTICE", title: "场景实战", desc: "按业务场景练习" },
   { href: "/practice/comprehensive", tag: "SIMULATION", title: "综合实战", desc: "全流程业务模拟" },
-  { href: "/knowledge-map", tag: "MAP", title: "知识地图", desc: "全局知识结构浏览" },
+  { href: "/knowledge-map", tag: "MAP", title: "课程地图", desc: "5篇22章学习结构" },
 ];
 
 export default function HomePage() {

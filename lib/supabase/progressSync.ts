@@ -4,6 +4,7 @@ import type { TermProgress } from "@/lib/types";
 
 type CardProgressRow = {
   user_id: string;
+  curriculum_version: string;
   module_id: string;
   concept_id: string;
   status: TermProgress["status"];
@@ -34,6 +35,7 @@ function toCardProgressRow(
 ): CardProgressRow {
   return {
     user_id: userId,
+    curriculum_version: "v2",
     module_id: moduleId,
     concept_id: progress.termCode,
     status: progress.status,
@@ -70,7 +72,7 @@ export async function syncCardProgress(
     const { error } = await sb
       .from("card_progress")
       .upsert(toCardProgressRow(userId, moduleId, { ...progress, termCode: conceptId }), {
-        onConflict: "user_id,module_id,concept_id",
+        onConflict: "user_id,curriculum_version,module_id,concept_id",
       });
     if (error) throw error;
   } catch (e) {
@@ -94,7 +96,7 @@ export async function syncStoredCardProgress(
   try {
     const { error } = await sb.from("card_progress").upsert(
       progress.map((item) => toCardProgressRow(userId, moduleId, item)),
-      { onConflict: "user_id,module_id,concept_id" }
+      { onConflict: "user_id,curriculum_version,module_id,concept_id" }
     );
     if (error) throw error;
   } catch (e) {

@@ -5,16 +5,10 @@ import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/", label: "首页" },
-  { href: "/knowledge-map", label: "知识地图" },
-  { href: "/terms", label: "术语" },
-  { href: "/settlement", label: "结算" },
-  { href: "/transport", label: "运输" },
-  { href: "/insurance", label: "保险" },
-  { href: "/documents", label: "单据" },
-  { href: "/customs", label: "报关" },
-  { href: "/contract", label: "合同" },
+  { href: "/knowledge-map", label: "课程" },
   { href: "/practice", label: "实战" },
   { href: "/flashcards", label: "闪卡" },
+  { href: "/progress", label: "进度" },
 ];
 
 export default function Header() {
@@ -34,7 +28,7 @@ export default function Header() {
           贸学 TradeLearn
         </Link>
 
-        <nav className="flex items-center gap-1">
+        <nav aria-label="主导航" className="flex items-center gap-1 max-w-[68vw] overflow-x-auto whitespace-nowrap scrollbar-none">
           {links.map((l) => {
             const active =
               l.href === "/"

@@ -138,6 +138,55 @@ export type ModuleId =
   | "customs"
   | "contract";
 
+/** 教材课程的篇章层级（第七版五篇二十二章） */
+export type CurriculumPartId = "intro" | "part-1" | "part-2" | "part-3" | "part-4" | "part-5";
+
+export type CurriculumStatus = "available" | "partial" | "planned";
+
+export interface SourceRef {
+  label: string;
+  url?: string;
+  version?: string;
+  updatedAt?: string;
+}
+
+export interface CurriculumChapter {
+  id: string;
+  number: string;
+  partId: CurriculumPartId;
+  title: string;
+  description: string;
+  status: CurriculumStatus;
+  route?: string;
+  moduleId?: ModuleId;
+  learningObjectives: string[];
+  prerequisites: string[];
+  workflowStages: string[];
+  sourceRefs: SourceRef[];
+  /** 规划章节的交付范围；已开放章节也可用来解释学习路径。 */
+  contentPlan?: string[];
+  /** 规划中的操作型练习，避免“建设中”页面只有一句空状态。 */
+  practicePlan?: string[];
+}
+
+export interface CurriculumPart {
+  id: CurriculumPartId;
+  number: string;
+  title: string;
+  description: string;
+  chapters: CurriculumChapter[];
+}
+
+/** 章节微课的第一版内容单元，独立于教材原文。 */
+export interface CurriculumLesson {
+  chapterId: string;
+  overview: string;
+  keyPoints: { title: string; detail: string }[];
+  caseStudy: { title: string; context: string; prompt: string; takeaway: string };
+  check: { question: string; options: string[]; answerIndex: number; explanation: string };
+  task: string;
+}
+
 export const MODULE_LABELS: Record<ModuleId, string> = {
   incoterms: "贸易术语",
   settlement: "国际结算",

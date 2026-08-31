@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useConceptProgress } from "@/hooks/useConceptProgress";
 import type { ModuleId } from "@/lib/types";
 
@@ -26,8 +27,8 @@ export interface ConceptFlashcardResultsProps<T> {
 }
 
 /** 简短格式化，用于列表中显示 */
-function formatShortLabel(nextReviewAt: number): string {
-  const diff = nextReviewAt - Date.now();
+function formatShortLabel(nextReviewAt: number, now: number): string {
+  const diff = nextReviewAt - now;
   if (diff <= 0) return "现在";
   const minutes = Math.floor(diff / 60000);
   if (minutes < 60) return `${minutes} 分钟`;
@@ -51,6 +52,7 @@ export default function ConceptFlashcardResults<T>({
   onGoHome,
 }: ConceptFlashcardResultsProps<T>) {
   const { getProgress, getNextReviewInfo } = useConceptProgress(storageKey, moduleId);
+  const [now] = useState(() => Date.now());
   const allIds = concepts.map(getId);
   const weakCount = weakIds.length;
   const masteredCount = stats.mastered + stats.gotIt;
@@ -66,8 +68,8 @@ export default function ConceptFlashcardResults<T>({
         id,
         concept,
         nextReviewLabel:
-          progress.nextReviewAt > Date.now()
-            ? formatShortLabel(progress.nextReviewAt)
+          progress.nextReviewAt > now
+            ? formatShortLabel(progress.nextReviewAt, now)
             : null,
       };
     })

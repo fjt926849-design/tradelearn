@@ -8,6 +8,7 @@ import { getModuleNav, getPrevNext } from "@/lib/navigation";
 import { MODULE_CHAPTERS } from "@/lib/types";
 import ModuleIndex from "@/components/learn/ModuleIndex";
 import PrevNextNav from "@/components/learn/PrevNextNav";
+import BackButton from "@/components/learn/BackButton";
 
 export async function generateStaticParams() {
   return contractConcepts.map((c) => ({ id: c.id }));
@@ -38,6 +39,7 @@ export default async function ContractDetailPage({
     <>
       <Header />
       <main className="flex-1 max-w-5xl mx-auto px-5 py-10">
+        <BackButton fallbackRoute="/contract" />
         <div className="lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 lg:items-start">
           <ModuleIndex moduleId="contract" currentSlug={id} />
           <div className="min-w-0">
@@ -64,6 +66,11 @@ export default async function ContractDetailPage({
 
               <div>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>{concept.description}</p>
+              </div>
+
+              <div className="rounded-md px-4 py-3 text-xs" style={{ background: "var(--color-accent-soft)", color: "var(--color-text-secondary)" }}>
+                <span className="font-medium">学习提示：</span>本页为外贸实务教学材料；合同效力和形式要求取决于适用法律、合同约定及具体证据，正式交易请咨询专业人士。
+                <span className="ml-2">参考：<a className="underline" href="https://uncitral.un.org/en/texts/salegoods/conventions/sale_of_goods/cisg" target="_blank" rel="noreferrer">UNCITRAL CISG</a></span>
               </div>
 
               <div>

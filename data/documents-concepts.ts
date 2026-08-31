@@ -1,4 +1,4 @@
-import type { KnowledgeConcept, ConceptComparison } from "@/lib/types";
+import type { KnowledgeConcept } from "@/lib/types";
 
 export const documentsConcepts: KnowledgeConcept[] = [
   /* ═══════════════════════ 单据体系总览 ═══════════════════════ */

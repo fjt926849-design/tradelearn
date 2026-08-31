@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { usePracticeProgress } from "@/hooks/usePracticeProgress";
 import PracticeResults from "@/components/practice/PracticeResults";
 import type { GenericScenarioQuestion, ModuleId } from "@/lib/types";
+import { trackLearningEvent } from "@/lib/analytics";
 
 type Phase = "intro" | "question" | "results";
 
@@ -55,17 +56,19 @@ export default function GenericPracticeDeck({
     if (selectedOption === null) return;
     const correct = selectedOption === question.correctIndex;
     submitAttempt(question.id, selectedOption, correct);
+    trackLearningEvent("practice_answered", { moduleId: moduleId ?? "unknown", questionId: question.id, isCorrect: correct });
     setAnswers((prev) => [
       ...prev,
       { questionId: question.id, selectedIndex: selectedOption, isCorrect: correct },
     ]);
     setSubmitted(true);
-  }, [selectedOption, question, submitAttempt]);
+  }, [selectedOption, question, submitAttempt, moduleId]);
 
   const handleNext = useCallback(() => {
     if (currentIndex + 1 >= total) {
-      const finalScore = answers.filter((a) => a.isCorrect).length;
-      const mistakeCodes = answers
+      const completedAnswers = [...answers, { questionId: question.id, selectedIndex: selectedOption ?? -1, isCorrect }];
+      const finalScore = completedAnswers.filter((a) => a.isCorrect).length;
+      const mistakeCodes = completedAnswers
         .filter((a) => !a.isCorrect)
         .map((a) => {
           const q = questions.find((x) => x.id === a.questionId)!;
@@ -73,13 +76,14 @@ export default function GenericPracticeDeck({
         })
         .flat();
       completeSession(finalScore, total, mistakeCodes);
+      trackLearningEvent("practice_completed", { moduleId: moduleId ?? "unknown", score: finalScore, total });
       setPhase("results");
     } else {
       setSelectedOption(null);
       setSubmitted(false);
       setCurrentIndex((p) => p + 1);
     }
-  }, [currentIndex, total, answers, completeSession, questions]);
+  }, [currentIndex, total, answers, completeSession, questions, question, selectedOption, isCorrect, moduleId]);
 
   const score = answers.filter((a) => a.isCorrect).length;
 
@@ -110,7 +114,10 @@ export default function GenericPracticeDeck({
             </p>
           </div>
           <button
-            onClick={() => setPhase("question")}
+            onClick={() => {
+              trackLearningEvent("practice_started", { moduleId: moduleId ?? "unknown", total });
+              setPhase("question");
+            }}
             className="inline-flex items-center px-6 py-3 text-sm font-medium rounded-md border transition-colors hover:bg-gray-50"
             style={{ color: "var(--color-text)", borderColor: "var(--color-text)" }}
           >

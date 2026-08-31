@@ -36,8 +36,8 @@ export default function Hero({
               通过知识卡、进度追踪与闪卡复习，让学习更系统、更清晰。
             </p>
             <div className="hero-cta hero-anim" style={delay(0.36)}>
-              <Link href="/flashcards" className="hero-cta-primary">
-                开始学习 <span aria-hidden="true">→</span>
+              <Link href="/start" className="hero-cta-primary">
+                从零开始 <span aria-hidden="true">→</span>
               </Link>
               <div className="hero-meta">
                 <span>

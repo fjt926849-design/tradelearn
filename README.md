@@ -1,6 +1,6 @@
 # 贸学 TradeLearn
 
-国际贸易知识系统学习工具。覆盖 7 大知识模块、73 个知识点，通过间隔复习系统和场景实战，帮助外贸从业者系统掌握国际贸易全流程。
+国际贸易知识系统学习工具。以黎孝先《国际贸易实务》第七版为课程骨架，逐步覆盖五篇二十二章，并通过间隔复习系统和场景实战帮助零基础学习者建立外贸能力。
 
 **线上地址：** [tradelearn-lake.vercel.app](https://tradelearn-lake.vercel.app)
 
@@ -10,8 +10,9 @@
 - **🃏 统一闪卡系统** — 4 级自评（很熟 / 会 / 模糊 / 不会），间隔复习算法自动安排下次复习，支持按模块切换
 - **📋 场景实战** — 30 道高仿真贸易场景题，覆盖全部 7 个模块；另有 7 步全流程综合实战（深圳蓝牙耳机→汉堡）
 - **🏠 首页学习中心** — 今日待学、薄弱知识点、全局学习进度、实战提示一目了然
-- **🗺️ 知识地图** — 按 E/F/C/D 四组可视化展示术语体系
-- **💾 纯本地存储** — 学习进度保存在浏览器 localStorage，无需登录，无后端
+- **🗺️ 课程地图** — 按教材五篇二十二章展示当前内容与建设状态
+- **🧭 学习诊断** — 从零开始前先选择目标和经验，获得第一课推荐
+- **💾 游客优先** — 进度保存在浏览器 localStorage，并预留登录云同步与迁移快照
 
 ## 🛠 技术栈
 
@@ -27,9 +28,19 @@
 
 ```bash
 npm install
-npm run dev      # → http://localhost:3000
+npm run dev -- -p 3002      # → http://localhost:3002（不占用个人网站3001）
 npm run build    # 生产构建（Turbopack，95 页，0 错误）
 ```
+
+### Google Analytics 4
+
+复制 `.env.example` 为 `.env.local`，填写 GA4 Measurement ID：
+
+```bash
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+```
+
+未填写时不会加载 GA 脚本。已接入页面浏览、闪卡评级、练习开始/答题/完成等事件；事件参数会自动转换为 GA4 可接受的下划线格式。
 
 ## 📁 项目结构
 
@@ -48,7 +59,9 @@ tradelearn/
 │   ├── contract/                   # 合同条款（列表 + 15 个详情页）
 │   ├── flashcards/                 # 统一闪卡入口 + 模块选择器
 │   ├── practice/                   # 分模块实战 + 综合实战
-│   └── knowledge-map/              # 知识地图
+│   ├── knowledge-map/              # 五篇二十二章课程地图
+│   ├── start/                      # 零基础学习诊断
+│   └── progress/                   # 统一学习进度
 ├── components/
 │   ├── flashcards/                 # 闪卡组件（FlashcardDeck + 6 模块专用 Deck）
 │   ├── practice/                   # 实战组件（GenericPracticeDeck + 原 Incoterms PracticeDeck）
@@ -70,7 +83,8 @@ tradelearn/
 │   ├── contract-concepts.ts        # 合同条款（15 个）
 │   ├── scenario-questions.ts       # 贸易术语场景题（15 道）
 │   ├── module-scenario-questions.ts # 新 6 模块场景题（15 道）+ 综合实战（7 步）
-│   └── knowledge-map.ts            # 知识地图结构
+│   ├── knowledge-map.ts            # 旧术语地图
+│   └── curriculum.ts               # 第七版五篇二十二章课程注册表
 └── lib/
     └── types.ts                    # TypeScript 类型定义
 ```
@@ -111,7 +125,10 @@ tradelearn/
 - [ ] 深色模式
 - [ ] PWA 离线支持
 - [ ] 术语对比矩阵页
-- [ ] 知识地图 7 模块全渲染
+- [x] 知识地图五篇二十二章课程骨架
+- [ ] 第1—14章内容与操作型实训补全
+- [ ] 第15—22章贸易方式与跨境电商补全
+- [ ] 登录、跨设备进度合并与正式云同步
 - [ ] 自定义题库导入
 - [ ] AI 场景题生成（V2）
 

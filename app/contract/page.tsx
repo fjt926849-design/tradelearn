@@ -9,6 +9,7 @@ import StatusDot from "@/components/ui/StatusDot";
 import type { KnowledgeConcept } from "@/lib/types";
 import { getModuleNav } from "@/lib/navigation";
 import BackButton from "@/components/learn/BackButton";
+import ModuleFlashcardEntry from "@/components/flashcards/ModuleFlashcardEntry";
 
 const INDEX_BY_ID = new Map(
   getModuleNav("contract").map((n, i) => [n.slug, i + 1] as const)
@@ -44,6 +45,7 @@ export default function ContractPage() {
           <p className="mt-1 text-sm" style={{ color: "var(--color-text-muted)" }}>
             核心条款 · 风险条款 · 共 {contractConcepts.length} 个知识点
           </p>
+          <ModuleFlashcardEntry href="/contract/flashcards" />
         </div>
 
         <div className="space-y-10">

@@ -9,6 +9,7 @@ import StatusDot from "@/components/ui/StatusDot";
 import type { KnowledgeConcept } from "@/lib/types";
 import { getModuleNav } from "@/lib/navigation";
 import BackButton from "@/components/learn/BackButton";
+import ModuleFlashcardEntry from "@/components/flashcards/ModuleFlashcardEntry";
 
 const INDEX_BY_ID = new Map(
   getModuleNav("customs").map((n, i) => [n.slug, i + 1] as const)
@@ -47,6 +48,7 @@ export default function CustomsPage() {
           <p className="mt-1 text-sm" style={{ color: "var(--color-text-muted)" }}>
             报关流程 · HS编码 · 商检 · 共 {customsConcepts.length} 个知识点
           </p>
+          <ModuleFlashcardEntry href="/customs/flashcards" />
         </div>
 
         <div className="space-y-10">

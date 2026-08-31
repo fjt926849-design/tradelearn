@@ -9,6 +9,7 @@ import StatusDot from "@/components/ui/StatusDot";
 import type { KnowledgeConcept } from "@/lib/types";
 import { getModuleNav } from "@/lib/navigation";
 import BackButton from "@/components/learn/BackButton";
+import ModuleFlashcardEntry from "@/components/flashcards/ModuleFlashcardEntry";
 
 const INDEX_BY_ID = new Map(
   getModuleNav("insurance").map((n, i) => [n.slug, i + 1] as const)
@@ -45,6 +46,7 @@ export default function InsurancePage() {
           <p className="mt-1 text-sm" style={{ color: "var(--color-text-muted)" }}>
             保险基础 · 计算实务 · 共 {insuranceConcepts.length} 个知识点
           </p>
+          <ModuleFlashcardEntry href="/insurance/flashcards" />
         </div>
 
         <div className="space-y-10">

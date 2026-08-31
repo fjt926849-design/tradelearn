@@ -9,6 +9,7 @@ import StatusDot from "@/components/ui/StatusDot";
 import type { TradeTerm } from "@/lib/types";
 import { getModuleNav } from "@/lib/navigation";
 import BackButton from "@/components/learn/BackButton";
+import ModuleFlashcardEntry from "@/components/flashcards/ModuleFlashcardEntry";
 
 const INDEX_BY_SLUG = new Map(
   getModuleNav("incoterms").map((n, i) => [n.slug, i + 1] as const)
@@ -42,6 +43,7 @@ export default function TermsPage() {
           <p className="mt-1 text-sm" style={{ color: "var(--color-text-muted)" }}>
             Incoterms 2020 · 共 11 个术语 · 按责任划分四组
           </p>
+          <ModuleFlashcardEntry href="/flashcards?module=incoterms" />
         </div>
 
         <div className="space-y-10">

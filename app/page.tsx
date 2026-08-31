@@ -34,7 +34,7 @@ export default function HomePage() {
   const { aggregated } = useProgressAggregator();
   const { getWeakTermCodes, getTermProgress, getNextReviewInfo } = useFlashcardProgress();
   const { hasMistakes, lastSession, getMistakeStats } = usePracticeProgress();
-  const { chapterProgress, currentChapter, completedCount, totalStudySeconds } = useCurriculumProgress();
+  const { chapterProgress, currentChapter, completedCount, totalStudySeconds, hydrated } = useCurriculumProgress();
 
   const weakTermCodes = getWeakTermCodes(ALL_CODES);
   const nextReviewInfo = getNextReviewInfo(ALL_CODES);
@@ -47,9 +47,12 @@ export default function HomePage() {
   const currentProgress = currentChapter ? chapterProgress[currentChapter.id] : undefined;
   const currentOrdinal = currentChapter ? curriculumChapters.findIndex((chapter) => chapter.id === currentChapter.id) + 1 : 1;
   const currentPart = currentChapter ? curriculumParts.find((part) => part.id === currentChapter.partId) : undefined;
-  const currentChapterHref = currentChapter?.route ?? `/knowledge-map/chapter/${currentChapter?.id ?? "intro"}`;
-  const heroHref = currentProgress?.progress ? currentChapterHref : "/start";
-  const heroLabel = currentProgress?.progress ? "继续学习" : "从零开始";
+  const currentChapterHref = currentChapter && getCurriculumLesson(currentChapter.id)
+    ? `/knowledge-map/chapter/${currentChapter.id}`
+    : currentChapter?.route ?? `/knowledge-map/chapter/${currentChapter?.id ?? "intro"}`;
+  const allChaptersCompleted = completedCount === curriculumChapters.length;
+  const heroHref = allChaptersCompleted ? "/knowledge-map" : currentProgress?.progress ? currentChapterHref : "/start";
+  const heroLabel = allChaptersCompleted ? "开始复习" : currentProgress?.progress ? "继续学习" : "从零开始";
   const currentPracticeHref = currentChapter && getCurriculumLesson(currentChapter.id)
     ? `/knowledge-map/chapter/${currentChapter.id}/practice`
     : currentChapterHref;
@@ -59,6 +62,11 @@ export default function HomePage() {
   }).length;
   const totalStudyMinutes = Math.floor(totalStudySeconds / 60);
   const mistakeStats = getMistakeStats();
+  const reviewDueCount = Math.max(0, aggregated.totalDue - aggregated.totalNew);
+  const learningChapterCount = curriculumChapters.filter((chapter) => chapterProgress[chapter.id]?.status === "learning").length;
+  const chapterProgressPercent = curriculumChapters.length
+    ? Math.round(curriculumChapters.reduce((sum, chapter) => sum + (chapterProgress[chapter.id]?.progress ?? 0), 0) / curriculumChapters.length)
+    : 0;
 
   return (
     <>
@@ -68,8 +76,8 @@ export default function HomePage() {
           totalConcepts={aggregated.totalConcepts}
           totalMastered={aggregated.totalMastered}
           overallProgress={aggregated.overallProgress}
-          primaryHref={heroHref}
-          primaryLabel={heroLabel}
+          primaryHref={hydrated ? heroHref : "/start"}
+          primaryLabel={hydrated ? heroLabel : "加载进度…"}
         />
         <section className="border-b" style={{ borderColor: "var(--color-border)" }}>
           <div className="mx-auto max-w-6xl px-5 py-8 lg:py-12">
@@ -83,23 +91,23 @@ export default function HomePage() {
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>当前学习章节 · {currentOrdinal} / {curriculumChapters.length}</p>
-                      <h2 className="mt-1 truncate text-lg font-semibold">{currentChapter?.title ?? "国际贸易实务导论"}</h2>
-                      <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>{currentChapter?.description}</p>
+                      <h2 className="mt-1 truncate text-lg font-semibold">{allChaptersCompleted ? "全部章节已完成" : currentChapter?.title ?? "国际贸易实务导论"}</h2>
+                      <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>{allChaptersCompleted ? "可以开始综合复习或挑战业务实战。" : currentChapter?.description}</p>
                     </div>
                     <span className="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium" style={{ background: "var(--color-accent-soft)", color: "var(--color-accent)" }}>{currentProgress?.progress ?? 0}%</span>
                   </div>
                   <div className="mt-4 h-1.5 overflow-hidden rounded-full" style={{ background: "var(--color-border-light)" }}><div className="h-full rounded-full" style={{ width: `${currentProgress?.progress ?? 0}%`, background: "var(--color-accent)" }} /></div>
                   <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                    <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{currentProgress?.lastOpenedAt ? `上次学习：${formatRelativeTime(currentProgress.lastOpenedAt)}` : "还没有开始学习，从第一课开始即可"}</p>
-                    <Link href={currentChapterHref} className="inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--color-accent)" }}>{currentProgress?.progress ? "继续学习" : "开始第一课"} <span aria-hidden="true" className="ml-1">→</span></Link>
+                    <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{allChaptersCompleted ? "所有章节和检测均已完成" : currentProgress?.lastOpenedAt ? `上次学习：${formatRelativeTime(currentProgress.lastOpenedAt)}` : "还没有开始学习，从第一课开始即可"}</p>
+                    <Link href={allChaptersCompleted ? "/knowledge-map" : currentChapterHref} className="inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--color-accent)" }}>{allChaptersCompleted ? "开始复习" : currentProgress?.progress ? "继续学习" : "开始第一课"} <span aria-hidden="true" className="ml-1">→</span></Link>
                   </div>
                 </div>
               </div>
 
               <aside className="rounded-xl border p-6" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }} aria-label="学习概览">
-                <div className="flex items-start justify-between gap-4"><div><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>课程完成度</p><p className="mt-2 text-3xl font-semibold tabular-nums">{Math.round((completedCount / curriculumChapters.length) * 100)}%</p></div><span className="rounded-lg px-2 py-1 text-xs" style={{ color: "var(--color-accent)", background: "var(--color-accent-soft)" }}>学习中</span></div>
-                <div className="mt-4 h-2 overflow-hidden rounded-full" style={{ background: "var(--color-border-light)" }}><div className="h-full rounded-full" style={{ width: `${(completedCount / curriculumChapters.length) * 100}%`, background: "var(--color-accent)" }} /></div>
-                <div className="mt-5 grid grid-cols-2 gap-4 border-t pt-4" style={{ borderColor: "var(--color-border-light)" }}><div><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>已完成章节</p><p className="mt-1 text-xl font-semibold tabular-nums">{completedCount}<span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>/{curriculumChapters.length}</span></p></div><div><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>累计学习</p><p className="mt-1 text-xl font-semibold tabular-nums">{totalStudyMinutes}<span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>分钟</span></p></div></div>
+                <div className="flex items-start justify-between gap-4"><div><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>课程进度</p><p className="mt-2 text-3xl font-semibold tabular-nums">{chapterProgressPercent}%</p></div><span className="rounded-lg px-2 py-1 text-xs" style={{ color: allChaptersCompleted ? "var(--color-status-mastered)" : "var(--color-accent)", background: "var(--color-accent-soft)" }}>{allChaptersCompleted ? "已完成" : "学习中"}</span></div>
+                <div className="mt-4 h-2 overflow-hidden rounded-full" style={{ background: "var(--color-border-light)" }}><div className="h-full rounded-full" style={{ width: `${chapterProgressPercent}%`, background: "var(--color-accent)" }} /></div>
+                <div className="mt-5 grid grid-cols-3 gap-3 border-t pt-4" style={{ borderColor: "var(--color-border-light)" }}><div><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>已完成</p><p className="mt-1 text-xl font-semibold tabular-nums">{completedCount}<span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>章</span></p></div><div><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>学习中</p><p className="mt-1 text-xl font-semibold tabular-nums">{learningChapterCount}<span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>章</span></p></div><div><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>累计学习</p><p className="mt-1 text-xl font-semibold tabular-nums">{totalStudyMinutes}<span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>分</span></p></div></div>
                 <p className="mt-5 text-xs leading-5" style={{ color: "var(--color-text-muted)" }}>建议每日学习 15—20 分钟，完成一节微课再做章节检测。</p>
               </aside>
             </div>
@@ -110,7 +118,7 @@ export default function HomePage() {
           <section>
             <div className="flex items-end justify-between gap-4"><div><h2 className="text-xl font-semibold">今日任务</h2><p className="mt-1 text-sm" style={{ color: "var(--color-text-muted)" }}>用 15—20 分钟完成一次小闭环。</p></div><Link href="/progress" className="text-sm hover:underline" style={{ color: "var(--color-accent)" }}>查看我的进度 →</Link></div>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <Link href="/flashcards" className="rounded-xl border p-4 transition-colors hover:bg-[var(--color-bg-soft)]" style={{ borderColor: "var(--color-border)" }}><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>待复习知识点</p><p className="mt-2 text-2xl font-semibold tabular-nums">{aggregated.totalDue}</p><p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>{aggregated.totalNew} 个新知识点等待学习</p></Link>
+              <Link href="/flashcards" className="rounded-xl border p-4 transition-colors hover:bg-[var(--color-bg-soft)]" style={{ borderColor: "var(--color-border)" }}><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>待复习知识点</p><p className="mt-2 text-2xl font-semibold tabular-nums">{reviewDueCount}</p><p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>{aggregated.totalNew} 个新知识点等待学习</p></Link>
               <Link href={checkpointReady > 0 ? currentPracticeHref : currentChapterHref} className="rounded-xl border p-4 transition-colors hover:bg-[var(--color-bg-soft)]" style={{ borderColor: "var(--color-border)" }}><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>待完成章节检测</p><p className="mt-2 text-2xl font-semibold tabular-nums">{checkpointReady}</p><p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>{checkpointReady > 0 ? "完成检测即可推进章节" : "先完成微课，再进行检测"}</p></Link>
               <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border)" }}><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>今日建议</p><p className="mt-2 text-2xl font-semibold">15—20<span className="ml-1 text-sm font-normal">分钟</span></p><p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>{nextReviewInfo.timestamp ? `下一次复习：${nextReviewInfo.label}` : "完成一节微课，建立学习节奏"}</p></div>
             </div>

@@ -17,7 +17,8 @@ export default function ProgressPage() {
   const { aggregated, modules } = useProgressAggregator();
   const { chapterProgress, currentChapter, completedCount, totalStudySeconds } = useCurriculumProgress();
   const chapterTotal = curriculumChapters.length;
-  const chapterPercent = Math.round((completedCount / chapterTotal) * 100);
+  const chapterPercent = Math.round(curriculumChapters.reduce((sum, chapter) => sum + (chapterProgress[chapter.id]?.progress ?? 0), 0) / chapterTotal);
+  const learningChapterCount = curriculumChapters.filter((chapter) => chapterProgress[chapter.id]?.status === "learning").length;
 
   return (
     <>
@@ -54,7 +55,7 @@ export default function ProgressPage() {
               <h2 className="text-sm font-medium" style={{ color: "var(--color-text-muted)" }}>课程章节进度</h2>
               <p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>按“微课完成 + 检测达标”计算</p>
             </div>
-            <span className="text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>{completedCount}/{chapterTotal} · {chapterPercent}%</span>
+            <span className="text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>{completedCount} 已完成 · {learningChapterCount} 学习中 · {chapterPercent}%</span>
           </div>
           <div className="mt-3 border rounded-lg divide-y" style={{ borderColor: "var(--color-border)" }}>
             {curriculumChapters.map((chapter) => {

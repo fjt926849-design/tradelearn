@@ -52,6 +52,7 @@
 body {
   background: var(--color-bg);
   color: var(--color-text);
+  overflow-x: hidden;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
     "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -76,6 +77,7 @@ main {
 .hero-section {
   background: var(--color-bg-soft);
   border-bottom: 1px solid var(--color-border);
+  overflow: hidden;
 }
 
 .hero-section-inner {
@@ -94,7 +96,8 @@ main {
   align-items: center;
 }
 @media (max-width: 767px) {
-  .hero { grid-template-columns: 1fr; gap: 3rem; }
+  .hero { grid-template-columns: 1fr; gap: 2rem; }
+  .hero-section-inner { padding: 44px 20px 52px; }
 }
 
 /* ── 左侧信息区 ── */
@@ -225,6 +228,9 @@ main {
   height: 400px;
   max-width: 460px;
   margin: 0 auto;
+}
+@media (max-width: 767px) {
+  .doc-desk { height: 350px; }
 }
 .doc-desk::before {
   content: "";

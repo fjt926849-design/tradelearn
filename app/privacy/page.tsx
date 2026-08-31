@@ -37,7 +37,7 @@ export default function PrivacyPage() {
           </PolicySection>
 
           <PolicySection title="三、第三方服务">
-            <p>网站可能使用 Google Analytics 进行匿名或汇总统计。Google 可能按照其自身隐私政策处理相关技术数据。你可以通过浏览器设置限制 Cookie，或使用浏览器扩展阻止统计脚本；统计脚本未配置时不会加载。</p>
+            <p>网站可能在获得你的统计同意后使用 Google Analytics 进行匿名或汇总统计。Google 可能按照其自身隐私政策处理相关技术数据。你可以在首次访问时选择暂不启用，也可以通过浏览器设置限制 Cookie 或使用浏览器扩展阻止统计脚本；未配置统计 ID 或未获得同意时不会加载统计脚本。</p>
             <p>网站可能使用 Supabase 作为进度数据的服务端镜像。服务端只接收完成学习功能所需的进度字段和匿名设备标识，不接收本地浏览器中的其他内容。</p>
           </PolicySection>
 

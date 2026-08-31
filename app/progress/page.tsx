@@ -73,7 +73,7 @@ export default function ProgressPage() {
               );
             })}
           </div>
-          <p className="mt-2 text-xs" style={{ color: "var(--color-text-muted)" }}>当前章节：{currentChapter?.number} {currentChapter?.title} · 累计学习 {Math.round(totalStudySeconds / 60)} 分钟</p>
+          <p className="mt-2 text-xs" style={{ color: "var(--color-text-muted)" }}>当前章节：{completedCount === chapterTotal ? "全部章节已完成" : `${currentChapter?.number ?? ""} ${currentChapter?.title ?? ""}`} · 累计学习 {Math.round(totalStudySeconds / 60)} 分钟</p>
         </section>
 
         <section>

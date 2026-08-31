@@ -4,9 +4,20 @@ import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useProgressAggregator } from "@/hooks/useProgressAggregator";
+import { useCurriculumProgress } from "@/hooks/useCurriculumProgress";
+import { curriculumChapters } from "@/data/curriculum";
+
+const CHAPTER_STATUS_META = {
+  new: { label: "未开始", tone: "var(--color-text-muted)" },
+  learning: { label: "进行中", tone: "var(--color-accent)" },
+  completed: { label: "已完成", tone: "var(--color-status-mastered)" },
+} as const;
 
 export default function ProgressPage() {
   const { aggregated, modules } = useProgressAggregator();
+  const { chapterProgress, currentChapter, completedCount, totalStudySeconds } = useCurriculumProgress();
+  const chapterTotal = curriculumChapters.length;
+  const chapterPercent = Math.round((completedCount / chapterTotal) * 100);
 
   return (
     <>
@@ -35,6 +46,33 @@ export default function ProgressPage() {
           <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
             这里的“已掌握”表示已完成闪卡熟悉度标记；章节测验和实训成绩会在后续版本加入能力判定。
           </p>
+        </section>
+
+        <section>
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-medium" style={{ color: "var(--color-text-muted)" }}>课程章节进度</h2>
+              <p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>按“微课完成 + 检测达标”计算</p>
+            </div>
+            <span className="text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>{completedCount}/{chapterTotal} · {chapterPercent}%</span>
+          </div>
+          <div className="mt-3 border rounded-lg divide-y" style={{ borderColor: "var(--color-border)" }}>
+            {curriculumChapters.map((chapter) => {
+              const progress = chapterProgress[chapter.id];
+              const meta = CHAPTER_STATUS_META[progress?.status ?? "new"];
+              return (
+                <Link key={chapter.id} href={`/knowledge-map/chapter/${chapter.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                  <span className="w-7 text-xs font-semibold tabular-nums" style={{ color: "var(--color-text-muted)" }}>{chapter.number === "导论" ? "导" : chapter.number}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-3 text-sm"><span className="truncate">{chapter.title}</span><span className="shrink-0 text-xs tabular-nums" style={{ color: progress?.progress === 100 ? "var(--color-status-mastered)" : "var(--color-text-muted)" }}>{progress?.progress ?? 0}%</span></div>
+                    <div className="mt-1.5 h-1 rounded-full" style={{ background: "var(--color-border-light)" }}><div className="h-full rounded-full" style={{ width: `${progress?.progress ?? 0}%`, background: progress?.progress === 100 ? "var(--color-status-mastered)" : "var(--color-accent)" }} /></div>
+                  </div>
+                  <span className="shrink-0 text-[10px]" style={{ color: meta.tone }}>{meta.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-xs" style={{ color: "var(--color-text-muted)" }}>当前章节：{currentChapter?.number} {currentChapter?.title} · 累计学习 {Math.round(totalStudySeconds / 60)} 分钟</p>
         </section>
 
         <section>

@@ -31,6 +31,8 @@ export default function Header() {
             const active =
               l.href === "/"
                 ? pathname === "/"
+                : l.href === "/knowledge-map"
+                  ? pathname.startsWith("/knowledge-map") || pathname.startsWith("/practice") || pathname.startsWith("/flashcards")
                 : pathname.startsWith(l.href);
             return (
               <Link

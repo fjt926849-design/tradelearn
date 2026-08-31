@@ -1,8 +1,6 @@
 "use client";
 
 export type LearningEventName =
-  | "lesson_started"
-  | "lesson_completed"
   | "flashcard_rated"
   | "practice_started"
   | "practice_answered"

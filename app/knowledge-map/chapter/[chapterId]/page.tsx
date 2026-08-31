@@ -7,7 +7,8 @@ import Footer from "@/components/layout/Footer";
 import { curriculumChapters } from "@/data/curriculum";
 import { getCurriculumLesson } from "@/data/curriculum-lessons";
 import type { CurriculumChapter } from "@/lib/types";
-import LessonBlock from "@/components/curriculum/LessonBlock";
+import ChapterContent from "@/components/curriculum/ChapterContent";
+import ChapterStudyTracker from "@/components/curriculum/ChapterStudyTracker";
 
 export function generateStaticParams() {
   return curriculumChapters.map((chapter) => ({ chapterId: chapter.id }));
@@ -48,6 +49,7 @@ export default async function CurriculumChapterPage({ params }: { params: Promis
   return (
     <>
       <Header />
+      <ChapterStudyTracker chapterId={chapter.id} />
 
       <main className="flex-1 mx-auto w-full max-w-2xl px-5 py-8">
         <BackButton fallbackRoute="/knowledge-map" label="返回课程地图" />
@@ -68,18 +70,15 @@ export default async function CurriculumChapterPage({ params }: { params: Promis
             <section className="rounded-xl border p-4" style={{ borderColor: "var(--color-accent)", background: "var(--color-accent-soft)" }}>
               <p className="text-sm font-semibold">这一章正在建设中</p>
               <p className="mt-2 text-xs leading-5" style={{ color: "var(--color-text-secondary)" }}>
-                本章微课已经开放，完整题库、错题复习和综合实训会在后续建设中补齐。学习检测不会影响已有学习记录。
+                本章正在建设中，当前可先查看学习目标和内容规划；章节检测与综合实训会逐步补齐。不会影响已有学习记录。
               </p>
             </section>
           )}
 
           {lesson && (
             <section className="space-y-3">
-              <div className="flex items-center justify-between gap-3">
-                <h2 className="text-base font-semibold">本章微课</h2>
-                <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>约 8 分钟</span>
-              </div>
-              <LessonBlock lesson={lesson} chapterId={chapter.id} />
+              <h2 className="text-base font-semibold">本章内容</h2>
+              <ChapterContent lesson={lesson} />
             </section>
           )}
 

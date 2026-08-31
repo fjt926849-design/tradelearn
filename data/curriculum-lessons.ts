@@ -1,7 +1,7 @@
 import type { CurriculumLesson } from "@/lib/types";
 
 /**
- * 第一批章节微课：内容为 TradeLearn 独立编写的教学摘要与案例，
+ * 第一批章节内容：内容为 TradeLearn 独立编写的教学摘要与案例，
  * 仅以教材目录和公开规则作为结构参考，不复制教材段落。
  */
 export const curriculumLessons: CurriculumLesson[] = [

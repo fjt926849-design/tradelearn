@@ -189,7 +189,7 @@ export interface CurriculumPart {
   chapters: CurriculumChapter[];
 }
 
-/** 章节微课的第一版内容单元，独立于教材原文。 */
+/** 章节内容单元，独立于教材原文。 */
 export interface CurriculumLesson {
   chapterId: string;
   overview: string;

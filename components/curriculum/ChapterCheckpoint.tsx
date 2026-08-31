@@ -36,7 +36,7 @@ export default function ChapterCheckpoint({ chapterId, chapterNumber, chapterTit
 
   const next = () => {
     if (currentIndex + 1 >= checks.length) {
-      recordCheckpoint(chapterId, score, checks.length);
+      recordCheckpoint(chapterId, score + (isCorrect ? 1 : 0), checks.length);
       setFinished(true);
       return;
     }

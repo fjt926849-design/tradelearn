@@ -4,7 +4,7 @@ type CurriculumCheck = CurriculumLesson["check"];
 
 /**
  * 原先“未开放”章节的第二轮检测题。
- * 每章先保留微课中的基础题，再补两道业务判断题；题目独立编写，
+ * 每章保留一道基础题，再补两道业务判断题；题目独立编写，
  * 用于检验迁移应用，不直接改变知识点掌握状态。
  */
 export const additionalCurriculumChecks: Record<string, CurriculumCheck[]> = {

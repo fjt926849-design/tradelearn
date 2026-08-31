@@ -83,8 +83,10 @@ export function useCurriculumProgress() {
     const legacyKnown = legacyConcepts.filter(({ mapping, conceptId }) => isKnown(getLegacyStatus(mapping.moduleId, conceptId))).length;
     const legacyTotal = legacyConcepts.length;
 
-    let progress = record.status === "completed" ? 100 : record.lessonCompletedAt ? 60 : record.lessonStartedAt ? 30 : 0;
-    if (!record.lessonStartedAt && legacyTotal > 0 && legacyKnown > 0) {
+    const hasOpenedChapter = Boolean(record.lastOpenedAt || record.lessonStartedAt || record.lessonCompletedAt);
+    const hasCheckpoint = (record.checkpointTotal ?? 0) > 0;
+    let progress = record.status === "completed" ? 100 : hasCheckpoint ? 60 : hasOpenedChapter ? 30 : 0;
+    if (!hasOpenedChapter && legacyTotal > 0 && legacyKnown > 0) {
       progress = Math.max(30, Math.round((legacyKnown / legacyTotal) * 100));
     }
     const status = record.status === "new" && legacyKnown > 0 ? "learning" : record.status;
@@ -100,28 +102,16 @@ export function useCurriculumProgress() {
     });
   }, []);
 
-  const markLessonStarted = useCallback((chapterId: string) => {
+  const markChapterOpened = useCallback((chapterId: string) => {
     const now = Date.now();
-    updateRecord(chapterId, { status: "learning", lessonStartedAt: now, lastOpenedAt: now });
+    updateRecord(chapterId, { status: "learning", lastOpenedAt: now });
   }, [updateRecord]);
-
-  const markLessonCompleted = useCallback((chapterId: string) => {
-    const now = Date.now();
-    setRecords((previous) => {
-      const current = previous[chapterId] ?? { chapterId, status: "new" as const };
-      const score = current.checkpointScore ?? -1;
-      const total = current.checkpointTotal ?? 0;
-      const passed = total > 0 && score / total >= 2 / 3;
-      return { ...previous, [chapterId]: { ...current, chapterId, status: passed ? "completed" : "learning", lessonCompletedAt: now, lastOpenedAt: now } };
-    });
-  }, []);
 
   const recordCheckpoint = useCallback((chapterId: string, score: number, total: number) => {
     setRecords((previous) => {
       const current = previous[chapterId] ?? { chapterId, status: "new" as const };
       const passed = score / total >= 2 / 3;
-      const completed = Boolean(current.lessonCompletedAt) && passed;
-      return { ...previous, [chapterId]: { ...current, chapterId, status: completed ? "completed" : "learning", checkpointScore: score, checkpointTotal: total, lastOpenedAt: Date.now() } };
+      return { ...previous, [chapterId]: { ...current, chapterId, status: passed ? "completed" : "learning", checkpointScore: score, checkpointTotal: total, lastOpenedAt: Date.now() } };
     });
   }, []);
 
@@ -143,5 +133,5 @@ export function useCurriculumProgress() {
   const completedCount = useMemo(() => curriculumChapters.filter((chapter) => chapterProgress[chapter.id]?.status === "completed").length, [chapterProgress]);
   const totalStudySeconds = useMemo(() => Object.values(chapterProgress).reduce((total, record) => total + (record.studySeconds ?? 0), 0), [chapterProgress]);
 
-  return { chapterProgress, currentChapter, completedCount, totalStudySeconds, hydrated, markLessonStarted, markLessonCompleted, recordCheckpoint, addStudySeconds };
+  return { chapterProgress, currentChapter, completedCount, totalStudySeconds, hydrated, markChapterOpened, recordCheckpoint, addStudySeconds };
 }

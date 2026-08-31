@@ -138,7 +138,7 @@ export default function CurriculumBrowser({ parts }: { parts: CurriculumPart[] }
             </div>
             <div className="mt-4 flex flex-wrap gap-1.5">{chapter.workflowStages.map((stage) => <span key={stage} className="rounded-full border px-2 py-1 text-[10px]" style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}>{stage}</span>)}</div>
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-              <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{progress?.legacyTotal ? `已掌握知识点 ${progress.legacyKnown}/${progress.legacyTotal}` : lesson ? "微课 + 章节检测" : "章节内容"}</span>
+              <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{progress?.legacyTotal ? `已掌握知识点 ${progress.legacyKnown}/${progress.legacyTotal}` : lesson ? "章节内容 + 检测" : "章节内容"}</span>
               <div className="flex flex-wrap gap-2"><Link href={chapterHref(chapter)} onClick={() => trackLearningEvent("curriculum_opened", { chapterId: chapter.id, chapterNumber: chapter.number })} className="rounded-md px-3 py-2 text-xs font-medium text-white" style={{ background: "var(--color-accent)" }}>{progress?.progress ? "继续学习" : "开始学习"} →</Link>{lesson && <Link href={`${chapterHref(chapter)}/practice`} className="rounded-md border px-3 py-2 text-xs font-medium" style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)" }}>章节检测</Link>}</div>
             </div>
           </div>

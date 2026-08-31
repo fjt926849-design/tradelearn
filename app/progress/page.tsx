@@ -53,7 +53,7 @@ export default function ProgressPage() {
           <div className="flex items-end justify-between gap-3">
             <div>
               <h2 className="text-sm font-medium" style={{ color: "var(--color-text-muted)" }}>课程章节进度</h2>
-              <p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>按“微课完成 + 检测达标”计算</p>
+              <p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>打开章节后开始记录，检测达标即可完成</p>
             </div>
             <span className="text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>{completedCount} 已完成 · {learningChapterCount} 学习中 · {chapterPercent}%</span>
           </div>

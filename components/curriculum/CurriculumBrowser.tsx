@@ -106,6 +106,7 @@ export default function CurriculumBrowser({ parts }: { parts: CurriculumPart[] }
   }, [query]);
 
   const totalChapters = curriculumStats.chapters + 1;
+  const currentOrdinal = currentChapter ? Math.max(1, parts.flatMap((part) => part.chapters).findIndex((chapter) => chapter.id === currentChapter.id) + 1) : 1;
   const overallProgress = Math.round((completedCount / totalChapters) * 100);
   const currentPart = currentChapter ? parts.find((part) => part.id === currentChapter.partId) : parts[0];
   const currentPartCompleted = currentPart?.chapters.filter((chapter) => chapterProgress[chapter.id]?.status === "completed").length ?? 0;
@@ -153,7 +154,7 @@ export default function CurriculumBrowser({ parts }: { parts: CurriculumPart[] }
           <p className="mt-2 text-sm" style={{ color: "var(--color-text-muted)" }}>按学习顺序逐步掌握外贸实务基础。</p>
         </div>
         <aside className="rounded-xl border p-4" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }} aria-label="课程进度">
-          <div className="grid grid-cols-2 divide-x" style={{ borderColor: "var(--color-border-light)" }}><div className="pr-3"><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>课程进度</p><p className="mt-1 text-2xl font-semibold tabular-nums">{completedCount} <span className="text-sm font-normal" style={{ color: "var(--color-text-muted)" }}>/ {totalChapters} 章</span></p></div><div className="pl-3"><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>累计学习</p><p className="mt-1 text-2xl font-semibold tabular-nums">{totalStudyMinutes} <span className="text-sm font-normal" style={{ color: "var(--color-text-muted)" }}>分钟</span></p></div></div>
+          <div className="grid grid-cols-2 divide-x" style={{ borderColor: "var(--color-border-light)" }}><div className="pr-3"><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>当前章节</p><p className="mt-1 text-2xl font-semibold tabular-nums">{currentOrdinal} <span className="text-sm font-normal" style={{ color: "var(--color-text-muted)" }}>/ {totalChapters} 章</span></p><p className="mt-1 truncate text-xs" style={{ color: "var(--color-text-secondary)" }}>{currentChapter?.title}</p></div><div className="pl-3"><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>已完成</p><p className="mt-1 text-2xl font-semibold tabular-nums">{completedCount} <span className="text-sm font-normal" style={{ color: "var(--color-text-muted)" }}>章</span></p><p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>累计 {totalStudyMinutes} 分钟</p></div></div>
           <div className="mt-4 h-1.5 rounded-full" style={{ background: "var(--color-border-light)" }}><div className="h-full rounded-full transition-all" style={{ width: `${overallProgress}%`, background: "var(--color-accent)" }} /></div>
           <p className="mt-3 text-xs" style={{ color: "var(--color-text-muted)" }}>建议每日学习 15—20 分钟 · 当前篇章 {currentPartCompleted}/{currentPartTotal}</p>
           {currentChapter && <Link href={chapterHref(currentChapter)} className="mt-3 inline-flex w-full items-center justify-center rounded-md border py-2 text-sm font-medium" style={{ borderColor: "var(--color-accent)", color: "var(--color-accent)" }}>继续：{currentChapter.title} →</Link>}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import type { ModuleId } from "@/lib/types";
+import BackButton from "@/components/learn/BackButton";
 
 /* ═══════════════════════ 综合实战模拟数据 ═══════════════════════ */
 
@@ -388,6 +389,7 @@ export default function ComprehensivePracticePage() {
     <>
       <Header />
       <main className="flex-1 max-w-2xl mx-auto px-5 py-10">
+        <BackButton fallbackRoute="/practice" label="返回实战入口" />
         <h1 className="text-xl font-semibold mb-8">综合实战</h1>
 
         <div className="space-y-6">

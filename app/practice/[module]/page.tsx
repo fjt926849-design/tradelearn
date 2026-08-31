@@ -5,6 +5,7 @@ import GenericPracticeDeck from "@/components/practice/GenericPracticeDeck";
 import { moduleScenarioQuestions } from "@/data/module-scenario-questions";
 import { MODULE_LABELS, MODULE_CHAPTERS } from "@/lib/types";
 import type { ModuleId } from "@/lib/types";
+import BackButton from "@/components/learn/BackButton";
 
 const MODULE_INTRO_ITEMS: Record<string, string[]> = {
   settlement: ["选择合适的结算方式", "识别L/C软条款和风险", "判断贸易融资工具的适用场景", "评估不同结算方式下的风险与成本"],
@@ -37,6 +38,7 @@ export default async function ModulePracticePage({
     <>
       <Header />
       <main className="flex-1 max-w-2xl mx-auto px-5 py-10">
+        <BackButton fallbackRoute="/practice" label="返回实战入口" />
         <GenericPracticeDeck
           questions={questions}
           title={`${chapter.no} ${label}实战`}

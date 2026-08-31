@@ -2,12 +2,14 @@ import { Suspense } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import PracticeDeck from "@/components/practice/PracticeDeck";
+import BackButton from "@/components/learn/BackButton";
 
 export default function IncotermsPracticePage() {
   return (
     <>
       <Header />
       <main className="flex-1 max-w-2xl mx-auto px-5 py-10">
+        <BackButton fallbackRoute="/practice" label="返回实战入口" />
         <Suspense
           fallback={
             <div className="text-center py-16">

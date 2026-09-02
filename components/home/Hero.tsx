@@ -1,15 +1,15 @@
 interface HeroProps {
-  totalConcepts: number;
-  totalMastered: number;
-  overallProgress: number;
+  totalTerms: number;
+  masteredTerms: number;
+  termProgress: number;
 }
 
 const delay = (seconds: number) => ({ animationDelay: `${seconds}s` });
 
 export default function Hero({
-  totalConcepts,
-  totalMastered,
-  overallProgress,
+  totalTerms,
+  masteredTerms,
+  termProgress,
 }: HeroProps) {
   return (
     <section className="hero-section">
@@ -17,7 +17,7 @@ export default function Hero({
         <div className="hero">
           {/* 左侧 · 信息区 */}
           <div className="hero-info">
-            <p className="hero-kicker hero-anim">国际贸易实务 · 学习系统</p>
+            <p className="hero-kicker hero-anim">国际贸易实务 · 术语卡片</p>
             <h1 className="hero-title">
               <span className="hero-title-cn hero-anim" style={delay(0.08)}>
                 贸学
@@ -27,26 +27,25 @@ export default function Hero({
               </span>
             </h1>
             <p className="hero-slogan hero-anim" style={delay(0.24)}>
-              把复杂的国际贸易，拆成可以真正掌握的知识。
+              把复杂的国际贸易，先从一个术语弄明白。
             </p>
             <p className="hero-desc hero-anim" style={delay(0.3)}>
-              从术语到单据，从结算到实战，建立属于你的外贸知识体系。
-              通过知识卡、进度追踪与闪卡复习，让学习更系统、更清晰。
+              用清晰的中文解释、英文名称和业务场景，逐张建立你的外贸术语基础。
             </p>
             <div className="hero-cta hero-anim" style={delay(0.36)}>
               <div className="hero-meta">
                 <span>
-                  <b>{totalConcepts}</b> 个知识点
+                  <b>{totalTerms}</b> 个术语
                 </span>
                 <span className="hero-meta-dot" aria-hidden="true" />
                 <span>
-                  已掌握 <b>{totalMastered}</b>
+                  已掌握 <b>{masteredTerms}</b>
                 </span>
                 <span className="hero-meta-progress">
                   <span className="hero-meta-bar">
-                    <i style={{ width: `${overallProgress}%` }} />
+                    <i style={{ width: `${termProgress}%` }} />
                   </span>
-                  <span>进度 {overallProgress}%</span>
+                  <span>进度 {termProgress}%</span>
                 </span>
               </div>
             </div>

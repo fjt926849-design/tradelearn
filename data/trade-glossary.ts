@@ -8,7 +8,7 @@ export interface TradeGlossaryEntry {
   id: string;
   chapterId: string;
   chapterLabel: string;
-  group: "合同" | "运输" | "保险" | "价格" | "结算" | "谈判" | "贸易方式" | "跨境电商";
+  group: "贸易术语" | "合同" | "运输" | "保险" | "价格" | "结算" | "谈判" | "贸易方式" | "跨境电商";
   term: string;
   english: string;
   definition: string;
@@ -17,6 +17,21 @@ export interface TradeGlossaryEntry {
 }
 
 export const tradeGlossary: TradeGlossaryEntry[] = [
+  { id: "ch02-risk-transfer", chapterId: "ch-02", chapterLabel: "第2章", group: "贸易术语", term: "风险转移", english: "Transfer of Risk", definition: "货物发生灭失或损坏的风险从卖方转移给买方的时间点。", usage: "先确认风险转移点，再判断运输途中损失由谁承担；风险点不一定等于费用支付到的地点。" },
+  { id: "ch02-cost-point", chapterId: "ch-02", chapterLabel: "第2章", group: "贸易术语", term: "费用承担点", english: "Cost Allocation Point", definition: "买卖双方按照术语约定分别承担运输、装卸、保险和清关费用的分界。", usage: "报价时把费用截止地点写完整，不能仅写‘运费已付’而不写目的地。" },
+  { id: "ch02-delivery-place", chapterId: "ch-02", chapterLabel: "第2章", group: "贸易术语", term: "交货地点", english: "Place of Delivery", definition: "卖方完成交货、买方取得对货物处置权的约定地点。", usage: "合同应同时写明具体地点和版本，‘某港口’等模糊表述可能导致责任争议。" },
+  { id: "ch02-named-place", chapterId: "ch-02", chapterLabel: "第2章", group: "贸易术语", term: "指定地点", english: "Named Place", definition: "贸易术语后面标注的具体地点，用来确定交货、风险或费用边界。", usage: "同一术语更换地点，卖方承担的内陆运输和装卸责任可能完全不同。" },
+  { id: "ch02-first-carrier", chapterId: "ch-02", chapterLabel: "第2章", group: "贸易术语", term: "第一承运人", english: "First Carrier", definition: "在多式联运中最先接收货物并承担运输责任的承运人。", usage: "CPT/CIP 的风险通常在货交第一承运人时转移，而不是到达最终目的地时。" },
+  { id: "ch02-main-carriage", chapterId: "ch-02", chapterLabel: "第2章", group: "贸易术语", term: "主运费", english: "Main Carriage", definition: "连接起运地与目的地、通常占国际运输成本主要部分的干线运输费用。", usage: "C 组术语由卖方支付主运费，但不代表卖方承担运输全程风险。" },
+  { id: "ch02-loading", chapterId: "ch-02", chapterLabel: "第2章", group: "贸易术语", term: "装船", english: "Loading on Board", definition: "货物被装上指定船舶并完成船上交货的动作。", usage: "FOB/CFR/CIF 的海运风险转移以装船为关键节点，不再使用‘越过船舷’表述。" },
+  { id: "ch02-unloading", chapterId: "ch-02", chapterLabel: "第2章", group: "贸易术语", term: "卸货", english: "Unloading", definition: "把货物从运输工具上卸下并交由买方或其指定方处置的动作。", usage: "DAP 不要求卖方卸货，DPU 则要求卖方在目的地完成卸货。" },
+  { id: "ch02-container-carriage", chapterId: "ch-02", chapterLabel: "第2章", group: "贸易术语", term: "集装箱运输", english: "Containerized Transport", definition: "以集装箱作为装载单元进行装箱、交接和多式联运的运输方式。", usage: "集装箱海运通常应优先评估 FCA，而不是把 FOB 当作通用海运术语。" },
+  { id: "ch02-multimodal", chapterId: "ch-02", chapterLabel: "第2章", group: "贸易术语", term: "多式联运", english: "Multimodal Transport", definition: "使用两种或以上运输方式完成一票货物全程运输的安排。", usage: "选择 CPT/CIP 等适用任何运输方式的术语，并确认风险在第一承运人处转移。" },
+  { id: "compare-fob-fca", chapterId: "ch-02", chapterLabel: "第2章", group: "贸易术语", term: "FOB vs FCA", english: "FOB vs FCA", definition: "FOB 仅适用于海运或内河水运，FCA 适用于任何运输方式。", usage: "集装箱交给码头或承运人时通常选 FCA；散货在船上交货时才考虑 FOB。" },
+  { id: "compare-cfr-cpt", chapterId: "ch-02", chapterLabel: "第2章", group: "贸易术语", term: "CFR vs CPT", english: "CFR vs CPT", definition: "两者都由卖方支付主运费，但 CFR 仅限海运且风险在装船时转移，CPT 适用于任何运输方式且风险在交给第一承运人时转移。", usage: "先看运输方式和实际交接节点，再决定使用 CFR 还是 CPT。" },
+  { id: "compare-cif-cip", chapterId: "ch-02", chapterLabel: "第2章", group: "贸易术语", term: "CIF vs CIP", english: "CIF vs CIP", definition: "两者都包含卖方投保，但 CIF 仅限海运，CIP 适用于任何运输方式且通常要求更高保险保障。", usage: "集装箱或多式联运优先评估 CIP，并在合同中写明保险范围和金额。" },
+  { id: "compare-dap-dpu", chapterId: "ch-02", chapterLabel: "第2章", group: "贸易术语", term: "DAP vs DPU", english: "DAP vs DPU", definition: "DAP 在目的地运输工具上交货，卖方不负责卸货；DPU 要求卖方在目的地完成卸货。", usage: "如果目的地卸货设备或操作由卖方安排，应明确使用 DPU 并确认卸货风险。" },
+  { id: "compare-dap-ddp", chapterId: "ch-02", chapterLabel: "第2章", group: "贸易术语", term: "DAP vs DDP", english: "DAP vs DDP", definition: "DAP 下买方负责进口报关和税费，DDP 下卖方负责进口报关、关税和相关手续。", usage: "卖方在目的国没有进口资质或税务能力时，不要轻易承诺 DDP。" },
   { id: "ch04-quality-clause", chapterId: "ch-04", chapterLabel: "第4章", group: "合同", term: "品质条款", english: "Quality Clause", definition: "约定货物质量、规格、等级和检验依据的合同条款。", usage: "把可检验的指标、标准版本和允许偏差写清楚，避免只写‘符合样品’。", relatedRoute: "/contract/quality-clause" },
   { id: "ch04-quantity-tolerance", chapterId: "ch-04", chapterLabel: "第4章", group: "合同", term: "数量机动幅度", english: "Quantity Tolerance", definition: "允许实际交货数量在约定数量上下浮动的范围。", usage: "散装货或受装载条件影响的货物，应同时约定幅度和溢短装计价方式。", relatedRoute: "/contract/quantity-clause" },
   { id: "ch04-shipping-mark", chapterId: "ch-04", chapterLabel: "第4章", group: "合同", term: "运输标志", english: "Shipping Mark", definition: "外包装上用于识别收发货人、目的地和件号的标记。", usage: "应与单据、箱唛和目的港要求一致，避免清关或提货时无法识别。", relatedRoute: "/contract/packaging-clause" },
@@ -52,4 +67,4 @@ export const tradeGlossary: TradeGlossaryEntry[] = [
   { id: "ch22-overseas-warehouse", chapterId: "ch-22", chapterLabel: "第22章", group: "跨境电商", term: "海外仓", english: "Overseas Warehouse", definition: "把货物提前存放在目标市场仓库，再完成本地配送和售后的履约方式。", usage: "要评估库存周转、仓储费、退货处理和当地合规责任。" },
 ];
 
-export const glossaryGroups = ["全部", "合同", "运输", "保险", "价格", "结算", "谈判", "贸易方式", "跨境电商"] as const;
+export const glossaryGroups = ["全部", "贸易术语", "合同", "运输", "保险", "价格", "结算", "谈判", "贸易方式", "跨境电商"] as const;

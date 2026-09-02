@@ -158,7 +158,58 @@ export default function TermsPage() {
               {categoryOrder.map((group) => {
                 const terms = groupedTerms.get(group.key) ?? [];
                 if (terms.length === 0) return null;
-                return <section key={group.key} className="overflow-hidden rounded-2xl border bg-[var(--color-bg)]" style={{ borderColor: "var(--color-border)" }}><div className="flex items-center justify-between border-b px-4 py-4 sm:px-5" style={{ borderColor: "var(--color-border)" }}><div className="flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold" style={{ color: categoryTone[group.key].color, background: categoryTone[group.key].background }}>{group.shortLabel}</span><div><h2 className="text-sm font-semibold">{group.label}</h2><p className="mt-0.5 text-xs" style={{ color: "var(--color-text-muted)" }}>{group.desc}</p></div></div><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{terms.length} 个术语</span></div><div className="divide-y" style={{ borderColor: "var(--color-border)" }}>{terms.map((term) => { const progress = progressByCode.get(term.code); const isDue = Boolean(progress && progress.status !== "new" && dueCodes.has(term.code)); return <TermRow key={term.code} term={term} index={INDEX_BY_SLUG.get(term.code.toLowerCase()) ?? 0} status={progress?.status ?? "new"} isDue={isDue} />; })}</div></section>;
+                return (
+                  <section
+                    key={group.key}
+                    className="overflow-hidden rounded-2xl border bg-[var(--color-bg)]"
+                    style={{ borderColor: "var(--color-border)" }}
+                  >
+                    <div
+                      className="flex items-center justify-between border-b px-4 py-4 sm:px-5"
+                      style={{ borderColor: "var(--color-border)", background: "var(--color-bg-soft)" }}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span
+                          className="mt-1 h-8 w-1 rounded-full"
+                          style={{ background: categoryTone[group.key].color }}
+                          aria-hidden="true"
+                        />
+                        <div>
+                          <p
+                            className="text-[11px] font-semibold uppercase tracking-[0.16em]"
+                            style={{ color: categoryTone[group.key].color }}
+                          >
+                            {group.shortLabel} · 责任分组
+                          </p>
+                          <h2 className="mt-1 text-base font-semibold">{group.label}</h2>
+                          <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-muted)" }}>
+                            {group.desc}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                        {terms.length} 个术语
+                      </span>
+                    </div>
+                    <div className="divide-y" style={{ borderColor: "var(--color-border)" }}>
+                      {terms.map((term) => {
+                        const progress = progressByCode.get(term.code);
+                        const isDue = Boolean(
+                          progress && progress.status !== "new" && dueCodes.has(term.code)
+                        );
+                        return (
+                          <TermRow
+                            key={term.code}
+                            term={term}
+                            index={INDEX_BY_SLUG.get(term.code.toLowerCase()) ?? 0}
+                            status={progress?.status ?? "new"}
+                            isDue={isDue}
+                          />
+                        );
+                      })}
+                    </div>
+                  </section>
+                );
               })}
               {filteredTerms.length === 0 && <div className="rounded-2xl border bg-[var(--color-bg)] px-5 py-14 text-center" style={{ borderColor: "var(--color-border)" }}><p className="text-sm font-medium">没有匹配的术语</p><p className="mt-2 text-xs" style={{ color: "var(--color-text-muted)" }}>试试清空搜索，或切换其他筛选条件。</p></div>}
               <p className="px-1 text-xs leading-5" style={{ color: "var(--color-text-muted)" }}>术语规则只处理交货、费用和风险分配；品质、所有权、付款和争议解决仍需在合同中另行约定。</p>

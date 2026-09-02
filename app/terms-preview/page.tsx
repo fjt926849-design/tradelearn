@@ -72,7 +72,7 @@ const termChapters: TermChapter[] = [
         english: entry.english,
         summary: entry.definition,
         meta: entry.chapterLabel,
-        href: entry.relatedRoute ?? `/glossary#${entry.id}`,
+        href: `/glossary/${entry.id}`,
       })),
     } satisfies TermChapter;
   }),

@@ -10,22 +10,6 @@ import { tradeTerms } from "@/data/trade-terms";
 
 const ALL_CODES = tradeTerms.map((term) => term.code);
 
-const PRACTICE_ENTRIES = [
-  { href: "/practice/incoterms", label: "报价实训", description: "根据交付场景选择贸易术语" },
-  { href: "/practice/contract", label: "合同实训", description: "补齐条款并判断履约风险" },
-  { href: "/practice/comprehensive", label: "综合业务模拟", description: "从询盘到结算完成一笔业务" },
-];
-
-const DOMAIN_ENTRIES = [
-  { href: "/terms-preview", number: "01", label: "贸易术语", en: "TERMS" },
-  { href: "/settlement", number: "02", label: "国际结算", en: "PAYMENT" },
-  { href: "/transport", number: "03", label: "国际运输", en: "SHIPPING" },
-  { href: "/insurance", number: "04", label: "货运保险", en: "INSURANCE" },
-  { href: "/documents", number: "05", label: "进出口单据", en: "DOCUMENTS" },
-  { href: "/customs", number: "06", label: "报关与检验", en: "CUSTOMS" },
-  { href: "/contract", number: "07", label: "合同条款", en: "CONTRACT" },
-];
-
 export default function HomePage() {
   const { getWeakTermCodes, getTermProgress } = useFlashcardProgress();
   const { hasMistakes, lastSession, getMistakeStats } = usePracticeProgress();
@@ -60,20 +44,11 @@ export default function HomePage() {
             <div className="mt-4 grid gap-3 md:grid-cols-3">{tradeTerms.slice(0, 3).map((term) => <Link key={term.code} href={`/terms/${term.code.toLowerCase()}`} className="rounded-xl border p-5 transition-colors hover:bg-[var(--color-bg-soft)]" style={{ borderColor: "var(--color-border)" }}><p className="text-3xl font-semibold tracking-tight">{term.code}</p><p className="mt-2 text-base font-medium">{term.chineseName}</p><p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>{term.fullName}</p><p className="mt-4 text-sm leading-6" style={{ color: "var(--color-text-secondary)" }}>{term.summary}</p></Link>)}</div>
           </section>
 
-          <section>
-            <div className="flex items-end justify-between gap-4"><div><h2 className="text-xl font-semibold">业务实战</h2><p className="mt-1 text-sm" style={{ color: "var(--color-text-muted)" }}>把刚学的知识放进真实业务场景。</p></div><Link href="/practice" className="text-sm hover:underline" style={{ color: "var(--color-accent)" }}>查看全部实战 →</Link></div>
-            <div className="mt-4 grid gap-3 md:grid-cols-3">{PRACTICE_ENTRIES.map((entry, index) => <Link key={entry.href} href={entry.href} className="group rounded-xl border p-5 transition-colors hover:bg-[var(--color-bg-soft)]" style={{ borderColor: "var(--color-border)" }}><div className="flex items-center justify-between"><span className="text-xs font-semibold tabular-nums" style={{ color: "var(--color-accent)" }}>0{index + 1}</span><span className="transition-transform group-hover:translate-x-1" style={{ color: "var(--color-text-muted)" }}>→</span></div><p className="mt-6 text-base font-semibold">{entry.label}</p><p className="mt-1 text-xs leading-5" style={{ color: "var(--color-text-muted)" }}>{entry.description}</p></Link>)}</div>
-          </section>
-
           {(weakTermCodes.length > 0 || recentTerms.length > 0 || hasMistakes) && <section className="grid gap-4 lg:grid-cols-2">
             {weakTermCodes.length > 0 && <div className="rounded-xl border p-5" style={{ borderColor: "var(--color-border)" }}><div className="flex items-center justify-between"><h2 className="text-base font-semibold">薄弱知识</h2><Link href="/flashcards" className="text-xs hover:underline" style={{ color: "var(--color-accent)" }}>去复习 →</Link></div><p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>{weakTermCodes.length} 个术语需要加强</p><div className="mt-4 space-y-2">{weakTermCodes.slice(0, 4).map((code) => { const term = tradeTerms.find((item) => item.code === code); return <Link key={code} href={`/terms/${code.toLowerCase()}`} className="flex items-center justify-between text-sm hover:underline"><span><b>{code}</b><span className="ml-2" style={{ color: "var(--color-text-muted)" }}>{term?.chineseName}</span></span><span style={{ color: "var(--color-text-muted)" }}>→</span></Link>; })}</div></div>}
             {recentTerms.length > 0 && <div className="rounded-xl border p-5" style={{ borderColor: "var(--color-border)" }}><h2 className="text-base font-semibold">最近学习</h2><div className="mt-4 space-y-1">{recentTerms.map(({ term, progress }) => <Link key={term.code} href={`/terms/${term.code.toLowerCase()}`} className="flex items-center justify-between rounded-md px-2 py-2 text-sm hover:bg-[var(--color-bg-soft)]"><span><b>{term.code}</b><span className="ml-2" style={{ color: "var(--color-text-muted)" }}>{term.chineseName}</span></span><span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{formatRelativeTime(progress.lastReviewed)}</span></Link>)}</div>{hasMistakes && lastSession && <p className="mt-3 border-t pt-3 text-xs" style={{ borderColor: "var(--color-border-light)", color: "var(--color-text-muted)" }}>最近实战正确率 {Math.round((lastSession.score / lastSession.total) * 100)}%，{mistakeStats.length} 个薄弱点待巩固。</p>}</div>}
           </section>}
 
-          <section>
-            <div className="flex items-end justify-between gap-4"><div><h2 className="text-xl font-semibold">业务资料</h2><p className="mt-1 text-sm" style={{ color: "var(--color-text-muted)" }}>按工作场景查找合同、运输、保险和结算资料。</p></div></div>
-            <div className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-xl border sm:grid-cols-4 lg:grid-cols-7" style={{ borderColor: "var(--color-border)" }}>{DOMAIN_ENTRIES.map((entry) => <Link key={entry.href} href={entry.href} className="p-4 text-center transition-colors hover:bg-[var(--color-bg-soft)]" style={{ background: "var(--color-surface)" }}><span className="text-xs font-semibold tabular-nums" style={{ color: "var(--color-text-muted)" }}>{entry.number}</span><p className="mt-2 text-xs font-medium">{entry.label}</p><p className="mt-1 text-[10px] tracking-[0.12em]" style={{ color: "var(--color-text-muted)" }}>{entry.en}</p></Link>)}</div>
-          </section>
         </div>
       </main>
       <Footer />

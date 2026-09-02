@@ -5,13 +5,11 @@ import Footer from "@/components/layout/Footer";
 import { tradeTerms, getTermByCode } from "@/data/trade-terms";
 import { settlementConcepts } from "@/data/settlement-concepts";
 import { getModuleNav, getPrevNext } from "@/lib/navigation";
-import { MODULE_CHAPTERS } from "@/lib/types";
-import ModuleIndex from "@/components/learn/ModuleIndex";
 import PrevNextNav from "@/components/learn/PrevNextNav";
 import BackButton from "@/components/learn/BackButton";
 
 export async function generateStaticParams() {
-  return tradeTerms.map((t) => ({ code: t.code.toLowerCase() }));
+  return tradeTerms.map((term) => ({ code: term.code.toLowerCase() }));
 }
 
 export default async function TermDetailPage({
@@ -24,369 +22,131 @@ export default async function TermDetailPage({
   if (!term) notFound();
 
   const relatedTerms = tradeTerms.filter(
-    (t) => t.category === term.category && t.code !== term.code
+    (item) => item.category === term.category && item.code !== term.code,
   );
-
-  // Cross-module: find settlement concepts linked to this Incoterm
-  const relatedSettlement = settlementConcepts.filter((sc) =>
-    sc.relatedIncotermCodes.includes(term.code)
+  const relatedSettlement = settlementConcepts.filter((concept) =>
+    concept.relatedIncotermCodes.includes(term.code),
   );
-
   const nav = getModuleNav("incoterms");
-  const index = nav.findIndex((n) => n.slug === code);
+  const index = nav.findIndex((item) => item.slug === code);
   const { prev, next } = getPrevNext("incoterms", code);
 
   return (
-    <>
+    <div className="min-h-screen" style={{ background: "#fff", color: "#1f1f1f" }}>
       <Header />
-      <main className="flex-1 max-w-5xl mx-auto px-5 py-10">
-        <BackButton fallbackRoute="/terms" />
-        <div className="lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 lg:items-start">
-          <ModuleIndex moduleId="incoterms" currentSlug={code} />
-          <div className="min-w-0">
-            {/* Breadcrumb */}
-            <nav
-              className="flex items-center gap-1.5 text-sm mb-8"
-              style={{ color: "var(--color-text-muted)" }}
-            >
-              <Link href="/" className="hover:text-black transition-colors">
-                首页
-              </Link>
-              <span>/</span>
-              <Link href="/terms" className="hover:text-black transition-colors">
-                贸易术语
-              </Link>
-              <span>/</span>
-              <span style={{ color: "var(--color-text)" }}>{term.code}</span>
+      <main>
+        <div className="mx-auto max-w-5xl px-5 py-8 sm:px-8 lg:py-12">
+          <BackButton fallbackRoute="/terms-preview" label="返回术语卡片" />
+
+          <div className="mt-8 flex items-center justify-between gap-4 text-xs" style={{ color: "#888" }}>
+            <nav aria-label="当前位置" className="flex items-center gap-2">
+              <Link href="/terms-preview" className="hover:text-[#222]">术语卡片</Link>
+              <span aria-hidden="true">/</span>
+              <span style={{ color: "#444" }}>{term.code}</span>
             </nav>
-
-            {/* ═══ 知识阅读区 ═══ */}
-            <div className="space-y-8">
-              {/* Header */}
-              <div>
-                <p className="text-xs font-semibold tracking-[0.16em]" style={{ color: "var(--color-accent)" }}>
-                  {MODULE_CHAPTERS.incoterms.no} · {MODULE_CHAPTERS.incoterms.en} · {String(index + 1).padStart(2, "0")} / {String(nav.length).padStart(2, "0")}
-                </p>
-                <h1 className="mt-3 text-2xl font-bold">{term.code}</h1>
-                <p className="mt-1 text-lg" style={{ color: "var(--color-text-secondary)" }}>
-                  {term.chineseName}
-                </p>
-                <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
-                  {term.fullName}
-                </p>
-              </div>
-
-              {/* Summary */}
-              <div
-                className="border-l-2 pl-4 py-1"
-                style={{ borderColor: "var(--color-text)" }}
-              >
-                <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-                  {term.summary}
-                </p>
-              </div>
-
-              {/* Description */}
-              <div>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-                  {term.description}
-                </p>
-              </div>
-
-              {/* Key info */}
-              <div
-                className="grid grid-cols-2 gap-px border rounded-lg overflow-hidden"
-                style={{ borderColor: "var(--color-border)", background: "var(--color-border)" }}
-              >
-                <div className="p-4" style={{ background: "var(--color-bg)" }}>
-                  <span
-                    className="text-xs font-medium"
-                    style={{ color: "var(--color-text-muted)" }}
-                  >
-                    风险转移点
-                  </span>
-                  <p className="mt-1 text-sm">{term.riskTransferPoint}</p>
-                </div>
-                <div className="p-4" style={{ background: "var(--color-bg)" }}>
-                  <span
-                    className="text-xs font-medium"
-                    style={{ color: "var(--color-text-muted)" }}
-                  >
-                    运输方式
-                  </span>
-                  <p className="mt-1 text-sm">{term.transportMode.join(" / ")}</p>
-                </div>
-              </div>
-
-              {/* Obligations */}
-              <div>
-                <h2
-                  className="text-sm font-semibold pb-3 border-b"
-                  style={{ borderColor: "var(--color-border)" }}
-                >
-                  责任划分
-                </h2>
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">卖方</h3>
-                    <ul className="space-y-1.5">
-                      {term.sellerObligations.map((o, i) => (
-                        <li
-                          key={i}
-                          className="flex gap-2 text-sm"
-                          style={{ color: "var(--color-text-secondary)" }}
-                        >
-                          <span className="shrink-0">·</span>
-                          <span>{o}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">买方</h3>
-                    <ul className="space-y-1.5">
-                      {term.buyerObligations.map((o, i) => (
-                        <li
-                          key={i}
-                          className="flex gap-2 text-sm"
-                          style={{ color: "var(--color-text-secondary)" }}
-                        >
-                          <span className="shrink-0">·</span>
-                          <span>{o}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              {/* Timeline */}
-              <div>
-                <h2
-                  className="text-sm font-semibold pb-3 border-b"
-                  style={{ borderColor: "var(--color-border)" }}
-                >
-                  责任时间线
-                </h2>
-                <div className="mt-4 space-y-0">
-                  {term.timeline.map((step, i) => (
-                    <div key={i} className="flex gap-3 pb-3 relative">
-                      {i < term.timeline.length - 1 && (
-                        <div
-                          className="absolute left-[13px] top-7 bottom-0 w-px"
-                          style={{ background: "var(--color-border)" }}
-                        />
-                      )}
-                      <div
-                        className="shrink-0 w-[27px] h-[27px] rounded-full border flex items-center justify-center text-xs font-medium"
-                        style={{
-                          borderColor: "var(--color-border)",
-                          background: "var(--color-bg)",
-                        }}
-                      >
-                        {i + 1}
-                      </div>
-                      <div>
-                        <p className="text-sm">{step.step}</p>
-                        <span
-                          className="text-xs"
-                          style={{ color: "var(--color-text-muted)" }}
-                        >
-                          {step.responsible === "seller"
-                            ? "卖方"
-                            : step.responsible === "buyer"
-                              ? "买方"
-                              : "双方"}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Key point */}
-              <div
-                className="border rounded-lg p-4"
-                style={{ borderColor: "var(--color-border)" }}
-              >
-                <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-                  <span className="font-medium" style={{ color: "var(--color-text)" }}>
-                    核心要点：
-                  </span>
-                  {term.keyPoint}
-                </p>
-              </div>
-
-              {/* Common misunderstandings */}
-              {term.commonMisunderstandings.length > 0 && (
-                <div>
-                  <h2
-                    className="text-sm font-semibold pb-3 border-b"
-                    style={{ borderColor: "var(--color-border)" }}
-                  >
-                    常见误解
-                  </h2>
-                  <div className="mt-4 space-y-3">
-                    {term.commonMisunderstandings.map((m, i) => (
-                      <div key={i} className="flex gap-3">
-                        <span
-                          className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full text-xs font-medium"
-                          style={{
-                            background: "var(--color-border)",
-                            color: "var(--color-text-secondary)",
-                          }}
-                        >
-                          {i + 1}
-                        </span>
-                        <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-                          {m}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Similar term diffs */}
-              {term.similarTermDiffs.length > 0 && (
-                <div>
-                  <h2
-                    className="text-sm font-semibold pb-3 border-b"
-                    style={{ borderColor: "var(--color-border)" }}
-                  >
-                    相近术语对比
-                  </h2>
-                  <div className="mt-4 space-y-4">
-                    {term.similarTermDiffs.map((d) => {
-                      const related = tradeTerms.find((t) => t.code === d.term);
-                      return (
-                        <div
-                          key={d.term}
-                          className="border rounded-lg p-4"
-                          style={{ borderColor: "var(--color-border)" }}
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            {related && (
-                              <Link
-                                href={`/terms/${d.term.toLowerCase()}`}
-                                className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
-                                style={{ color: "var(--color-text)" }}
-                              >
-                                <span>{d.term}</span>
-                                <span style={{ color: "var(--color-text-muted)" }}>
-                                  {related.chineseName}
-                                </span>
-                                <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                                  →
-                                </span>
-                              </Link>
-                            )}
-                            {!related && (
-                              <span className="text-sm font-medium">{d.term}</span>
-                            )}
-                          </div>
-                          <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-                            {d.diff}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Settlement cross-module links */}
-            {relatedSettlement.length > 0 && (
-              <div>
-                <h2
-                  className="text-sm font-semibold pb-3 border-b"
-                  style={{ borderColor: "var(--color-border)" }}
-                >
-                  国际结算关联
-                </h2>
-                <p
-                  className="mt-3 text-xs"
-                  style={{ color: "var(--color-text-muted)" }}
-                >
-                  实务中与本术语常搭配使用的结算方式：
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {relatedSettlement.map((sc) => (
-                    <Link
-                      key={sc.id}
-                      href={`/settlement/${sc.id}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-md hover:bg-gray-50 transition-colors"
-                      style={{ borderColor: "var(--color-border)" }}
-                    >
-                      <span className="font-medium">{sc.title}</span>
-                      <span style={{ color: "var(--color-text-muted)" }}>
-                        {sc.englishTitle}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* ═══ 操作区 ═══ */}
-            <div
-              className="mt-10 pt-8 border-t space-y-5"
-              style={{ borderColor: "var(--color-border)" }}
-            >
-              {/* Current status — client component needed, use a simple inline approach */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium">准备闪卡复习？</p>
-                  <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-                    翻转卡片，检验你是否真正理解了这个术语
-                  </p>
-                </div>
-                <Link
-                  href={`/flashcards?term=${term.code.toLowerCase()}`}
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md border transition-colors hover:bg-gray-50"
-                  style={{
-                    color: "var(--color-text)",
-                    borderColor: "var(--color-text)",
-                  }}
-                >
-                  开始闪卡复习 →
-                </Link>
-              </div>
-
-              {/* Related terms */}
-              {relatedTerms.length > 0 && (
-                <div>
-                  <span
-                    className="text-xs"
-                    style={{ color: "var(--color-text-muted)" }}
-                  >
-                    同组术语
-                  </span>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {relatedTerms.map((rt) => (
-                      <Link
-                        key={rt.code}
-                        href={`/terms/${rt.code.toLowerCase()}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-md hover:bg-gray-50 transition-colors"
-                        style={{ borderColor: "var(--color-border)" }}
-                      >
-                        <span className="font-medium">{rt.code}</span>
-                        <span style={{ color: "var(--color-text-muted)" }}>
-                          {rt.chineseName}
-                        </span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <PrevNextNav prev={prev} next={next} />
+            <span>{String(index + 1).padStart(2, "0")} / {String(nav.length).padStart(2, "0")}</span>
           </div>
+
+          <section className="mt-4 overflow-hidden rounded-[28px] border" style={{ borderColor: "#dcdcdc", background: "rgba(250,250,250,.72)", boxShadow: "0 18px 50px rgba(0,0,0,.06)" }}>
+            <div className="border-b px-6 py-9 sm:px-10 sm:py-12" style={{ borderColor: "#dedede", background: "rgba(245,245,245,.72)", backdropFilter: "blur(14px)" }}>
+              <div className="flex flex-wrap items-start justify-between gap-6">
+                <div>
+                  <span className="inline-flex rounded-full border bg-white/75 px-3 py-1 text-xs" style={{ borderColor: "#d6d6d6", color: "#666" }}>{term.category} 组 · {term.categoryLabel}</span>
+                  <p className="mt-7 text-6xl font-semibold tracking-[-0.08em] sm:text-8xl">{term.code}</p>
+                  <h1 className="mt-3 text-2xl font-medium tracking-[-0.03em] sm:text-3xl">{term.chineseName}</h1>
+                  <p className="mt-2 text-sm tracking-wide" style={{ color: "#777" }}>{term.fullName}</p>
+                </div>
+                <div className="max-w-[18rem] rounded-2xl border bg-white/65 p-4 text-sm leading-6" style={{ borderColor: "#dedede", color: "#555" }}>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#888" }}>一句话理解</p>
+                  <p className="mt-2">{term.summary}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-8 px-6 py-7 sm:px-10 sm:py-10">
+              <section className="rounded-2xl border bg-white/70 p-5 sm:p-6" style={{ borderColor: "#dedede", backdropFilter: "blur(10px)" }}>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#888" }}>核心定义</p>
+                <p className="mt-3 text-base leading-7" style={{ color: "#444" }}>{term.description}</p>
+              </section>
+
+              <section>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <InfoCard label="风险转移" value={term.riskTransferPoint} />
+                  <InfoCard label="运输方式" value={term.transportMode.join(" / ")} />
+                  <InfoCard label="核心要点" value={term.keyPoint} />
+                </div>
+              </section>
+
+              <section>
+                <SectionHeading eyebrow="RESPONSIBILITIES" title="谁负责什么" />
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <ObligationCard title="卖方负责" items={term.sellerObligations} />
+                  <ObligationCard title="买方负责" items={term.buyerObligations} />
+                </div>
+              </section>
+
+              <details className="group rounded-2xl border bg-white/55" style={{ borderColor: "#dedede" }}>
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-sm font-medium sm:px-6">
+                  <span>查看责任时间线</span>
+                  <span className="text-lg transition-transform group-open:rotate-45" style={{ color: "#888" }}>＋</span>
+                </summary>
+                <div className="border-t px-5 py-5 sm:px-6" style={{ borderColor: "#e8e8e8" }}>
+                  <div className="space-y-4">
+                    {term.timeline.map((step, stepIndex) => (
+                      <div key={`${step.step}-${stepIndex}`} className="flex items-start gap-3">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[11px]" style={{ borderColor: "#d5d5d5", color: "#666" }}>{stepIndex + 1}</span>
+                        <div><p className="text-sm">{step.step}</p><p className="mt-1 text-xs" style={{ color: "#888" }}>{step.responsible === "seller" ? "卖方" : step.responsible === "buyer" ? "买方" : "双方"}</p></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </details>
+
+              {term.commonMisunderstandings.length > 0 && <section>
+                <SectionHeading eyebrow="WATCH OUT" title="容易误解的地方" />
+                <div className="mt-4 space-y-3">
+                  {term.commonMisunderstandings.map((item, itemIndex) => <div key={item} className="flex gap-3 rounded-xl border bg-white/55 p-4" style={{ borderColor: "#e3e3e3" }}><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f0f0f0] text-xs" style={{ color: "#666" }}>{itemIndex + 1}</span><p className="text-sm leading-6" style={{ color: "#555" }}>{item}</p></div>)}
+                </div>
+              </section>}
+
+              {term.similarTermDiffs.length > 0 && <section>
+                <SectionHeading eyebrow="COMPARE" title="和相近术语对比" />
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {term.similarTermDiffs.map((difference) => {
+                    const related = tradeTerms.find((item) => item.code === difference.term);
+                    return <div key={difference.term} className="rounded-2xl border bg-white/55 p-4" style={{ borderColor: "#e3e3e3" }}><Link href={`/terms/${difference.term.toLowerCase()}`} className="inline-flex items-center gap-2 text-sm font-medium hover:underline">{difference.term}<span style={{ color: "#777" }}>{related?.chineseName}</span><span style={{ color: "#888" }}>↗</span></Link><p className="mt-3 text-sm leading-6" style={{ color: "#555" }}>{difference.diff}</p></div>;
+                  })}
+                </div>
+              </section>}
+
+              {relatedSettlement.length > 0 && <section>
+                <SectionHeading eyebrow="RELATED" title="相关业务资料" />
+                <div className="mt-4 flex flex-wrap gap-2">{relatedSettlement.map((concept) => <Link key={concept.id} href={`/settlement/${concept.id}`} className="rounded-full border bg-white/60 px-3 py-2 text-xs hover:bg-[#f3f3f3]" style={{ borderColor: "#dedede" }}>{concept.title}</Link>)}</div>
+              </section>}
+
+              {relatedTerms.length > 0 && <section className="border-t pt-7" style={{ borderColor: "#e5e5e5" }}>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#888" }}>同组术语</p>
+                <div className="mt-3 flex flex-wrap gap-2">{relatedTerms.map((related) => <Link key={related.code} href={`/terms/${related.code.toLowerCase()}`} className="rounded-full border bg-white/60 px-3 py-2 text-xs hover:bg-[#f3f3f3]" style={{ borderColor: "#dedede" }}><span className="font-medium">{related.code}</span><span className="ml-2" style={{ color: "#777" }}>{related.chineseName}</span></Link>)}</div>
+              </section>}
+            </div>
+          </section>
+
+          <div className="mt-7"><PrevNextNav prev={prev} next={next} /></div>
         </div>
       </main>
       <Footer />
-    </>
+    </div>
   );
+}
+
+function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
+  return <div><p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#888" }}>{eyebrow}</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.03em]">{title}</h2></div>;
+}
+
+function InfoCard({ label, value }: { label: string; value: string }) {
+  return <div className="rounded-2xl border bg-white/60 p-4" style={{ borderColor: "#dedede" }}><p className="text-xs" style={{ color: "#888" }}>{label}</p><p className="mt-2 text-sm leading-6" style={{ color: "#444" }}>{value}</p></div>;
+}
+
+function ObligationCard({ title, items }: { title: string; items: string[] }) {
+  return <div className="rounded-2xl border bg-white/60 p-5" style={{ borderColor: "#dedede" }}><h3 className="text-sm font-medium">{title}</h3><ul className="mt-4 space-y-3">{items.map((item) => <li key={item} className="flex gap-2 text-sm leading-6" style={{ color: "#555" }}><span style={{ color: "#999" }}>•</span><span>{item}</span></li>)}</ul></div>;
 }

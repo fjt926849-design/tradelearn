@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 const links = [
   { href: "/", label: "首页" },
   { href: "/terms-preview", label: "术语卡片" },
-  { href: "/knowledge-map", label: "课程" },
   { href: "/progress", label: "我的" },
 ];
 
@@ -34,8 +33,6 @@ export default function Header() {
                 ? pathname === "/"
                 : l.href === "/terms-preview"
                   ? pathname.startsWith("/terms") || pathname.startsWith("/glossary")
-                : l.href === "/knowledge-map"
-                  ? pathname.startsWith("/knowledge-map") || pathname.startsWith("/practice")
                   : pathname.startsWith(l.href);
             return (
               <Link

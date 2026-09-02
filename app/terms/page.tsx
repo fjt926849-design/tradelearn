@@ -161,6 +161,7 @@ export default function TermsPage() {
                 return (
                   <section
                     key={group.key}
+                    id={`group-${group.key}`}
                     className="overflow-hidden rounded-2xl border bg-[var(--color-bg)]"
                     style={{ borderColor: "var(--color-border)" }}
                   >

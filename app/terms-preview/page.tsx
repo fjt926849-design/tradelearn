@@ -5,90 +5,19 @@ import { useMemo, useState } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BackButton from "@/components/learn/BackButton";
-import { tradeTerms } from "@/data/trade-terms";
-import { tradeGlossary } from "@/data/trade-glossary";
-
-type TermCard = {
-  id: string;
-  code: string;
-  name: string;
-  english: string;
-  summary: string;
-  meta: string;
-  href: string;
-};
-
-type TermChapter = {
-  id: string;
-  number: string;
-  title: string;
-  description: string;
-  source: string;
-  terms: TermCard[];
-};
-
-const groupDescription: Record<string, string> = {
-  合同: "掌握合同标的、品质、数量、包装和争议条款。",
-  运输: "认识运输方式、装运安排和运输单据。",
-  保险: "区分险别、风险范围和货损索赔流程。",
-  价格: "理解佣金、折扣和价格调整的报价口径。",
-  结算: "梳理汇付、托收和信用证中的付款责任。",
-  谈判: "分清询盘、发盘、还盘和接受的法律效果。",
-  贸易方式: "了解经销、代理和套期保值等业务安排。",
-  跨境电商: "认识平台、支付、物流和海外仓的基本概念。",
-};
-
-const termChapters: TermChapter[] = [
-  {
-    id: "trade-terms",
-    number: "01",
-    title: "贸易术语",
-    description: "理解交货、费用和风险如何在买卖双方之间分配。",
-    source: "Incoterms® 2020 · E / F / C / D 组",
-    terms: [
-      ...tradeTerms.map((term) => ({
-        id: term.code,
-        code: term.code,
-        name: term.chineseName,
-        english: term.fullName,
-        summary: term.summary,
-        meta: term.transportMode.join(" / "),
-        href: `/terms/${term.code.toLowerCase()}`,
-      })),
-    ],
-  },
-  ...(["合同", "运输", "保险", "价格", "结算", "谈判", "贸易方式", "跨境电商"] as const).map((group, index) => {
-    const groupTerms = tradeGlossary.filter((entry) => entry.group === group);
-    return {
-      id: `glossary-${group}`,
-      number: String(index + 2).padStart(2, "0"),
-      title: group,
-      description: groupDescription[group],
-      source: `${groupTerms.length} 个专业词汇 · 按教材章节整理`,
-      terms: groupTerms.map((entry) => ({
-        id: entry.id,
-        code: entry.term,
-        name: entry.term,
-        english: entry.english,
-        summary: entry.definition,
-        meta: entry.chapterLabel,
-        href: `/glossary/${entry.id}`,
-      })),
-    } satisfies TermChapter;
-  }),
-];
+import { termLibraryChapters } from "@/data/term-library";
 
 export default function TermsPreviewPage() {
   const [query, setQuery] = useState("");
   const [expandedChapter, setExpandedChapter] = useState("trade-terms");
   const normalizedQuery = query.trim().toLowerCase();
 
-  const visibleChapters = useMemo(() => termChapters.map((chapter) => ({
+  const visibleChapters = useMemo(() => termLibraryChapters.map((chapter) => ({
     ...chapter,
     terms: chapter.terms.filter((term) => !normalizedQuery || [term.code, term.name, term.english, term.summary, term.meta].join(" ").toLowerCase().includes(normalizedQuery)),
   })).filter((chapter) => chapter.terms.length > 0), [normalizedQuery]);
 
-  const totalTerms = termChapters.reduce((total, chapter) => total + chapter.terms.length, 0);
+  const totalTerms = termLibraryChapters.reduce((total, chapter) => total + chapter.terms.length, 0);
 
   return (
     <div className="min-h-screen" style={{ background: "#fff", color: "#1f1f1f" }}>
@@ -107,7 +36,7 @@ export default function TermsPreviewPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   <Stat value={totalTerms} label="术语总数" />
-                  <Stat value={termChapters.length} label="篇章" />
+                  <Stat value={termLibraryChapters.length} label="篇章" />
                   <Stat value="2020" label="规则版本" hiddenOnMobile />
                 </div>
               </div>
@@ -124,7 +53,7 @@ export default function TermsPreviewPage() {
             <div className="space-y-4 px-6 py-7 sm:px-10 sm:py-9">
               {visibleChapters.map((chapter) => {
                 const isExpanded = normalizedQuery.length > 0 || expandedChapter === chapter.id;
-                return <section key={chapter.id} className="overflow-hidden rounded-[22px] border bg-white/65 transition-shadow" style={{ borderColor: isExpanded ? "#bdbdbd" : "#dedede", boxShadow: isExpanded ? "0 12px 28px rgba(0,0,0,.07)" : "none" }}>
+                return <section key={chapter.id} id={chapter.id} className="scroll-mt-24 overflow-hidden rounded-[22px] border bg-white/65 transition-shadow" style={{ borderColor: isExpanded ? "#bdbdbd" : "#dedede", boxShadow: isExpanded ? "0 12px 28px rgba(0,0,0,.07)" : "none" }}>
                   <button type="button" onClick={() => setExpandedChapter(isExpanded && !normalizedQuery ? "" : chapter.id)} className="group flex w-full items-start justify-between gap-5 px-5 py-5 text-left transition-colors hover:bg-[#fafafa] sm:px-6" aria-expanded={isExpanded} aria-label={`${isExpanded ? "收起" : "展开"}${chapter.title}篇章`}>
                     <span className="flex min-w-0 items-start gap-4"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f1f1f1] text-xs font-semibold" style={{ color: "#555" }}>{chapter.number}</span><span className="min-w-0"><span className="block text-lg font-semibold">{chapter.title}</span><span className="mt-1 block text-sm leading-5" style={{ color: "#777" }}>{chapter.description}</span><span className="mt-2 block text-xs" style={{ color: "#999" }}>{chapter.source}</span></span></span>
                     <span className="flex shrink-0 items-center gap-3 pt-1 text-xs" style={{ color: "#777" }}><span>{chapter.terms.length} 个术语</span><span className="hidden rounded-full border px-2 py-1 text-[10px] group-hover:inline-flex" style={{ borderColor: "#d6d6d6", color: "#666" }}>{isExpanded ? "收起" : "查看本篇"}</span><span className={`text-lg transition-transform ${isExpanded ? "rotate-45" : ""}`} aria-hidden="true">＋</span></span>

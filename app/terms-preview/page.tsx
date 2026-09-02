@@ -44,7 +44,7 @@ const termChapters: TermChapter[] = [
     number: "01",
     title: "贸易术语",
     description: "理解交货、费用和风险如何在买卖双方之间分配。",
-    source: "11 个 Incoterms® 规则 + 15 张基础概念与对比卡",
+    source: "Incoterms® 2020 · E / F / C / D 组",
     terms: [
       ...tradeTerms.map((term) => ({
         id: term.code,
@@ -54,15 +54,6 @@ const termChapters: TermChapter[] = [
         summary: term.summary,
         meta: term.transportMode.join(" / "),
         href: `/terms/${term.code.toLowerCase()}`,
-      })),
-      ...tradeGlossary.filter((entry) => entry.group === "贸易术语").map((entry) => ({
-        id: entry.id,
-        code: entry.term,
-        name: entry.term,
-        english: entry.english,
-        summary: entry.definition,
-        meta: entry.chapterLabel,
-        href: entry.relatedRoute ?? `/glossary#${entry.id}`,
       })),
     ],
   },

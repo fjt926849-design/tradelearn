@@ -70,6 +70,11 @@ main {
 .rotate-y-180 { transform: rotateY(180deg); }
 .transform-style-3d { transform-style: preserve-3d; }
 
+@keyframes term-reveal {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* ═══════════════════════════════════════════════
    Hero 封面区 — Trade Manual × Learning System
    ═══════════════════════════════════════════════ */

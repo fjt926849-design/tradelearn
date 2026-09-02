@@ -45,7 +45,44 @@ export default function GlossaryPage() {
           <section className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {entries.map((entry) => {
               const expanded = expandedId === entry.id;
-              return <button key={entry.id} type="button" onClick={() => setExpandedId(expanded ? null : entry.id)} className="group min-h-[178px] rounded-2xl border bg-[var(--color-bg)] p-5 text-left transition hover:-translate-y-0.5 hover:border-[var(--color-accent)]" style={{ borderColor: expanded ? "var(--color-accent)" : "var(--color-border)" }} aria-expanded={expanded}><div className="flex items-center justify-between gap-2"><span className="rounded-lg bg-[var(--color-accent-soft)] px-2 py-1 text-[11px] font-medium" style={{ color: "var(--color-accent)" }}>{entry.group}</span><span className="text-[11px]" style={{ color: "var(--color-text-muted)" }}>{entry.chapterLabel}</span></div>{expanded ? <div className="mt-5"><p className="text-sm leading-6" style={{ color: "var(--color-text-secondary)" }}>{entry.definition}</p><p className="mt-3 border-t pt-3 text-xs leading-5" style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}>{entry.usage}</p></div> : <div className="mt-5"><h2 className="text-lg font-semibold tracking-tight">{entry.term}</h2><p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>{entry.english}</p><p className="mt-5 line-clamp-2 text-sm leading-5" style={{ color: "var(--color-text-secondary)" }}>{entry.definition}</p></div>}<span className="mt-4 block text-[11px] font-medium" style={{ color: "var(--color-accent)" }}>{expanded ? "收起 ↑" : "查看定义和用法 ↓"}</span></button>;
+              return (
+                <article
+                  key={entry.id}
+                  className="group rounded-2xl border bg-[var(--color-bg)] transition hover:-translate-y-0.5 hover:border-[var(--color-accent)]"
+                  style={{ borderColor: expanded ? "var(--color-accent)" : "var(--color-border)" }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setExpandedId(expanded ? null : entry.id)}
+                    className="min-h-[178px] w-full rounded-2xl p-5 text-left"
+                    aria-expanded={expanded}
+                    aria-controls={`glossary-detail-${entry.id}`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="rounded-lg bg-[var(--color-accent-soft)] px-2 py-1 text-[11px] font-medium" style={{ color: "var(--color-accent)" }}>{entry.group}</span>
+                      <span className="text-[11px]" style={{ color: "var(--color-text-muted)" }}>{entry.chapterLabel}</span>
+                    </div>
+                    <div className="mt-5 flex items-start justify-between gap-3">
+                      <div>
+                        <h2 className="text-lg font-semibold tracking-tight">{entry.term}</h2>
+                        <p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>{entry.english}</p>
+                      </div>
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-lg leading-none" style={{ borderColor: expanded ? "var(--color-accent)" : "var(--color-border)", color: "var(--color-accent)" }} aria-hidden="true">{expanded ? "−" : "+"}</span>
+                    </div>
+                    {expanded ? (
+                      <div id={`glossary-detail-${entry.id}`} className="mt-4 rounded-xl bg-[var(--color-accent-soft)] p-4">
+                        <p className="text-[11px] font-semibold" style={{ color: "var(--color-accent)" }}>核心定义</p>
+                        <p className="mt-1 text-sm leading-6" style={{ color: "var(--color-text-secondary)" }}>{entry.definition}</p>
+                        <p className="mt-3 border-t pt-3 text-[11px] font-semibold" style={{ borderColor: "color-mix(in srgb, var(--color-accent) 20%, transparent)", color: "var(--color-accent)" }}>实务用法</p>
+                        <p className="mt-1 text-xs leading-5" style={{ color: "var(--color-text-secondary)" }}>{entry.usage}</p>
+                      </div>
+                    ) : (
+                      <p className="mt-5 line-clamp-2 text-sm leading-5" style={{ color: "var(--color-text-secondary)" }}>{entry.definition}</p>
+                    )}
+                    <span className="mt-4 block text-[11px] font-medium" style={{ color: "var(--color-accent)" }}>{expanded ? "收起详情 ↑" : "点击展开定义和用法 ↓"}</span>
+                  </button>
+                </article>
+              );
             })}
           </section>
           {entries.length === 0 && <div className="mt-3 rounded-2xl border bg-[var(--color-bg)] px-5 py-14 text-center" style={{ borderColor: "var(--color-border)" }}><p className="text-sm font-medium">没有匹配的词汇</p><p className="mt-2 text-xs" style={{ color: "var(--color-text-muted)" }}>试试清空搜索，或切换章节和类别。</p></div>}

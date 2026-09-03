@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
-import { termLibraryCards, termLibraryChapters } from "@/data/term-library";
+import { termLibraryCards } from "@/data/term-library";
 import { useTermCardProgress } from "@/hooks/useTermCardProgress";
 
 export default function HomePage() {
@@ -65,7 +65,7 @@ export default function HomePage() {
                   </Link>
                 </div>
                 <p className="mt-8 text-sm" style={{ color: "var(--color-text-muted)" }}>
-                  {termLibraryCards.length} 张术语卡片 · 按教材整理为 {termLibraryChapters.length} 个篇章
+                  {termLibraryCards.length} 张术语卡片
                 </p>
               </div>
 

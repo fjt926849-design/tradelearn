@@ -8,6 +8,7 @@ import { termLibraryCards, termLibraryChapters } from "@/data/term-library";
 import { useTermCardProgress } from "@/hooks/useTermCardProgress";
 
 type Rating = "again" | "learning" | "mastered";
+type ReviewMode = "pending" | "learned";
 
 const ratingLabels: Record<Rating, string> = {
   again: "再看一次",
@@ -15,23 +16,33 @@ const ratingLabels: Record<Rating, string> = {
   mastered: "已掌握",
 };
 
-function getInitialQueue(getStatus: (id: string) => string, targetId: string | null) {
+function getInitialQueue(getStatus: (id: string) => string, targetId: string | null, mode: ReviewMode) {
   const available = termLibraryCards
-    .filter((card) => getStatus(card.id) !== "mastered")
+    .filter((card) => mode === "learned" ? getStatus(card.id) !== "new" : getStatus(card.id) !== "mastered")
     .map((card) => card.id);
 
-  if (targetId && termLibraryCards.some((card) => card.id === targetId)) {
+  if (targetId && available.includes(targetId)) {
     return [targetId, ...available.filter((id) => id !== targetId)];
   }
 
   return available;
 }
 
+function shuffle(ids: string[]) {
+  const result = [...ids];
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
+  }
+  return result;
+}
+
 export default function TermFlashcardReview() {
   const searchParams = useSearchParams();
   const targetId = searchParams.get("term");
   const { getStatus, markOpened, markMastered, markNew } = useTermCardProgress();
-  const [sessionIds, setSessionIds] = useState(() => getInitialQueue(getStatus, targetId));
+  const [mode, setMode] = useState<ReviewMode>("pending");
+  const [sessionIds, setSessionIds] = useState(() => getInitialQueue(getStatus, targetId, "pending"));
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [rating, setRating] = useState<Rating | null>(null);
@@ -68,27 +79,47 @@ export default function TermFlashcardReview() {
   };
 
   const restart = () => {
-    setSessionIds(getInitialQueue(() => "new", null));
+    const queue = getInitialQueue(getStatus, null, mode);
+    setSessionIds(mode === "learned" ? shuffle(queue) : queue);
     setCurrentIndex(0);
     setFlipped(false);
     setRating(null);
   };
 
+  const changeMode = (nextMode: ReviewMode) => {
+    const queue = getInitialQueue(getStatus, null, nextMode);
+    setMode(nextMode);
+    setSessionIds(nextMode === "learned" ? shuffle(queue) : queue);
+    setCurrentIndex(0);
+    setFlipped(false);
+    setRating(null);
+  };
+
+  const modeToggle = (
+    <div className="mb-6 flex flex-wrap items-center gap-2 rounded-xl border p-2" style={{ borderColor: "var(--color-border)", background: "var(--color-bg-soft)" }}>
+      <span className="px-2 text-xs" style={{ color: "var(--color-text-muted)" }}>抽取范围</span>
+      {(["pending", "learned"] as ReviewMode[]).map((option) => (
+        <button key={option} type="button" onClick={() => changeMode(option)} className="rounded-lg px-3 py-2 text-xs transition-colors" style={{ background: mode === option ? "var(--color-bg)" : "transparent", color: mode === option ? "var(--color-accent)" : "var(--color-text-muted)", boxShadow: mode === option ? "0 1px 3px rgba(0,0,0,.08)" : "none", fontWeight: mode === option ? 600 : 400 }}>
+          {option === "pending" ? "待掌握术语" : "随机已学习"}
+        </button>
+      ))}
+    </div>
+  );
+
   if (!currentCard || currentIndex >= sessionIds.length) {
     return (
       <section className="rounded-2xl border p-8 text-center sm:p-12" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
+        {modeToggle}
         <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full" style={{ background: "var(--color-accent-soft)", color: "var(--color-accent)" }} aria-hidden="true">
-          ✓
+          {mode === "learned" && sessionIds.length === 0 ? "—" : "✓"}
         </div>
         <p className="mb-2 text-xs font-medium uppercase tracking-[0.2em]" style={{ color: "var(--color-accent)" }}>TERM REVIEW</p>
-        <h1 className="text-2xl font-semibold tracking-tight">这一轮术语复习完成</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{mode === "learned" && sessionIds.length === 0 ? "还没有已学习的术语" : "这一轮术语复习完成"}</h1>
         <p className="mx-auto mt-3 max-w-md text-sm leading-6" style={{ color: "var(--color-text-muted)" }}>
-          本轮共处理 {sessionIds.length} 张卡片。已掌握的术语会自动从下一轮复习中暂时移出。
+          {mode === "learned" && sessionIds.length === 0 ? "先在待掌握术语中翻看并标记“学习中”，之后就可以从已学习卡片中随机抽取复习。" : `本轮共处理 ${sessionIds.length} 张卡片。已掌握的术语会自动从下一轮复习中暂时移出。`}
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <button type="button" onClick={restart} className="rounded-lg border px-4 py-2.5 text-sm transition-colors hover:bg-gray-50" style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)" }}>
-            再看一遍
-          </button>
+          {sessionIds.length > 0 && <button type="button" onClick={restart} className="rounded-lg border px-4 py-2.5 text-sm transition-colors hover:bg-gray-50" style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)" }}>再看一遍</button>}
           <Link href="/terms-preview" className="rounded-lg px-4 py-2.5 text-sm font-medium text-white" style={{ background: "var(--color-accent)" }}>
             返回术语篇章
           </Link>
@@ -104,11 +135,12 @@ export default function TermFlashcardReview() {
 
   return (
     <section>
+      {modeToggle}
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="mb-2 text-xs font-medium uppercase tracking-[0.2em]" style={{ color: "var(--color-accent)" }}>TERM REVIEW</p>
           <h1 className="text-2xl font-semibold tracking-tight">术语闪卡复习</h1>
-          <p className="mt-2 text-sm" style={{ color: "var(--color-text-muted)" }}>翻面查看释义，再选择你对这张卡片的掌握程度。</p>
+          <p className="mt-2 text-sm" style={{ color: "var(--color-text-muted)" }}>{mode === "learned" ? "从已经学习过的术语中随机抽取，翻面后再次巩固。" : "翻面查看释义，再选择你对这张卡片的掌握程度。"}</p>
         </div>
         <span className="shrink-0 text-sm" style={{ color: "var(--color-text-muted)" }}>{Math.min(completedCount + 1, sessionIds.length)} / {sessionIds.length}</span>
       </div>

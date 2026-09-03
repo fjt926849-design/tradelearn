@@ -545,3 +545,17 @@ main {
   font-size: 11px;
   color: var(--color-text-muted);
 }
+
+@media (max-width: 639px) {
+  .prevnext {
+    flex-direction: column;
+  }
+  .prevnext-link {
+    width: 100%;
+    max-width: none;
+  }
+  .prevnext-link--next {
+    align-items: flex-start;
+    text-align: left;
+  }
+}

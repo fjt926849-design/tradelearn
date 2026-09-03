@@ -70,3 +70,38 @@ const glossaryChapters = (["合同", "运输", "保险", "价格", "结算", "�
 
 export const termLibraryChapters: TermLibraryChapter[] = [incotermChapter, ...glossaryChapters];
 export const termLibraryCards = termLibraryChapters.flatMap((chapter) => chapter.terms);
+
+/**
+ * Keep the term center honest as more chapters are added. This runs during the
+ * build as well as in development, so a missing card, duplicate id, or broken
+ * internal target cannot silently reach the UI.
+ */
+function assertTermLibraryIntegrity() {
+  const ids = new Set<string>();
+  const hrefs = new Set<string>();
+  const invalid: string[] = [];
+
+  for (const chapter of termLibraryChapters) {
+    if (!chapter.id || !chapter.title || chapter.terms.length === 0) {
+      invalid.push(`chapter:${chapter.id || "missing-id"}`);
+    }
+    for (const card of chapter.terms) {
+      if (ids.has(card.id)) invalid.push(`duplicate-id:${card.id}`);
+      if (hrefs.has(card.href)) invalid.push(`duplicate-href:${card.href}`);
+      if (!card.id || !card.code || !card.name || !card.english || !card.summary || !card.meta) {
+        invalid.push(`missing-content:${card.id || "missing-id"}`);
+      }
+      if (!/^\/(terms|glossary)\/[^/]+$/.test(card.href)) {
+        invalid.push(`invalid-route:${card.id}:${card.href}`);
+      }
+      ids.add(card.id);
+      hrefs.add(card.href);
+    }
+  }
+
+  if (termLibraryChapters.length !== 9) invalid.push(`chapter-count:${termLibraryChapters.length}`);
+  if (termLibraryCards.length !== 44) invalid.push(`card-count:${termLibraryCards.length}`);
+  if (invalid.length > 0) throw new Error(`Term library integrity check failed: ${invalid.join(", ")}`);
+}
+
+assertTermLibraryIntegrity();

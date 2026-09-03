@@ -80,6 +80,11 @@ export default async function TermDetailPage({
                 </div>
               </section>
 
+              <section className="grid gap-3 sm:grid-cols-2">
+                <InfoCard label="典型业务场景" value={term.usageScenario} />
+                <InfoCard label="怎么选择" value={term.selectionTip} />
+              </section>
+
               <section>
                 <SectionHeading eyebrow="RESPONSIBILITIES" title="谁负责什么" />
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">

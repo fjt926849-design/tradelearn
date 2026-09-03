@@ -1,6 +1,8 @@
 import type { TradeTerm } from "@/lib/types";
 
-export const tradeTerms: TradeTerm[] = [
+type BaseTradeTerm = Omit<TradeTerm, "usageScenario" | "selectionTip">;
+
+const baseTradeTerms: BaseTradeTerm[] = [
   {
     code: "EXW",
     fullName: "Ex Works",
@@ -491,6 +493,59 @@ export const tradeTerms: TradeTerm[] = [
     ],
   },
 ];
+
+const termContexts: Record<string, Pick<TradeTerm, "usageScenario" | "selectionTip">> = {
+  EXW: {
+    usageScenario: "买方在卖方所在国有自己的仓库、报关代理和提货车队时，可从工厂直接提货并自行组织出口。",
+    selectionTip: "只有在买方能处理出口报关和装货时才选 EXW；否则优先考虑 FCA。",
+  },
+  FCA: {
+    usageScenario: "集装箱货物在卖方工厂装车，或在货运站交给第一承运人时，FCA能清楚划分出口和主运段责任。",
+    selectionTip: "集装箱、多式联运或无法确认装船时，通常用 FCA 替代 FOB。",
+  },
+  FAS: {
+    usageScenario: "矿石、粮食等大宗散货由卖方运到装运港船边，买方再安排吊装和海运。",
+    selectionTip: "仅适用于海运或内河水运，并且买方能控制装船作业的场景。",
+  },
+  FOB: {
+    usageScenario: "买方指定船舶，卖方负责把散货或传统件杂货装上船，装船完成后由买方安排后续运输。",
+    selectionTip: "适合传统海运散货；集装箱在码头交承运人时应优先考虑 FCA。",
+  },
+  CFR: {
+    usageScenario: "卖方为海运货物订舱并支付到目的港的运费，买方根据自己的风险偏好另行投保。",
+    selectionTip: "当卖方能拿到更有优势的海运费、但买方希望自行控制保险时可选 CFR。",
+  },
+  CIF: {
+    usageScenario: "卖方报价中包含到目的港的海运费和最低保险，买方在目的港接货并办理进口。",
+    selectionTip: "需要卖方代办海运保险时选 CIF；高价值或多式联运货物要评估 CIP。",
+  },
+  CPT: {
+    usageScenario: "卖方把货物交给第一承运人并支付至指定目的地的运费，适用于空运、铁路和集装箱多式联运。",
+    selectionTip: "卖方付运费但不负责保险，且风险在第一承运人处转移时选 CPT。",
+  },
+  CIP: {
+    usageScenario: "高价值设备采用空运或多式联运，卖方负责运费并按较高保障投保，买方在目的地接货。",
+    selectionTip: "需要卖方投保、且货物价值高或运输风险复杂时，优先比较 CIP。",
+  },
+  DAP: {
+    usageScenario: "卖方将货物运到买方指定仓库或工地，在运输工具上交付；买方负责卸货和进口清关。",
+    selectionTip: "卖方能组织门到门运输但不便承担目的国进口税费时选 DAP。",
+  },
+  DPU: {
+    usageScenario: "卖方把货物运至指定场所并完成卸货，例如把设备卸到买方工地后再交付。",
+    selectionTip: "只有卖方能控制目的地卸货设备和作业风险时才选 DPU。",
+  },
+  DDP: {
+    usageScenario: "卖方提供接近门到门的服务，负责目的国进口申报、关税和增值税，买方只接收货物。",
+    selectionTip: "先确认卖方能否成为目的国进口主体；无法合法清关时不要使用 DDP。",
+  },
+};
+
+export const tradeTerms: TradeTerm[] = baseTradeTerms.map((term) => {
+  const context = termContexts[term.code];
+  if (!context) throw new Error(`Missing business context for Incoterm: ${term.code}`);
+  return { ...term, ...context };
+});
 
 export function getTermByCode(code: string): TradeTerm | undefined {
   return tradeTerms.find((t) => t.code === code.toUpperCase());

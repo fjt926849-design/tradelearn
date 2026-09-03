@@ -88,6 +88,9 @@ export interface TradeTerm {
   commonMisunderstandings: string[];
   /** 与相近术语的关键区别 */
   similarTermDiffs: SimilarTermDiff[];
+  /** 将术语定义连接到真实业务决策。 */
+  usageScenario: string;
+  selectionTip: string;
 }
 
 export interface TimelineStep {

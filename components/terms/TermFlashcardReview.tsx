@@ -5,6 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import FlashCard from "@/components/flashcards/FlashCard";
 import { termLibraryCards, termLibraryChapters } from "@/data/term-library";
+import { tradeGlossary } from "@/data/trade-glossary";
+import { tradeTerms } from "@/data/trade-terms";
 import { useTermCardProgress } from "@/hooks/useTermCardProgress";
 
 type Rating = "again" | "learning" | "mastered";
@@ -56,6 +58,17 @@ export default function TermFlashcardReview() {
     () => termLibraryChapters.find((chapter) => chapter.terms.some((card) => card.id === currentId)),
     [currentId]
   );
+  const currentLearningContext = useMemo(() => {
+    const incoterm = tradeTerms.find((term) => term.code === currentId);
+    if (incoterm) {
+      return { label: "典型业务场景", text: incoterm.usageScenario, tipLabel: "怎么选择", tip: incoterm.selectionTip };
+    }
+    const glossary = tradeGlossary.find((entry) => entry.id === currentId);
+    if (glossary) {
+      return { label: "业务场景", text: glossary.scenario, tipLabel: "实务用法", tip: glossary.practicalUse };
+    }
+    return null;
+  }, [currentId]);
   const completedCount = currentIndex + (rating ? 1 : 0);
 
   const handleRating = (nextRating: Rating) => {
@@ -166,6 +179,12 @@ export default function TermFlashcardReview() {
             <p className="mb-2 text-xs font-medium uppercase tracking-[0.18em]" style={{ color: "var(--color-accent)" }}>一句话理解</p>
             <h2 className="text-2xl font-semibold">{currentCard.name}</h2>
             <p className="mt-5 text-base leading-8" style={{ color: "var(--color-text-secondary)" }}>{currentCard.summary}</p>
+            {currentLearningContext && <div className="mt-5 rounded-xl border p-4" style={{ borderColor: "var(--color-border-light)", background: "var(--color-bg-soft)" }}>
+              <p className="text-[11px] font-medium uppercase tracking-[0.16em]" style={{ color: "var(--color-accent)" }}>{currentLearningContext.label}</p>
+              <p className="mt-2 text-sm leading-6" style={{ color: "var(--color-text-secondary)" }}>{currentLearningContext.text}</p>
+              <p className="mt-3 text-[11px] font-medium uppercase tracking-[0.16em]" style={{ color: "var(--color-text-muted)" }}>{currentLearningContext.tipLabel}</p>
+              <p className="mt-1 text-sm leading-6" style={{ color: "var(--color-text-secondary)" }}>{currentLearningContext.tip}</p>
+            </div>}
             <div className="mt-7 border-t pt-4 text-sm" style={{ borderColor: "var(--color-border-light)", color: "var(--color-text-muted)" }}>
               {currentChapter?.title} · {currentCard.meta}
             </div>

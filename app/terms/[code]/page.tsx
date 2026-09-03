@@ -7,6 +7,7 @@ import { settlementConcepts } from "@/data/settlement-concepts";
 import { getModuleNav, getPrevNext } from "@/lib/navigation";
 import PrevNextNav from "@/components/learn/PrevNextNav";
 import BackButton from "@/components/learn/BackButton";
+import TermProgressAction from "@/components/terms/TermProgressAction";
 
 export async function generateStaticParams() {
   return tradeTerms.map((term) => ({ code: term.code.toLowerCase() }));
@@ -55,6 +56,7 @@ export default async function TermDetailPage({
                   <p className="mt-7 text-6xl font-semibold tracking-[-0.08em] sm:text-8xl">{term.code}</p>
                   <h1 className="mt-3 text-2xl font-medium tracking-[-0.03em] sm:text-3xl">{term.chineseName}</h1>
                   <p className="mt-2 text-sm tracking-wide" style={{ color: "#777" }}>{term.fullName}</p>
+                  <TermProgressAction termId={term.code} />
                 </div>
                 <div className="max-w-[18rem] rounded-2xl border bg-white/65 p-4 text-sm leading-6" style={{ borderColor: "#dedede", color: "#555" }}>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#888" }}>一句话理解</p>

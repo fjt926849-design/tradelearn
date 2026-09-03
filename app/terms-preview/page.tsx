@@ -6,11 +6,17 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BackButton from "@/components/learn/BackButton";
 import { termLibraryChapters } from "@/data/term-library";
+import { useTermCardProgress } from "@/hooks/useTermCardProgress";
 
 export default function TermsPreviewPage() {
   const [query, setQuery] = useState("");
   const [expandedChapter, setExpandedChapter] = useState("trade-terms");
+  const { getStatus } = useTermCardProgress();
   const normalizedQuery = query.trim().toLowerCase();
+  const masteredByChapter = useMemo(
+    () => new Map(termLibraryChapters.map((chapter) => [chapter.id, chapter.terms.filter((term) => getStatus(term.id) === "mastered").length] as const)),
+    [getStatus],
+  );
 
   const visibleChapters = useMemo(() => termLibraryChapters.map((chapter) => ({
     ...chapter,
@@ -56,7 +62,7 @@ export default function TermsPreviewPage() {
                 return <section key={chapter.id} id={chapter.id} className="scroll-mt-24 overflow-hidden rounded-[22px] border bg-white/65 transition-shadow" style={{ borderColor: isExpanded ? "#bdbdbd" : "#dedede", boxShadow: isExpanded ? "0 12px 28px rgba(0,0,0,.07)" : "none" }}>
                   <button type="button" onClick={() => setExpandedChapter(isExpanded && !normalizedQuery ? "" : chapter.id)} className="group flex w-full items-start justify-between gap-5 px-5 py-5 text-left transition-colors hover:bg-[#fafafa] sm:px-6" aria-expanded={isExpanded} aria-label={`${isExpanded ? "收起" : "展开"}${chapter.title}篇章`}>
                     <span className="flex min-w-0 items-start gap-4"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f1f1f1] text-xs font-semibold" style={{ color: "#555" }}>{chapter.number}</span><span className="min-w-0"><span className="block text-lg font-semibold">{chapter.title}</span><span className="mt-1 block text-sm leading-5" style={{ color: "#777" }}>{chapter.description}</span><span className="mt-2 block text-xs" style={{ color: "#999" }}>{chapter.source}</span></span></span>
-                    <span className="flex shrink-0 items-center gap-3 pt-1 text-xs" style={{ color: "#777" }}><span>{chapter.terms.length} 个术语</span><span className="hidden rounded-full border px-2 py-1 text-[10px] group-hover:inline-flex" style={{ borderColor: "#d6d6d6", color: "#666" }}>{isExpanded ? "收起" : "查看本篇"}</span><span className={`text-lg transition-transform ${isExpanded ? "rotate-45" : ""}`} aria-hidden="true">＋</span></span>
+                    <span className="flex shrink-0 items-center gap-3 pt-1 text-xs" style={{ color: "#777" }}><span>{masteredByChapter.get(chapter.id) ?? 0} / {chapter.terms.length} 已掌握</span><span className="hidden rounded-full border px-2 py-1 text-[10px] group-hover:inline-flex" style={{ borderColor: "#d6d6d6", color: "#666" }}>{isExpanded ? "收起" : "查看本篇"}</span><span className={`text-lg transition-transform ${isExpanded ? "rotate-45" : ""}`} aria-hidden="true">＋</span></span>
                   </button>
                   {isExpanded && <div className="animate-[term-reveal_180ms_ease-out] border-t px-5 py-5 sm:px-6" style={{ borderColor: "#e8e8e8", background: "rgba(248,248,248,.55)" }}><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{chapter.terms.map((term) => <Link key={term.id} href={term.href} className="group rounded-2xl border bg-white/80 p-4 transition duration-200 hover:-translate-y-1 hover:shadow-[0_10px_22px_rgba(0,0,0,.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#777]" style={{ borderColor: "#dedede" }}><div className="flex items-start justify-between gap-3"><p className="text-xl font-semibold tracking-[-0.03em]">{term.code}</p><span className="text-base transition-transform group-hover:translate-x-1" style={{ color: "#999" }} aria-hidden="true">↗</span></div><p className="mt-2 text-sm font-medium">{term.name}</p><p className="mt-1 truncate text-xs" style={{ color: "#888" }}>{term.english}</p><p className="mt-3 line-clamp-2 text-xs leading-5" style={{ color: "#666" }}>{term.summary}</p><p className="mt-3 text-[10px]" style={{ color: "#999" }}>{term.meta}</p><span className="mt-3 block text-[10px] font-medium opacity-0 transition-opacity group-hover:opacity-100" style={{ color: "#666" }}>查看详情 ↗</span></Link>)}</div></div>}
                 </section>;

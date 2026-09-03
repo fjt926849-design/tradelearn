@@ -6,6 +6,7 @@ import BackButton from "@/components/learn/BackButton";
 import { tradeGlossary } from "@/data/trade-glossary";
 import { termLibraryCards } from "@/data/term-library";
 import PrevNextNav, { type PrevNextLink } from "@/components/learn/PrevNextNav";
+import TermProgressAction from "@/components/terms/TermProgressAction";
 
 export async function generateStaticParams() {
   return tradeGlossary.map((entry) => ({ id: entry.id }));
@@ -55,6 +56,7 @@ export default async function GlossaryDetailPage({
                   <span className="inline-flex rounded-full border bg-white/75 px-3 py-1 text-xs" style={{ borderColor: "#d6d6d6", color: "#666" }}>{entry.group} · {entry.chapterLabel}</span>
                   <p className="mt-7 max-w-3xl text-4xl font-semibold tracking-[-0.06em] sm:text-6xl">{entry.term}</p>
                   <p className="mt-3 text-lg" style={{ color: "#555" }}>{entry.english}</p>
+                  <TermProgressAction termId={entry.id} />
                 </div>
                 <div className="max-w-[18rem] rounded-2xl border bg-white/65 p-4 text-sm leading-6" style={{ borderColor: "#dedede", color: "#555" }}>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#888" }}>一句话理解</p>

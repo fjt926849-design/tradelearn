@@ -78,6 +78,7 @@ export default async function GlossaryDetailPage({
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#999" }}>业务场景</p>
                   <p className="mt-2 text-sm leading-6" style={{ color: "#555" }}>{entry.scenario}</p>
                 </div>
+                {entry.relatedRoute && <Link href={entry.relatedRoute} className="mt-5 inline-flex items-center rounded-xl border bg-white/70 px-3 py-2 text-xs font-medium transition hover:bg-white" style={{ borderColor: "#d8d8d8", color: "#555" }}>查看对应业务模块 <span className="ml-1" aria-hidden="true">→</span></Link>}
               </section>
 
               <section>

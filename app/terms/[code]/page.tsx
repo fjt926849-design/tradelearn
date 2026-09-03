@@ -29,8 +29,9 @@ export default async function TermDetailPage({
     concept.relatedIncotermCodes.includes(term.code),
   );
   const nav = getModuleNav("incoterms");
-  const index = nav.findIndex((item) => item.slug === code);
-  const { prev, next } = getPrevNext("incoterms", code);
+  const normalizedCode = code.toLowerCase();
+  const index = nav.findIndex((item) => item.slug === normalizedCode);
+  const { prev, next } = getPrevNext("incoterms", normalizedCode);
 
   return (
     <div className="min-h-screen" style={{ background: "#fff", color: "#1f1f1f" }}>

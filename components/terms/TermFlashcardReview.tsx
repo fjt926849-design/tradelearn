@@ -49,6 +49,7 @@ export default function TermFlashcardReview() {
   const [flipped, setFlipped] = useState(false);
   const [rating, setRating] = useState<Rating | null>(null);
   const [sessionRatings, setSessionRatings] = useState<Record<string, Rating>>({});
+  const [sessionSeenIds, setSessionSeenIds] = useState<string[]>([]);
 
   const currentId = sessionIds[currentIndex];
   const currentCard = useMemo(
@@ -82,6 +83,13 @@ export default function TermFlashcardReview() {
     setRating(nextRating);
   };
 
+  const handleFlip = () => {
+    if (!flipped && currentCard) {
+      setSessionSeenIds((previous) => previous.includes(currentCard.id) ? previous : [...previous, currentCard.id]);
+    }
+    setFlipped((value) => !value);
+  };
+
   const handleNext = () => {
     if (currentIndex >= sessionIds.length - 1) {
       setCurrentIndex(sessionIds.length);
@@ -100,6 +108,7 @@ export default function TermFlashcardReview() {
     setFlipped(false);
     setRating(null);
     setSessionRatings({});
+    setSessionSeenIds([]);
   };
 
   const changeMode = (nextMode: ReviewMode) => {
@@ -110,6 +119,7 @@ export default function TermFlashcardReview() {
     setFlipped(false);
     setRating(null);
     setSessionRatings({});
+    setSessionSeenIds([]);
   };
 
   const modeToggle = (
@@ -122,7 +132,7 @@ export default function TermFlashcardReview() {
       ))}
     </div>
   );
-  const sessionSeenCount = Object.keys(sessionRatings).length;
+  const sessionSeenCount = sessionSeenIds.length;
   const sessionLearningCount = Object.values(sessionRatings).filter((value) => value === "learning").length;
   const sessionMasteredCount = Object.values(sessionRatings).filter((value) => value === "mastered").length;
   const sessionStats = (
@@ -187,7 +197,7 @@ export default function TermFlashcardReview() {
 
       <FlashCard
         flipped={flipped}
-        onFlip={() => setFlipped((value) => !value)}
+        onFlip={handleFlip}
         front={
           <div className="flex h-full w-full flex-col items-center justify-center text-center">
             <span className="mb-5 rounded-full border px-3 py-1 text-xs" style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}>{currentChapter?.title} · {currentCard.meta}</span>

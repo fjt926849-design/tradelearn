@@ -48,6 +48,7 @@ export default function TermFlashcardReview() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [rating, setRating] = useState<Rating | null>(null);
+  const [sessionRatings, setSessionRatings] = useState<Record<string, Rating>>({});
 
   const currentId = sessionIds[currentIndex];
   const currentCard = useMemo(
@@ -77,6 +78,7 @@ export default function TermFlashcardReview() {
     if (nextRating === "mastered") markMastered(currentCard.id);
     if (nextRating === "learning") markOpened(currentCard.id);
     if (nextRating === "again") markNew(currentCard.id);
+    setSessionRatings((previous) => ({ ...previous, [currentCard.id]: nextRating }));
     setRating(nextRating);
   };
 
@@ -97,6 +99,7 @@ export default function TermFlashcardReview() {
     setCurrentIndex(0);
     setFlipped(false);
     setRating(null);
+    setSessionRatings({});
   };
 
   const changeMode = (nextMode: ReviewMode) => {
@@ -106,6 +109,7 @@ export default function TermFlashcardReview() {
     setCurrentIndex(0);
     setFlipped(false);
     setRating(null);
+    setSessionRatings({});
   };
 
   const modeToggle = (
@@ -115,6 +119,23 @@ export default function TermFlashcardReview() {
         <button key={option} type="button" onClick={() => changeMode(option)} className="rounded-lg px-3 py-2 text-xs transition-colors" style={{ background: mode === option ? "var(--color-bg)" : "transparent", color: mode === option ? "var(--color-accent)" : "var(--color-text-muted)", boxShadow: mode === option ? "0 1px 3px rgba(0,0,0,.08)" : "none", fontWeight: mode === option ? 600 : 400 }}>
           {option === "pending" ? "待掌握术语" : "随机已学习"}
         </button>
+      ))}
+    </div>
+  );
+  const sessionSeenCount = Object.keys(sessionRatings).length;
+  const sessionLearningCount = Object.values(sessionRatings).filter((value) => value === "learning").length;
+  const sessionMasteredCount = Object.values(sessionRatings).filter((value) => value === "mastered").length;
+  const sessionStats = (
+    <div className="mb-6 grid grid-cols-3 gap-2">
+      {[
+        { label: "本轮已看", value: sessionSeenCount },
+        { label: "学习中", value: sessionLearningCount },
+        { label: "已掌握", value: sessionMasteredCount },
+      ].map((stat) => (
+        <div key={stat.label} className="rounded-xl border px-3 py-3 text-center" style={{ borderColor: "var(--color-border)", background: "var(--color-bg-soft)" }}>
+          <p className="text-lg font-semibold" style={{ color: "var(--color-text)" }}>{stat.value}</p>
+          <p className="mt-1 text-[11px]" style={{ color: "var(--color-text-muted)" }}>{stat.label}</p>
+        </div>
       ))}
     </div>
   );
@@ -128,6 +149,7 @@ export default function TermFlashcardReview() {
         </div>
         <p className="mb-2 text-xs font-medium uppercase tracking-[0.2em]" style={{ color: "var(--color-accent)" }}>TERM REVIEW</p>
         <h1 className="text-2xl font-semibold tracking-tight">{mode === "learned" && sessionIds.length === 0 ? "还没有已学习的术语" : "这一轮术语复习完成"}</h1>
+        {sessionIds.length > 0 && <div className="mx-auto mt-6 max-w-md text-left">{sessionStats}</div>}
         <p className="mx-auto mt-3 max-w-md text-sm leading-6" style={{ color: "var(--color-text-muted)" }}>
           {mode === "learned" && sessionIds.length === 0 ? "先在待掌握术语中翻看并标记“学习中”，之后就可以从已学习卡片中随机抽取复习。" : `本轮共处理 ${sessionIds.length} 张卡片。已掌握的术语会自动从下一轮复习中暂时移出。`}
         </p>
@@ -161,6 +183,7 @@ export default function TermFlashcardReview() {
       <div className="mb-5 h-1.5 overflow-hidden rounded-full" style={{ background: "var(--color-border-light)" }}>
         <div className="h-full rounded-full transition-all" style={{ width: `${Math.min((completedCount / sessionIds.length) * 100, 100)}%`, background: "var(--color-accent)" }} />
       </div>
+      {sessionStats}
 
       <FlashCard
         flipped={flipped}

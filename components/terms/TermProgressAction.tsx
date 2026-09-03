@@ -12,9 +12,10 @@ export default function TermProgressAction({ termId }: { termId: string }) {
   }, [markOpened, termId]);
 
   const isMastered = status === "mastered";
+  const statusColor = isMastered ? "#c24141" : status === "learning" ? "#3f8a60" : "#666";
   return (
     <div className="mt-4 flex flex-wrap items-center gap-3">
-      <span className="inline-flex items-center gap-2 rounded-full border bg-white/70 px-3 py-1.5 text-xs" style={{ borderColor: "#d8d8d8", color: isMastered ? "#3f8a60" : "#666" }}>
+      <span className="inline-flex items-center gap-2 rounded-full border bg-white/70 px-3 py-1.5 text-xs" style={{ borderColor: "#d8d8d8", color: statusColor }}>
         <span aria-hidden="true">{isMastered ? "●" : status === "learning" ? "◉" : "○"}</span>
         {isMastered ? "已掌握" : status === "learning" ? "学习中" : "未开始"}
       </span>

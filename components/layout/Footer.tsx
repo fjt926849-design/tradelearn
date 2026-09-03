@@ -7,7 +7,7 @@ export default function Footer() {
       style={{ borderColor: "var(--color-border)" }}
     >
       <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm" style={{ color: "var(--color-text-muted)" }}>
-        <span>贸学 TradeLearn · 基于 Incoterms 2020</span>
+        <span>贸学 TradeLearn</span>
         <span aria-hidden="true">·</span>
         <Link href="/privacy" className="hover:underline" style={{ color: "var(--color-text-secondary)" }}>隐私政策</Link>
       </div>

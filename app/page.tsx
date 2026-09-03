@@ -46,7 +46,7 @@ export default function HomePage() {
                   国际贸易术语卡片
                 </h1>
                 <p className="mt-6 max-w-xl text-base leading-8 sm:text-lg" style={{ color: "var(--color-text-muted)" }}>
-                  整理书中的核心术语，提供缩写、中文名称、英文名称和基础释义。
+                  核心术语，提供缩写、中文名称、英文名称和基础释义。
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link

@@ -38,12 +38,11 @@ export default function TermsPreviewPage() {
               <div className="mt-4 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
                 <div>
                   <h1 className="text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">术语篇章</h1>
-                  <p className="mt-3 max-w-xl text-sm leading-6" style={{ color: "#666" }}>按教材篇章整理术语。先选择一个大卡片，再在其中查看对应的小术语卡片。</p>
+                  <p className="mt-3 max-w-xl text-sm leading-6" style={{ color: "#666" }}>先选择一个大卡片，再在其中查看对应的小术语卡片。</p>
                 </div>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                <div className="grid grid-cols-2 gap-2">
                   <Stat value={totalTerms} label="术语总数" />
                   <Stat value={termLibraryChapters.length} label="篇章" />
-                  <Stat value="2020" label="规则版本" hiddenOnMobile />
                 </div>
               </div>
             </div>
@@ -77,6 +76,6 @@ export default function TermsPreviewPage() {
   );
 }
 
-function Stat({ value, label, hiddenOnMobile = false }: { value: string | number; label: string; hiddenOnMobile?: boolean }) {
-  return <div className={`${hiddenOnMobile ? "hidden sm:block" : ""} rounded-2xl border bg-white/70 px-4 py-3`} style={{ borderColor: "#dedede" }}><p className="text-2xl font-semibold">{value}</p><p className="mt-1 text-xs" style={{ color: "#777" }}>{label}</p></div>;
+function Stat({ value, label }: { value: string | number; label: string }) {
+  return <div className="rounded-2xl border bg-white/70 px-4 py-3" style={{ borderColor: "#dedede" }}><p className="text-2xl font-semibold">{value}</p><p className="mt-1 text-xs" style={{ color: "#777" }}>{label}</p></div>;
 }

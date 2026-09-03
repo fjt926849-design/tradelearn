@@ -4,6 +4,8 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BackButton from "@/components/learn/BackButton";
 import { tradeGlossary } from "@/data/trade-glossary";
+import { termLibraryCards } from "@/data/term-library";
+import PrevNextNav, { type PrevNextLink } from "@/components/learn/PrevNextNav";
 
 export async function generateStaticParams() {
   return tradeGlossary.map((entry) => ({ id: entry.id }));
@@ -21,6 +23,14 @@ export default async function GlossaryDetailPage({
   const relatedEntries = (entry.relatedIds ?? [])
     .map((relatedId) => tradeGlossary.find((item) => item.id === relatedId))
     .filter((item): item is (typeof tradeGlossary)[number] => Boolean(item));
+  const cardIndex = termLibraryCards.findIndex((card) => card.id === entry.id);
+  const previousCard = cardIndex > 0 ? termLibraryCards[cardIndex - 1] : null;
+  const nextCard = cardIndex >= 0 && cardIndex < termLibraryCards.length - 1 ? termLibraryCards[cardIndex + 1] : null;
+  const toNavigationLink = (card: (typeof termLibraryCards)[number]): PrevNextLink => ({
+    href: card.href,
+    label: `${card.code} · ${card.name}`,
+    sub: card.english,
+  });
 
   return (
     <div className="min-h-screen" style={{ background: "#fff", color: "#1f1f1f" }}>
@@ -108,6 +118,13 @@ export default async function GlossaryDetailPage({
               <p className="border-t pt-5 text-xs leading-5" style={{ borderColor: "#e5e5e5", color: "#888" }}>内容参考《国际贸易实务》第七版相关章节整理，定义为独立编写的学习提示。</p>
             </div>
           </section>
+
+          <div className="mt-7">
+            <PrevNextNav
+              prev={previousCard ? toNavigationLink(previousCard) : null}
+              next={nextCard ? toNavigationLink(nextCard) : null}
+            />
+          </div>
         </div>
       </main>
       <Footer />

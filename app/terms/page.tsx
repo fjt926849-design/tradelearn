@@ -127,7 +127,7 @@ export default function TermsPage() {
       <Header />
       <main className="flex-1 bg-[var(--color-bg-soft)]">
         <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8 lg:py-12">
-          <BackButton fallbackRoute="/knowledge-map" label="返回课程地图" />
+          <BackButton fallbackRoute="/terms-preview" label="返回术语篇章" />
           <section className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-end">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--color-accent)" }}>TRADE TERMS · INCOTERMS® 2020</p>

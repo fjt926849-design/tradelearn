@@ -52,7 +52,7 @@ export default function StartPage() {
             </div>
             <div className="flex gap-2">
               <Link href="/terms" className="inline-flex items-center px-4 py-2.5 text-sm font-medium rounded-md border" style={{ borderColor: "var(--color-text)" }}>进入第一课 →</Link>
-              <Link href="/knowledge-map" className="inline-flex items-center px-4 py-2.5 text-sm rounded-md border" style={{ borderColor: "var(--color-border)" }}>查看课程地图</Link>
+              <Link href="/terms-preview" className="inline-flex items-center px-4 py-2.5 text-sm rounded-md border" style={{ borderColor: "var(--color-border)" }}>查看术语卡片</Link>
             </div>
           </section>
         )}

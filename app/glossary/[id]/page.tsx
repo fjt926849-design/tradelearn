@@ -27,7 +27,6 @@ export default async function GlossaryDetailPage({
   const cardIndex = termLibraryCards.findIndex((card) => card.id === entry.id);
   const previousCard = cardIndex > 0 ? termLibraryCards[cardIndex - 1] : null;
   const nextCard = cardIndex >= 0 && cardIndex < termLibraryCards.length - 1 ? termLibraryCards[cardIndex + 1] : null;
-  const chapterHref = `/knowledge-map/chapter/${entry.chapterId}`;
   const toNavigationLink = (card: (typeof termLibraryCards)[number]): PrevNextLink => ({
     href: card.href,
     label: `${card.code} · ${card.name}`,
@@ -79,7 +78,6 @@ export default async function GlossaryDetailPage({
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#999" }}>业务场景</p>
                   <p className="mt-2 text-sm leading-6" style={{ color: "#555" }}>{entry.scenario}</p>
                 </div>
-                <Link href={chapterHref} className="mt-5 inline-flex items-center rounded-xl border bg-white/70 px-3 py-2 text-xs font-medium transition hover:bg-white" style={{ borderColor: "#d8d8d8", color: "#555" }}>查看对应章节 <span className="ml-1" aria-hidden="true">→</span></Link>
               </section>
 
               <section>

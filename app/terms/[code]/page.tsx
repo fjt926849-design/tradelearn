@@ -3,7 +3,6 @@ import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { tradeTerms, getTermByCode } from "@/data/trade-terms";
-import { settlementConcepts } from "@/data/settlement-concepts";
 import { getModuleNav, getPrevNext } from "@/lib/navigation";
 import PrevNextNav from "@/components/learn/PrevNextNav";
 import BackButton from "@/components/learn/BackButton";
@@ -24,9 +23,6 @@ export default async function TermDetailPage({
 
   const relatedTerms = tradeTerms.filter(
     (item) => item.category === term.category && item.code !== term.code,
-  );
-  const relatedSettlement = settlementConcepts.filter((concept) =>
-    concept.relatedIncotermCodes.includes(term.code),
   );
   const nav = getModuleNav("incoterms");
   const normalizedCode = code.toLowerCase();
@@ -125,11 +121,6 @@ export default async function TermDetailPage({
                     return <div key={difference.term} className="rounded-2xl border bg-white/55 p-4" style={{ borderColor: "#e3e3e3" }}><Link href={`/terms/${difference.term.toLowerCase()}`} className="inline-flex items-center gap-2 text-sm font-medium hover:underline">{difference.term}<span style={{ color: "#777" }}>{related?.chineseName}</span><span style={{ color: "#888" }}>↗</span></Link><p className="mt-3 text-sm leading-6" style={{ color: "#555" }}>{difference.diff}</p></div>;
                   })}
                 </div>
-              </section>}
-
-              {relatedSettlement.length > 0 && <section>
-                <SectionHeading eyebrow="RELATED" title="相关业务资料" />
-                <div className="mt-4 flex flex-wrap gap-2">{relatedSettlement.map((concept) => <Link key={concept.id} href={`/settlement/${concept.id}`} className="rounded-full border bg-white/60 px-3 py-2 text-xs hover:bg-[#f3f3f3]" style={{ borderColor: "#dedede" }}>{concept.title}</Link>)}</div>
               </section>}
 
               {relatedTerms.length > 0 && <section className="border-t pt-7" style={{ borderColor: "#e5e5e5" }}>

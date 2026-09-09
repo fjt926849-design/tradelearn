@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import { termLibraryCards } from "@/data/term-library";
@@ -9,19 +9,27 @@ import { useTermCardProgress } from "@/hooks/useTermCardProgress";
 
 export default function HomePage() {
   const { getStatus, records } = useTermCardProgress();
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setHydrated(true), 0);
+    return () => window.clearTimeout(timer);
+  }, []);
   const continueTerm = useMemo(() => {
+    const statusFor = (termId: string) => hydrated ? getStatus(termId) : "new";
     const latestStarted = termLibraryCards
       .map((term) => ({
         term,
-        status: getStatus(term.id),
-        lastOpenedAt: records[term.id]?.lastOpenedAt ?? 0,
+        status: statusFor(term.id),
+        lastOpenedAt: hydrated ? records[term.id]?.lastOpenedAt ?? 0 : 0,
       }))
       .filter(({ status, lastOpenedAt }) => status !== "mastered" && lastOpenedAt > 0)
       .sort((a, b) => b.lastOpenedAt - a.lastOpenedAt)[0];
 
-    return latestStarted?.term ?? termLibraryCards.find((term) => getStatus(term.id) === "new") ?? termLibraryCards[0];
-  }, [getStatus, records]);
-  const isLearning = getStatus(continueTerm.id) === "learning";
+    return latestStarted?.term ?? termLibraryCards.find((term) => statusFor(term.id) === "new") ?? termLibraryCards[0];
+  }, [getStatus, hydrated, records]);
+  const isLearning = hydrated && getStatus(continueTerm.id) === "learning";
+  const startedCount = hydrated ? Object.keys(records).length : 0;
+  const masteredCount = hydrated ? Object.values(records).filter((record) => record.status === "mastered").length : 0;
   const steps = [
     ["01", "浏览篇章", "先建立术语地图"],
     ["02", "打开卡片", "认识缩写和中文含义"],
@@ -48,8 +56,8 @@ export default function HomePage() {
 
           <section className="home-progress" aria-label="学习进度">
             <div><span className="progress-value">{termLibraryCards.length}</span><span>张术语卡片</span></div>
-            <div><span className="progress-value">{records ? Object.keys(records).length : 0}</span><span>已开始学习</span></div>
-            <div className="progress-track-wrap"><div className="progress-track"><span style={{ width: `${Math.min(100, Math.max(0, (Object.values(records).filter((r) => r.status === "mastered").length / termLibraryCards.length) * 100))}%` }} /></div><span>{Math.round((Object.values(records).filter((r) => r.status === "mastered").length / termLibraryCards.length) * 100) || 0}% 已掌握</span></div>
+            <div><span className="progress-value">{startedCount}</span><span>已开始学习</span></div>
+            <div className="progress-track-wrap"><div className="progress-track"><span style={{ width: `${Math.min(100, Math.max(0, (masteredCount / termLibraryCards.length) * 100))}%` }} /></div><span>{Math.round((masteredCount / termLibraryCards.length) * 100) || 0}% 已掌握</span></div>
           </section>
 
           <section className="home-workspace">

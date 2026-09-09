@@ -30,7 +30,7 @@ export default function TermProgressAction({ termId }: { termId: string }) {
             onClick={option.onSelect}
             aria-pressed={isActive}
             className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition hover:brightness-95"
-            style={{ borderColor: option.border, color: option.color, background: isActive ? option.background : "transparent", boxShadow: isActive ? "inset 0 0 0 1px rgba(0,0,0,.02)" : "none" }}
+            style={{ borderColor: isActive ? option.border : "#d8d8d8", color: isActive ? option.color : "#666", background: isActive ? option.background : "transparent", boxShadow: isActive ? "inset 0 0 0 1px rgba(0,0,0,.02)" : "none" }}
           >
             <span aria-hidden="true">{option.dot}</span>
             {option.label}

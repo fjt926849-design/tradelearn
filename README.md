@@ -2,7 +2,7 @@
 
 国际贸易知识系统学习工具。以黎孝先《国际贸易实务》第七版为课程骨架，逐步覆盖五篇二十二章，并通过间隔复习系统和场景实战帮助零基础学习者建立外贸能力。
 
-**线上地址：** [tradelearn-lake.vercel.app](https://tradelearn-lake.vercel.app)
+**线上地址：** [tradelearn.dpdns.org](https://tradelearn.dpdns.org)
 
 ## ✨ 功能
 

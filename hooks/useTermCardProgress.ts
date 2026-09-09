@@ -7,7 +7,7 @@ import { useLocalStorage } from "@/hooks/useLocalStorage";
 import type { LearnStatus } from "@/lib/types";
 
 const STORAGE_KEY = "tradelearn-term-card-progress-v1";
-type TermCardStatus = "new" | "learning" | "mastered";
+type TermCardStatus = "new" | "learning" | "mastered" | "review";
 
 interface TermCardRecord {
   status: TermCardStatus;
@@ -38,7 +38,7 @@ export function useTermCardProgress() {
   const markOpened = useCallback((termId: string) => {
     setRecords((previous) => {
       const current = previous[termId];
-      if (current?.status === "mastered" || current?.status === "learning") {
+      if (current?.status === "mastered" || current?.status === "learning" || current?.status === "review") {
         return { ...previous, [termId]: { ...current, lastOpenedAt: Date.now() } };
       }
       return { ...previous, [termId]: { status: "learning", lastOpenedAt: Date.now() } };
@@ -59,5 +59,12 @@ export function useTermCardProgress() {
     }));
   }, [setRecords]);
 
-  return { getStatus, markOpened, markMastered, markNew, records };
+  const markReview = useCallback((termId: string) => {
+    setRecords((previous) => ({
+      ...previous,
+      [termId]: { status: "review", lastOpenedAt: Date.now() },
+    }));
+  }, [setRecords]);
+
+  return { getStatus, markOpened, markMastered, markNew, markReview, records };
 }

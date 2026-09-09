@@ -42,7 +42,7 @@ function shuffle(ids: string[]) {
 export default function TermFlashcardReview() {
   const searchParams = useSearchParams();
   const targetId = searchParams.get("term");
-  const { getStatus, markOpened, markMastered, markNew } = useTermCardProgress();
+  const { getStatus, markOpened, markMastered, markReview } = useTermCardProgress();
   const [mode, setMode] = useState<ReviewMode>("pending");
   const [sessionIds, setSessionIds] = useState(() => getInitialQueue(getStatus, targetId, "pending"));
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -78,7 +78,7 @@ export default function TermFlashcardReview() {
 
     if (nextRating === "mastered") markMastered(currentCard.id);
     if (nextRating === "learning") markOpened(currentCard.id);
-    if (nextRating === "again") markNew(currentCard.id);
+    if (nextRating === "again") markReview(currentCard.id);
     setSessionRatings((previous) => ({ ...previous, [currentCard.id]: nextRating }));
     setRating(nextRating);
   };

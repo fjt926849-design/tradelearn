@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 import { useTermCardProgress } from "@/hooks/useTermCardProgress";
 
 export default function TermProgressAction({ termId }: { termId: string }) {
-  const { getStatus, markOpened, markMastered, markNew } = useTermCardProgress();
+  const { getStatus, markMastered, markNew, markReview } = useTermCardProgress();
   const hydrated = useSyncExternalStore(
     () => () => undefined,
     () => true,
@@ -12,25 +12,31 @@ export default function TermProgressAction({ termId }: { termId: string }) {
   );
   const status = hydrated ? getStatus(termId) : "new";
 
-  useEffect(() => {
-    markOpened(termId);
-  }, [markOpened, termId]);
+  const activeStatus = status === "mastered" || status === "review" ? status : "new";
+  const statusOptions = [
+    { key: "new", label: "未完成", dot: "○", color: "#666", border: "#d8d8d8", background: "#f7f7f7", onSelect: () => markNew(termId) },
+    { key: "mastered", label: "已掌握", dot: "●", color: "#2f7d55", border: "#b9ddc8", background: "#effaf3", onSelect: () => markMastered(termId) },
+    { key: "review", label: "再看看", dot: "●", color: "#b33a3a", border: "#edb7b7", background: "#fff2f2", onSelect: () => markReview(termId) },
+  ] as const;
 
-  const isMastered = status === "mastered";
-  const statusColor = isMastered ? "#b33a3a" : status === "learning" ? "#2f7d55" : "#666";
-  const statusBorder = isMastered ? "#edb7b7" : status === "learning" ? "#b9ddc8" : "#d8d8d8";
-  const statusBackground = isMastered ? "#fff2f2" : status === "learning" ? "#effaf3" : "#f7f7f7";
-  const actionColor = isMastered ? "#b33a3a" : "#2f7d55";
-  const actionBackground = isMastered ? "#fff2f2" : "#effaf3";
   return (
     <div className="mt-4 flex flex-wrap items-center gap-3">
-      <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium" style={{ borderColor: statusBorder, color: statusColor, background: statusBackground }}>
-        <span aria-hidden="true">{isMastered ? "●" : status === "learning" ? "◉" : "○"}</span>
-        {isMastered ? "已掌握" : status === "learning" ? "学习中" : "未开始"}
-      </span>
-      <button type="button" onClick={() => (isMastered ? markNew(termId) : markMastered(termId))} className="rounded-xl border px-3 py-2 text-xs font-medium transition hover:brightness-95" style={{ borderColor: statusBorder, color: actionColor, background: actionBackground }}>
-        {isMastered ? "取消掌握" : "标记为已掌握"}
-      </button>
+      {statusOptions.map((option) => {
+        const isActive = activeStatus === option.key;
+        return (
+          <button
+            key={option.key}
+            type="button"
+            onClick={option.onSelect}
+            aria-pressed={isActive}
+            className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition hover:brightness-95"
+            style={{ borderColor: option.border, color: option.color, background: isActive ? option.background : "transparent", boxShadow: isActive ? "inset 0 0 0 1px rgba(0,0,0,.02)" : "none" }}
+          >
+            <span aria-hidden="true">{option.dot}</span>
+            {option.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

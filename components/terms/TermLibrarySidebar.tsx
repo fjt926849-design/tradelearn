@@ -31,7 +31,18 @@ function readSidebarRecords() {
 
 function useSidebarStatus() {
   const records = useSyncExternalStore(
-    () => () => undefined,
+    (onStoreChange) => {
+      const handleProgressUpdate = () => {
+        cachedSidebarRecords = null;
+        onStoreChange();
+      };
+      window.addEventListener("storage", handleProgressUpdate);
+      window.addEventListener("tradelearn-progress-updated", handleProgressUpdate);
+      return () => {
+        window.removeEventListener("storage", handleProgressUpdate);
+        window.removeEventListener("tradelearn-progress-updated", handleProgressUpdate);
+      };
+    },
     readSidebarRecords,
     () => emptySidebarRecords,
   );
@@ -118,6 +129,8 @@ function ChapterList({
               {chapter.terms.map((term) => {
                 const isCurrent = term.id === currentId;
                 const status = getStatus(term.id);
+                const isMastered = status === "mastered";
+                const isLearning = status === "learning";
                 return (
                   <Link
                     key={term.id}
@@ -125,12 +138,12 @@ function ChapterList({
                     aria-current={isCurrent ? "page" : undefined}
                     className="flex items-center gap-2 rounded-lg border px-2.5 py-2 transition-colors hover:bg-white"
                     style={{
-                      borderColor: isCurrent ? "#bdbdbd" : "transparent",
-                      background: isCurrent ? "#f5f5f5" : "transparent",
+                      borderColor: isMastered ? "#b9ddc8" : isCurrent ? "#bdbdbd" : "transparent",
+                      background: isMastered ? "#effaf3" : isCurrent ? "#f5f5f5" : "transparent",
                     }}
                   >
-                    <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: status === "mastered" ? "#2f7d55" : status === "learning" ? "#8bb69c" : "#d2d2d2" }} aria-hidden="true" />
-                    <span className="min-w-0 flex-1 truncate text-xs" style={{ color: isCurrent ? "#222" : "#555", fontWeight: isCurrent ? 600 : 400 }}>{term.code} <span style={{ color: isCurrent ? "#555" : "#888" }}>{term.name}</span></span>
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: isMastered ? "#2f7d55" : isLearning ? "#8bb69c" : "#d2d2d2" }} aria-hidden="true" />
+                    <span className="min-w-0 flex-1 truncate text-xs" style={{ color: isMastered ? "#2f7d55" : isCurrent ? "#222" : "#555", fontWeight: isMastered || isCurrent ? 600 : 400 }}>{term.code} <span style={{ color: isMastered ? "#4c8a68" : isCurrent ? "#555" : "#888" }}>{term.name}</span></span>
                     <span className="text-[11px]" style={{ color: "#aaa" }} aria-hidden="true">↗</span>
                   </Link>
                 );

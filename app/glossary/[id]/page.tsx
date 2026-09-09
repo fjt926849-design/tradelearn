@@ -7,6 +7,7 @@ import { tradeGlossary } from "@/data/trade-glossary";
 import { termLibraryCards } from "@/data/term-library";
 import PrevNextNav, { type PrevNextLink } from "@/components/learn/PrevNextNav";
 import TermProgressAction from "@/components/terms/TermProgressAction";
+import TermLibrarySidebar from "@/components/terms/TermLibrarySidebar";
 
 export async function generateStaticParams() {
   return tradeGlossary.map((entry) => ({ id: entry.id }));
@@ -37,19 +38,22 @@ export default async function GlossaryDetailPage({
     <div className="min-h-screen" style={{ background: "#fff", color: "#1f1f1f" }}>
       <Header />
       <main>
-        <div className="mx-auto max-w-5xl px-5 py-8 sm:px-8 lg:py-12">
+        <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:py-12">
           <BackButton fallbackRoute="/terms-preview" label="返回术语篇章" />
 
-          <div className="mt-8 flex items-center justify-between gap-4 text-xs" style={{ color: "#888" }}>
-            <nav aria-label="当前位置" className="flex items-center gap-2">
-              <Link href="/terms-preview" className="hover:text-[#222]">术语篇章</Link>
-              <span aria-hidden="true">/</span>
-              <span style={{ color: "#444" }}>{entry.group}</span>
-            </nav>
-            <span>{entry.chapterLabel}</span>
-          </div>
+          <div className="mt-8 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-8">
+            <TermLibrarySidebar currentId={entry.id} currentChapterId={`glossary-${entry.group}`} />
+            <div className="min-w-0">
+              <div className="flex items-center justify-between gap-4 text-xs" style={{ color: "#888" }}>
+                <nav aria-label="当前位置" className="flex items-center gap-2">
+                  <Link href="/terms-preview" className="hover:text-[#222]">术语篇章</Link>
+                  <span aria-hidden="true">/</span>
+                  <span style={{ color: "#444" }}>{entry.group}</span>
+                </nav>
+                <span>{entry.chapterLabel}</span>
+              </div>
 
-          <section className="mt-4 overflow-hidden rounded-[28px] border" style={{ borderColor: "#dcdcdc", background: "rgba(250,250,250,.72)", boxShadow: "0 18px 50px rgba(0,0,0,.06)" }}>
+              <section className="mt-4 overflow-hidden rounded-[28px] border" style={{ borderColor: "#dcdcdc", background: "rgba(250,250,250,.72)", boxShadow: "0 18px 50px rgba(0,0,0,.06)" }}>
             <div className="border-b px-6 py-9 sm:px-10 sm:py-12" style={{ borderColor: "#dedede", background: "rgba(245,245,245,.72)", backdropFilter: "blur(14px)" }}>
               <div className="flex flex-wrap items-start justify-between gap-6">
                 <div>
@@ -119,13 +123,15 @@ export default async function GlossaryDetailPage({
 
               <p className="border-t pt-5 text-xs leading-5" style={{ borderColor: "#e5e5e5", color: "#888" }}>内容参考《国际贸易实务》第七版相关章节整理，定义为独立编写的学习提示。</p>
             </div>
-          </section>
+              </section>
 
-          <div className="mt-7">
-            <PrevNextNav
-              prev={previousCard ? toNavigationLink(previousCard) : null}
-              next={nextCard ? toNavigationLink(nextCard) : null}
-            />
+              <div className="mt-7">
+                <PrevNextNav
+                  prev={previousCard ? toNavigationLink(previousCard) : null}
+                  next={nextCard ? toNavigationLink(nextCard) : null}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </main>

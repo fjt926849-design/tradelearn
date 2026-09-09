@@ -7,6 +7,7 @@ import { getModuleNav, getPrevNext } from "@/lib/navigation";
 import PrevNextNav from "@/components/learn/PrevNextNav";
 import BackButton from "@/components/learn/BackButton";
 import TermProgressAction from "@/components/terms/TermProgressAction";
+import TermLibrarySidebar from "@/components/terms/TermLibrarySidebar";
 
 export async function generateStaticParams() {
   return tradeTerms.map((term) => ({ code: term.code.toLowerCase() }));
@@ -33,19 +34,22 @@ export default async function TermDetailPage({
     <div className="min-h-screen" style={{ background: "#fff", color: "#1f1f1f" }}>
       <Header />
       <main>
-        <div className="mx-auto max-w-5xl px-5 py-8 sm:px-8 lg:py-12">
+        <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:py-12">
           <BackButton fallbackRoute="/terms-preview" label="返回术语卡片" />
 
-          <div className="mt-8 flex items-center justify-between gap-4 text-xs" style={{ color: "#888" }}>
-            <nav aria-label="当前位置" className="flex items-center gap-2">
-              <Link href="/terms-preview" className="hover:text-[#222]">术语卡片</Link>
-              <span aria-hidden="true">/</span>
-              <span style={{ color: "#444" }}>{term.code}</span>
-            </nav>
-            <span>{String(index + 1).padStart(2, "0")} / {String(nav.length).padStart(2, "0")}</span>
-          </div>
+          <div className="mt-8 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-8">
+            <TermLibrarySidebar currentId={term.code} currentChapterId="trade-terms" />
+            <div className="min-w-0">
+              <div className="flex items-center justify-between gap-4 text-xs" style={{ color: "#888" }}>
+                <nav aria-label="当前位置" className="flex items-center gap-2">
+                  <Link href="/terms-preview" className="hover:text-[#222]">术语卡片</Link>
+                  <span aria-hidden="true">/</span>
+                  <span style={{ color: "#444" }}>{term.code}</span>
+                </nav>
+                <span>{String(index + 1).padStart(2, "0")} / {String(nav.length).padStart(2, "0")}</span>
+              </div>
 
-          <section className="mt-4 overflow-hidden rounded-[28px] border" style={{ borderColor: "#dcdcdc", background: "rgba(250,250,250,.72)", boxShadow: "0 18px 50px rgba(0,0,0,.06)" }}>
+              <section className="mt-4 overflow-hidden rounded-[28px] border" style={{ borderColor: "#dcdcdc", background: "rgba(250,250,250,.72)", boxShadow: "0 18px 50px rgba(0,0,0,.06)" }}>
             <div className="border-b px-6 py-9 sm:px-10 sm:py-12" style={{ borderColor: "#dedede", background: "rgba(245,245,245,.72)", backdropFilter: "blur(14px)" }}>
               <div className="flex flex-wrap items-start justify-between gap-6">
                 <div>
@@ -128,9 +132,11 @@ export default async function TermDetailPage({
                 <div className="mt-3 flex flex-wrap gap-2">{relatedTerms.map((related) => <Link key={related.code} href={`/terms/${related.code.toLowerCase()}`} className="rounded-full border bg-white/60 px-3 py-2 text-xs hover:bg-[#f3f3f3]" style={{ borderColor: "#dedede" }}><span className="font-medium">{related.code}</span><span className="ml-2" style={{ color: "#777" }}>{related.chineseName}</span></Link>)}</div>
               </section>}
             </div>
-          </section>
+              </section>
 
-          <div className="mt-7"><PrevNextNav prev={prev} next={next} /></div>
+              <div className="mt-7"><PrevNextNav prev={prev} next={next} /></div>
+            </div>
+          </div>
         </div>
       </main>
       <Footer />

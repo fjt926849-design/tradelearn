@@ -9,12 +9,12 @@ import { tradeGlossary } from "@/data/trade-glossary";
 import { tradeTerms } from "@/data/trade-terms";
 import { useTermCardProgress } from "@/hooks/useTermCardProgress";
 
-type Rating = "again" | "learning" | "mastered";
+type Rating = "again" | "review" | "mastered";
 type ReviewMode = "pending" | "learned";
 
 const ratingLabels: Record<Rating, string> = {
   again: "再看一次",
-  learning: "学习中",
+  review: "再看看",
   mastered: "已掌握",
 };
 
@@ -42,7 +42,7 @@ function shuffle(ids: string[]) {
 export default function TermFlashcardReview() {
   const searchParams = useSearchParams();
   const targetId = searchParams.get("term");
-  const { getStatus, markOpened, markMastered, markReview } = useTermCardProgress();
+  const { getStatus, markNew, markMastered, markReview } = useTermCardProgress();
   const [mode, setMode] = useState<ReviewMode>("pending");
   const [sessionIds, setSessionIds] = useState(() => getInitialQueue(getStatus, targetId, "pending"));
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -77,8 +77,8 @@ export default function TermFlashcardReview() {
     if (!currentCard || !flipped) return;
 
     if (nextRating === "mastered") markMastered(currentCard.id);
-    if (nextRating === "learning") markOpened(currentCard.id);
-    if (nextRating === "again") markReview(currentCard.id);
+    if (nextRating === "review") markReview(currentCard.id);
+    if (nextRating === "again") markNew(currentCard.id);
     setSessionRatings((previous) => ({ ...previous, [currentCard.id]: nextRating }));
     setRating(nextRating);
   };
@@ -133,13 +133,13 @@ export default function TermFlashcardReview() {
     </div>
   );
   const sessionSeenCount = sessionSeenIds.length;
-  const sessionLearningCount = Object.values(sessionRatings).filter((value) => value === "learning").length;
+  const sessionReviewCount = Object.values(sessionRatings).filter((value) => value === "review").length;
   const sessionMasteredCount = Object.values(sessionRatings).filter((value) => value === "mastered").length;
   const sessionStats = (
     <div className="mb-6 grid grid-cols-3 gap-2">
       {[
         { label: "本轮已看", value: sessionSeenCount },
-        { label: "学习中", value: sessionLearningCount },
+        { label: "再看看", value: sessionReviewCount },
         { label: "已掌握", value: sessionMasteredCount },
       ].map((stat) => (
         <div key={stat.label} className="rounded-xl border px-3 py-3 text-center" style={{ borderColor: "var(--color-border)", background: "var(--color-bg-soft)" }}>
@@ -161,7 +161,7 @@ export default function TermFlashcardReview() {
         <h1 className="text-2xl font-semibold tracking-tight">{mode === "learned" && sessionIds.length === 0 ? "还没有已学习的术语" : "这一轮术语复习完成"}</h1>
         {sessionIds.length > 0 && <div className="mx-auto mt-6 max-w-md text-left">{sessionStats}</div>}
         <p className="mx-auto mt-3 max-w-md text-sm leading-6" style={{ color: "var(--color-text-muted)" }}>
-          {mode === "learned" && sessionIds.length === 0 ? "先在待掌握术语中翻看并标记“学习中”，之后就可以从已学习卡片中随机抽取复习。" : `本轮共处理 ${sessionIds.length} 张卡片。已掌握的术语会自动从下一轮复习中暂时移出。`}
+          {mode === "learned" && sessionIds.length === 0 ? "先在待掌握术语中翻看并标记“再看看”，之后就可以从已学习卡片中随机抽取复习。" : `本轮共处理 ${sessionIds.length} 张卡片。已掌握的术语会自动从下一轮复习中暂时移出。`}
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           {sessionIds.length > 0 && <button type="button" onClick={restart} className="rounded-lg border px-4 py-2.5 text-sm transition-colors hover:bg-gray-50" style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)" }}>再看一遍</button>}
@@ -228,11 +228,11 @@ export default function TermFlashcardReview() {
       <div className="mt-5 rounded-xl border p-4" style={{ borderColor: "var(--color-border)", background: "var(--color-bg-soft)" }}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>{rating ? `已标记为「${ratingLabels[rating]}」` : "看完释义后选择掌握程度"}</p>
-          {status !== "new" && !rating && <span className="text-xs" style={{ color: status === "mastered" ? "#b33a3a" : "#2f7d55" }}>{status === "mastered" ? "已掌握" : "学习中"}</span>}
+          {status !== "new" && !rating && <span className="text-xs" style={{ color: status === "mastered" ? "#2f7d55" : status === "review" || status === "learning" ? "#b33a3a" : "#666" }}>{status === "mastered" ? "已掌握" : status === "review" || status === "learning" ? "再看看" : "未完成"}</span>}
         </div>
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
-          {(["again", "learning", "mastered"] as Rating[]).map((option) => (
-            <button key={option} type="button" disabled={!flipped || Boolean(rating)} onClick={() => handleRating(option)} className="rounded-lg border px-3 py-2.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-45" style={{ borderColor: option === "mastered" ? "#efb5b5" : option === "learning" ? "#b8dcc7" : "var(--color-border)", background: rating === option ? (option === "mastered" ? "#fff1f1" : option === "learning" ? "#effaf3" : "var(--color-bg)") : "var(--color-bg)", color: option === "mastered" ? "#b33a3a" : option === "learning" ? "#2f7d55" : "var(--color-text-secondary)" }}>
+          {(["again", "review", "mastered"] as Rating[]).map((option) => (
+            <button key={option} type="button" disabled={!flipped || Boolean(rating)} onClick={() => handleRating(option)} className="rounded-lg border px-3 py-2.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-45" style={{ borderColor: rating === option ? (option === "mastered" ? "#b9ddc8" : option === "review" ? "#edb7b7" : "var(--color-border)") : "var(--color-border)", background: rating === option ? (option === "mastered" ? "#effaf3" : option === "review" ? "#fff2f2" : "var(--color-bg-soft)") : "var(--color-bg)", color: rating === option ? (option === "mastered" ? "#2f7d55" : option === "review" ? "#b33a3a" : "var(--color-text-secondary)") : "var(--color-text-secondary)" }}>
               {ratingLabels[option]}
             </button>
           ))}

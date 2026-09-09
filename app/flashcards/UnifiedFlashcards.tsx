@@ -7,7 +7,7 @@ export default function UnifiedFlashcards() {
   return (
     <>
       <Header />
-      <main className="flex-1 mx-auto w-full max-w-2xl px-5 py-10">
+      <main className="flex-1 mx-auto w-full max-w-4xl px-5 py-10">
         <BackButton fallbackRoute="/terms-preview" label="返回术语卡片" />
         <div className="mt-8">
           <TermFlashcardReview />

@@ -14,6 +14,9 @@ type CardProgressRow = {
   interval_ms: number;
 };
 
+type LegacyCardProgressRow = Omit<CardProgressRow, "curriculum_version">;
+let cardProgressSchema: "unknown" | "versioned" | "legacy" = "unknown";
+
 function describeSyncError(error: unknown): string {
   if (error instanceof Error) return error.message;
   if (typeof error === "object" && error !== null) {
@@ -26,6 +29,25 @@ function describeSyncError(error: unknown): string {
     });
   }
   return String(error);
+}
+
+function isMissingCurriculumVersion(error: unknown): boolean {
+  if (typeof error !== "object" || error === null) return false;
+  const value = error as Record<string, unknown>;
+  return value.code === "PGRST204" && String(value.message ?? "").includes("curriculum_version");
+}
+
+function toLegacyCardProgressRow(row: CardProgressRow): LegacyCardProgressRow {
+  return {
+    user_id: row.user_id,
+    module_id: row.module_id,
+    concept_id: row.concept_id,
+    status: row.status,
+    last_reviewed: row.last_reviewed,
+    next_review_at: row.next_review_at,
+    review_count: row.review_count,
+    interval_ms: row.interval_ms,
+  };
 }
 
 function toCardProgressRow(
@@ -69,11 +91,26 @@ export async function syncCardProgress(
   const userId = getDeviceId();
   if (!userId) return;
   try {
-    const { error } = await sb
-      .from("card_progress")
-      .upsert(toCardProgressRow(userId, moduleId, { ...progress, termCode: conceptId }), {
+    const row = toCardProgressRow(userId, moduleId, { ...progress, termCode: conceptId });
+    let error;
+    if (cardProgressSchema === "legacy") {
+      ({ error } = await sb.from("card_progress").upsert(toLegacyCardProgressRow(row), {
+        onConflict: "user_id,module_id,concept_id",
+      }));
+    } else {
+      ({ error } = await sb.from("card_progress").upsert(row, {
         onConflict: "user_id,curriculum_version,module_id,concept_id",
+      }));
+    }
+    if (error && isMissingCurriculumVersion(error)) {
+      cardProgressSchema = "legacy";
+      const fallback = await sb.from("card_progress").upsert(toLegacyCardProgressRow(row), {
+        onConflict: "user_id,module_id,concept_id",
       });
+      error = fallback.error;
+    } else if (!error) {
+      cardProgressSchema = cardProgressSchema === "legacy" ? "legacy" : "versioned";
+    }
     if (error) throw error;
   } catch (e) {
     console.warn("[supabase] card_progress sync failed", describeSyncError(e));
@@ -94,10 +131,29 @@ export async function syncStoredCardProgress(
   if (!userId || progress.length === 0) return;
 
   try {
-    const { error } = await sb.from("card_progress").upsert(
-      progress.map((item) => toCardProgressRow(userId, moduleId, item)),
-      { onConflict: "user_id,curriculum_version,module_id,concept_id" }
-    );
+    const rows = progress.map((item) => toCardProgressRow(userId, moduleId, item));
+    let error;
+    if (cardProgressSchema === "legacy") {
+      ({ error } = await sb.from("card_progress").upsert(
+        rows.map(toLegacyCardProgressRow),
+        { onConflict: "user_id,module_id,concept_id" },
+      ));
+    } else {
+      ({ error } = await sb.from("card_progress").upsert(
+        rows,
+        { onConflict: "user_id,curriculum_version,module_id,concept_id" },
+      ));
+    }
+    if (error && isMissingCurriculumVersion(error)) {
+      cardProgressSchema = "legacy";
+      const fallback = await sb.from("card_progress").upsert(
+        rows.map(toLegacyCardProgressRow),
+        { onConflict: "user_id,module_id,concept_id" },
+      );
+      error = fallback.error;
+    } else if (!error) {
+      cardProgressSchema = cardProgressSchema === "legacy" ? "legacy" : "versioned";
+    }
     if (error) throw error;
   } catch (e) {
     console.warn(

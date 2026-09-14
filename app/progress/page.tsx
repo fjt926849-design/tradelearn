@@ -1,17 +1,25 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { deepKnowledgePointCount } from "@/data/learning-architecture";
 import { termLibraryCards, termLibraryChapters } from "@/data/term-library";
+import { useProgressAggregator } from "@/hooks/useProgressAggregator";
 import { useTermCardProgress } from "@/hooks/useTermCardProgress";
 
 export default function ProgressPage() {
   const { getStatus } = useTermCardProgress();
+  const { aggregated, modules } = useProgressAggregator();
+  const hydrated = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  );
   const progressById = useMemo(
-    () => new Map(termLibraryCards.map((card) => [card.id, getStatus(card.id)] as const)),
-    [getStatus],
+    () => new Map(termLibraryCards.map((card) => [card.id, hydrated ? getStatus(card.id) : "new"] as const)),
+    [getStatus, hydrated],
   );
   const chapterStats = useMemo(
     () => termLibraryChapters.map((chapter) => {
@@ -43,7 +51,13 @@ export default function ProgressPage() {
 
           <section className="mt-10"><div className="flex items-end justify-between gap-3"><div><p className="text-[11px] font-semibold uppercase tracking-[0.2em]" style={{ color: "#888" }}>CHAPTER PROGRESS</p><h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">篇章进度</h2></div><Link href="/terms-preview" className="text-sm font-medium" style={{ color: "#555" }}>查看术语卡片 →</Link></div><div className="mt-4 overflow-hidden rounded-2xl border bg-white/70" style={{ borderColor: "#dedede" }}>{chapterStats.map(({ chapter, mastered, learning, percent }, index) => <Link key={chapter.id} href={`/terms-preview#${chapter.id}`} className={`group flex items-center gap-4 px-5 py-5 transition hover:bg-[#fafafa] ${index > 0 ? "border-t" : ""}`} style={{ borderColor: "#e8e8e8" }}><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f1f1f1] text-xs font-semibold" style={{ color: "#555" }}>{chapter.number}</span><span className="min-w-0 flex-1"><span className="flex items-center justify-between gap-3"><span className="text-sm font-semibold">{chapter.title}</span><span className="text-sm tabular-nums" style={{ color: "#555" }}>{mastered} / {chapter.terms.length} 已掌握</span></span><span className="mt-1 block text-xs" style={{ color: "#888" }}>{chapter.description}</span><span className="mt-3 block h-1.5 rounded-full" style={{ background: "#ededed" }}><span className="block h-full rounded-full" style={{ width: `${percent}%`, background: "#222" }} /></span></span><span className="flex shrink-0 items-center gap-2 text-xs" style={{ color: "#888" }}><span className="rounded-full border px-2 py-1 font-medium" style={{ borderColor: mastered === chapter.terms.length ? "#edb7b7" : learning > 0 ? "#b9ddc8" : "#d8d8d8", color: mastered === chapter.terms.length ? "#b33a3a" : learning > 0 ? "#2f7d55" : "#666", background: mastered === chapter.terms.length ? "#fff2f2" : learning > 0 ? "#effaf3" : "#f7f7f7" }}>{learning > 0 ? `${learning} 个学习中` : mastered === chapter.terms.length ? "已完成" : "未开始"}</span><span className="text-lg transition-transform group-hover:translate-x-1" aria-hidden="true">→</span></span></Link>)}</div></section>
 
-          <p className="mt-8 text-xs leading-5" style={{ color: "#888" }}>现有闪卡记录会继续保留；尚未建立学习记录的术语卡片显示为“未开始”。</p>
+          <section className="mt-12 border-t pt-10" style={{ borderColor: "#dedede" }}>
+            <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-[11px] font-semibold uppercase tracking-[0.2em]" style={{ color: "#888" }}>DEEP LEARNING PROGRESS</p><h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em]">深入知识点进度</h2><p className="mt-2 text-sm" style={{ color: "#777" }}>这是 7 个模块、{deepKnowledgePointCount} 个知识点的独立进度，不与 44 张术语卡重复相加。</p></div><Link href="/learn" className="text-sm font-medium" style={{ color: "#555" }}>进入深入学习 →</Link></div>
+            <div className="mt-5 rounded-2xl border p-5 sm:p-6" style={{ borderColor: "#dedede", background: "#f8f8f8" }}><div className="flex items-end justify-between gap-4"><p className="text-4xl font-semibold tracking-[-0.06em]">{hydrated ? aggregated.totalMastered : 0}<span className="ml-2 text-base font-normal" style={{ color: "#888" }}>/ {deepKnowledgePointCount} 已掌握</span></p><span className="text-xl font-medium" style={{ color: "#555" }}>{hydrated ? aggregated.overallProgress : 0}%</span></div><div className="mt-4 h-2 rounded-full bg-[#e8e8e8]"><span className="block h-full rounded-full bg-[#222]" style={{ width: `${hydrated ? aggregated.overallProgress : 0}%` }} /></div></div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">{modules.map((module) => <Link key={module.moduleId} href={module.route} className="rounded-xl border p-4 transition hover:bg-[#fafafa]" style={{ borderColor: "#dedede" }}><span className="flex items-center justify-between gap-3"><span className="text-sm font-semibold">{module.label}</span><span className="text-xs" style={{ color: "#777" }}>{hydrated ? module.mastered + module.familiar : 0} / {module.total}</span></span><span className="mt-3 block h-1.5 rounded-full bg-[#ededed]"><span className="block h-full rounded-full bg-[#333]" style={{ width: `${hydrated ? module.progress : 0}%` }} /></span></Link>)}</div>
+          </section>
+
+          <p className="mt-8 text-xs leading-5" style={{ color: "#888" }}>现有浏览器进度会继续保留并旁路写入 Supabase；当前仍以本地记录为读取主源，尚不等于登录后的跨设备双向同步。</p>
         </div>
       </main>
       <Footer />

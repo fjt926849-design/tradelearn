@@ -1,16 +1,20 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { useTermCardProgress } from "@/hooks/useTermCardProgress";
 
 export default function TermProgressAction({ termId }: { termId: string }) {
-  const { getStatus, markMastered, markNew, markReview } = useTermCardProgress();
+  const { getStatus, markOpened, markMastered, markNew, markReview } = useTermCardProgress();
   const hydrated = useSyncExternalStore(
     () => () => undefined,
     () => true,
     () => false,
   );
   const status = hydrated ? getStatus(termId) : "new";
+
+  useEffect(() => {
+    markOpened(termId);
+  }, [markOpened, termId]);
 
   const activeStatus = status === "mastered" || status === "review" ? status : "new";
   const statusOptions = [

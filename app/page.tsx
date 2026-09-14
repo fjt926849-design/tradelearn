@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
+import { deepKnowledgePointCount } from "@/data/learning-architecture";
 import { termLibraryCards } from "@/data/term-library";
 import { useTermCardProgress } from "@/hooks/useTermCardProgress";
 
@@ -51,11 +52,13 @@ export default function HomePage() {
             <div className="home-intro-actions">
               <Link href="/terms-preview" className="button button-primary">浏览术语篇章 <span aria-hidden="true">→</span></Link>
               <Link href="/flashcards" className="button button-secondary">开始复习</Link>
+              <Link href="/learn" className="button button-secondary">深入学习</Link>
             </div>
           </section>
 
           <section className="home-progress" aria-label="学习进度">
             <div><span className="progress-value">{termLibraryCards.length}</span><span>张术语卡片</span></div>
+            <div><span className="progress-value">{deepKnowledgePointCount}</span><span>个深入知识点</span></div>
             <div><span className="progress-value">{startedCount}</span><span>已开始学习</span></div>
             <div className="progress-track-wrap"><div className="progress-track"><span style={{ width: `${Math.min(100, Math.max(0, (masteredCount / termLibraryCards.length) * 100))}%` }} /></div><span>{Math.round((masteredCount / termLibraryCards.length) * 100) || 0}% 已掌握</span></div>
           </section>

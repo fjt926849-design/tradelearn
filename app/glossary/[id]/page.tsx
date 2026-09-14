@@ -8,6 +8,7 @@ import { termLibraryCards } from "@/data/term-library";
 import PrevNextNav, { type PrevNextLink } from "@/components/learn/PrevNextNav";
 import TermProgressAction from "@/components/terms/TermProgressAction";
 import TermLibrarySidebar from "@/components/terms/TermLibrarySidebar";
+import DeepLearningLinks from "@/components/learn/DeepLearningLinks";
 
 export async function generateStaticParams() {
   return tradeGlossary.map((entry) => ({ id: entry.id }));
@@ -107,6 +108,8 @@ export default async function GlossaryDetailPage({
                   ))}
                 </div>
               </section>}
+
+              <DeepLearningLinks termId={entry.id} />
 
               {relatedEntries.length > 0 && <section className="border-t pt-7" style={{ borderColor: "#e5e5e5" }}>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#888" }}>RELATED</p>

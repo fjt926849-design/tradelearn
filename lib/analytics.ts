@@ -2,6 +2,8 @@
 
 export type LearningEventName =
   | "flashcard_rated"
+  | "term_card_opened"
+  | "term_card_status_changed"
   | "practice_started"
   | "practice_answered"
   | "practice_completed"

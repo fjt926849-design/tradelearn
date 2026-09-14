@@ -65,7 +65,7 @@ main {
 .button-primary:hover { background: var(--color-accent-hover); }
 .button-secondary { color: var(--color-text); border: 1px solid var(--color-border); background: var(--color-surface); }
 .button-secondary:hover { border-color: var(--color-text-secondary); }
-.home-progress { display: grid; grid-template-columns: auto auto minmax(220px, 1fr); align-items: center; gap: 42px; margin: 0 18px; padding: 22px 0; border-bottom: 1px solid #dedede; color: var(--color-text-muted); font-size: 12px; }
+.home-progress { display: grid; grid-template-columns: auto auto auto minmax(220px, 1fr); align-items: center; gap: 32px; margin: 0 18px; padding: 22px 0; border-bottom: 1px solid #dedede; color: var(--color-text-muted); font-size: 12px; }
 .home-progress > div:not(.progress-track-wrap) { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
 .progress-value { color: var(--color-text); font-size: 20px; font-weight: 650; letter-spacing: -.03em; }
 .progress-track-wrap { display: flex; align-items: center; justify-content: end; gap: 12px; }
@@ -93,7 +93,7 @@ main {
   .home-container { padding: 48px 20px 68px; }
   .home-intro { display: block; padding: 40px 20px; border-radius: 22px; }
   .home-intro h1 { font-size: 40px; }
-  .home-intro-actions { flex-direction: row; margin-top: 30px; }
+  .home-intro-actions { flex-flow: row wrap; margin-top: 30px; }
   .home-progress { grid-template-columns: 1fr 1fr; gap: 18px; margin: 0 8px; }
   .progress-track-wrap { grid-column: 1 / -1; justify-content: start; }
   .step-grid { grid-template-columns: 1fr 1fr; }

@@ -1,6 +1,6 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import InsuranceFlashcardDeck from "@/components/flashcards/InsuranceFlashcardDeck";
+import ModuleFlashcardDeck from "@/components/flashcards/ModuleFlashcardDeck";
 import BackButton from "@/components/learn/BackButton";
 
 export default function InsuranceFlashcardsPage() {
@@ -9,7 +9,7 @@ export default function InsuranceFlashcardsPage() {
       <Header />
       <main className="flex-1 max-w-xl mx-auto px-5 py-10">
         <BackButton fallbackRoute="/insurance" label="返回货运保险" />
-        <InsuranceFlashcardDeck />
+        <ModuleFlashcardDeck moduleId="insurance" />
       </main>
       <Footer />
     </>
